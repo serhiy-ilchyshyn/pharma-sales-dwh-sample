@@ -27,7 +27,7 @@ CREATE TABLE [dwh].[FctVisit]
     -- Measures
     [VisitCount]           [int]           NOT NULL,    -- always 1 (fact counter)
     [DurationMinutes]      [int]           NULL,
-    [DetailedProductsCount][int]           NULL,
+    [DetailedProductsCount] [int]          NULL,
     [IsCompleted]          [bit]           NOT NULL,
 
     -- Audit
