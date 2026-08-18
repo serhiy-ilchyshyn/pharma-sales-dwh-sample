@@ -4,8 +4,7 @@
 **5 фактових** і **5 вимірних** таблиць, DDL, генератор синтетичних даних і
 візуальна ER-схема зв'язків.
 
-Модель відтворює конвенції реальних Azure Fabric DWH-репозиторіїв цього каталогу
-(`grp-ctl-azure-dwh`, `grp-fbrc-azure-dwh`): схема `[dwh]`, T-SQL для Microsoft
+Модель відтворює конвенції реальних Azure Fabric DWH-репозиторіїв : схема `[dwh]`, T-SQL для Microsoft
 Fabric Warehouse, Kimball-виміри типу **SCD Type 2** з durable-ключами, member `-1`
 для невідомих значень, аудитні колонки `CreatedBy/CreatedAt/ModifiedBy/ModifiedAt`.
 
