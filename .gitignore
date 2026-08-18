@@ -1,0 +1,14 @@
+# Generated sample data (reproducible via scripts/generate_sample_data.py)
+/data/*.csv
+/data/*.sql
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# OS / IDE
+.DS_Store
+.idea/
+.vscode/
