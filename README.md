@@ -97,6 +97,32 @@ python3 generate_sample_data.py --clients 500 --sales-rows 20000 --seed 7
 - **Реалістичність:** ціни/суми узгоджені (`NetAmount = Gross − Discount`, `StockValue = OnHand × UnitPrice`),
   демонструється SCD2-історія (частина співробітників має закриту + поточну версію).
 
+## Silver level (Fabric Warehouse)
+
+Поверх ERP-джерела зі скриптів `01_ddl_azure_sql.sql` → `02_generate_data_fixed.sql`
+побудована **silver-модель** для Microsoft Fabric Warehouse `whsilverad.dwh`:
+23 виміри, 6 reference-таблиць маппінгу і 5 фактів, з SCD2 + durable-ключами,
+unknown member `-1` та прапорцями якості даних.
+
+```
+fabric-migrations/flyway/
+├── flyway.conf
+└── migrations/
+    ├── V260819.1000__silver_init_creation_create_table.sql   -- Dim / Ref / Fct + DimDate
+    ├── V260819.1010__silver_init_creation_insert.sql         -- рядки -1 + статичні виміри
+    ├── V260819.1020__silver_init_creation_create_view.sql    -- v* view над bronze
+    ├── V260819.1030__silver_init_creation_create_prc.sql     -- spUpsertSCDDimension / spFullFct
+    ├── V260819.1040__silver_insert_DimDate.sql               -- календар
+    └── V260819.1050__silver_create_prc_full_load.sql         -- spSilverFullLoad
+```
+
+Опис моделі, ER-схема, bus matrix, порядок завантаження та обробка дефектів джерела —
+[`docs/silver_model.md`](docs/silver_model.md). Запуск завантаження після міграцій:
+
+```sql
+EXEC [dwh].[spSilverFullLoad] @load_id = 'manual_full_load';
+```
+
 ## Приклади аналітики
 Див. [`docs/sample_queries.sql`](docs/sample_queries.sql): продажі vs план, виконання
 call-плану (факт-візити vs `FctTargetFrequency`), залишки на складі тощо.
