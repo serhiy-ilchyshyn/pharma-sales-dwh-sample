@@ -169,6 +169,9 @@ EXEC [dwh].[spSilverFullLoad] @load_id = 'manual_full_load';
    далі `DimWarehouse` (потребує `RefClientAccount`) і `RefWarehouse`
 5. факти: `FctSales`, `FctInventoryMovement`, `FctVisit`, `FctPrescription`, `FctAdverseEvent`
 
+Повний перелік залежностей між об'єктами (`Object | DependOnObject`) —
+[`docs/silver_dependencies.md`](silver_dependencies.md).
+
 ## 8. Міграції
 
 | Файл | Вміст |
