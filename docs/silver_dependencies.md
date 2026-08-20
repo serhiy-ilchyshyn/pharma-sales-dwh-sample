@@ -10,7 +10,7 @@
 * `dwh.v<Object>` → `dwh.<Object>` — view читає вже завантажений silver-об'єкт
   (резолв durable keys).
 
-## 1. Залежності всередині silver (92 ребер)
+## 1. Залежності всередині silver (92 ребра)
 
 | Object | DependOnObject |
 |---|---|
@@ -107,43 +107,43 @@
 | dwh.vRefWarehouse | dwh.DimSrcSystem |
 | dwh.vRefWarehouse | dwh.DimWarehouse |
 
-## 2. Залежності від bronze (33 ребер)
+## 2. Залежності від bronze: view -> bronze table (33 ребра)
 
 | Object | DependOnObject |
 |---|---|
-| dwh.vDimActivityType | lhbronzead.pharma_erp.DOCTOR_VISITS |
-| dwh.vDimAeOutcome | lhbronzead.pharma_erp.ADVERSE_EVENTS |
-| dwh.vDimAeSeriousness | lhbronzead.pharma_erp.ADVERSE_EVENTS |
-| dwh.vDimChain | lhbronzead.pharma_erp.CUSTOMERS |
-| dwh.vDimCity | lhbronzead.pharma_erp.CUSTOMERS |
-| dwh.vDimCity | lhbronzead.pharma_erp.DOCTORS |
-| dwh.vDimCity | lhbronzead.pharma_erp.WAREHOUSES |
-| dwh.vDimClientAccount | lhbronzead.pharma_erp.CUSTOMERS |
-| dwh.vDimDoctor | lhbronzead.pharma_erp.DOCTORS |
-| dwh.vDimEmployee | lhbronzead.pharma_erp.EMPLOYEES |
-| dwh.vDimLegalEntity | lhbronzead.pharma_erp.CUSTOMERS |
-| dwh.vDimLpu | lhbronzead.pharma_erp.DOCTORS |
-| dwh.vDimManufacturer | lhbronzead.pharma_erp.PRODUCTS |
-| dwh.vDimProduct | lhbronzead.pharma_erp.PRODUCTS |
-| dwh.vDimRegion | lhbronzead.pharma_erp.ADVERSE_EVENTS |
-| dwh.vDimRegion | lhbronzead.pharma_erp.CUSTOMERS |
-| dwh.vDimRegion | lhbronzead.pharma_erp.DOCTORS |
-| dwh.vDimRegion | lhbronzead.pharma_erp.WAREHOUSES |
-| dwh.vDimReportSource | lhbronzead.pharma_erp.ADVERSE_EVENTS |
-| dwh.vDimSpecialty | lhbronzead.pharma_erp.DOCTORS |
-| dwh.vDimTerritory | lhbronzead.pharma_erp.EMPLOYEES |
-| dwh.vDimWarehouse | lhbronzead.pharma_erp.WAREHOUSES |
-| dwh.vFctAdverseEvent | lhbronzead.pharma_erp.ADVERSE_EVENTS |
-| dwh.vFctInventoryMovement | lhbronzead.pharma_erp.INVENTORY_MOVEMENTS |
-| dwh.vFctPrescription | lhbronzead.pharma_erp.PRESCRIPTIONS |
-| dwh.vFctSales | lhbronzead.pharma_erp.SALES_ORDERS |
-| dwh.vFctVisit | lhbronzead.pharma_erp.DOCTOR_VISITS |
-| dwh.vRefClientAccount | lhbronzead.pharma_erp.CUSTOMERS |
-| dwh.vRefDoctor | lhbronzead.pharma_erp.DOCTORS |
-| dwh.vRefEmployee | lhbronzead.pharma_erp.EMPLOYEES |
-| dwh.vRefMovementType | lhbronzead.pharma_erp.INVENTORY_MOVEMENTS |
-| dwh.vRefProduct | lhbronzead.pharma_erp.PRODUCTS |
-| dwh.vRefWarehouse | lhbronzead.pharma_erp.WAREHOUSES |
+| dwh.vDimActivityType | lhbronze.erp_erp.DOCTOR_VISITS |
+| dwh.vDimAeOutcome | lhbronze.erp_erp.ADVERSE_EVENTS |
+| dwh.vDimAeSeriousness | lhbronze.erp_erp.ADVERSE_EVENTS |
+| dwh.vDimChain | lhbronze.erp_erp.CUSTOMERS |
+| dwh.vDimCity | lhbronze.erp_erp.CUSTOMERS |
+| dwh.vDimCity | lhbronze.erp_erp.DOCTORS |
+| dwh.vDimCity | lhbronze.erp_erp.WAREHOUSES |
+| dwh.vDimClientAccount | lhbronze.erp_erp.CUSTOMERS |
+| dwh.vDimDoctor | lhbronze.erp_erp.DOCTORS |
+| dwh.vDimEmployee | lhbronze.erp_erp.EMPLOYEES |
+| dwh.vDimLegalEntity | lhbronze.erp_erp.CUSTOMERS |
+| dwh.vDimLpu | lhbronze.erp_erp.DOCTORS |
+| dwh.vDimManufacturer | lhbronze.erp_erp.PRODUCTS |
+| dwh.vDimProduct | lhbronze.erp_erp.PRODUCTS |
+| dwh.vDimRegion | lhbronze.erp_erp.ADVERSE_EVENTS |
+| dwh.vDimRegion | lhbronze.erp_erp.CUSTOMERS |
+| dwh.vDimRegion | lhbronze.erp_erp.DOCTORS |
+| dwh.vDimRegion | lhbronze.erp_erp.WAREHOUSES |
+| dwh.vDimReportSource | lhbronze.erp_erp.ADVERSE_EVENTS |
+| dwh.vDimSpecialty | lhbronze.erp_erp.DOCTORS |
+| dwh.vDimTerritory | lhbronze.erp_erp.EMPLOYEES |
+| dwh.vDimWarehouse | lhbronze.erp_erp.WAREHOUSES |
+| dwh.vFctAdverseEvent | lhbronze.erp_erp.ADVERSE_EVENTS |
+| dwh.vFctInventoryMovement | lhbronze.erp_erp.INVENTORY_MOVEMENTS |
+| dwh.vFctPrescription | lhbronze.erp_erp.PRESCRIPTIONS |
+| dwh.vFctSales | lhbronze.erp_erp.SALES_ORDERS |
+| dwh.vFctVisit | lhbronze.erp_erp.DOCTOR_VISITS |
+| dwh.vRefClientAccount | lhbronze.erp_erp.CUSTOMERS |
+| dwh.vRefDoctor | lhbronze.erp_erp.DOCTORS |
+| dwh.vRefEmployee | lhbronze.erp_erp.EMPLOYEES |
+| dwh.vRefMovementType | lhbronze.erp_erp.INVENTORY_MOVEMENTS |
+| dwh.vRefProduct | lhbronze.erp_erp.PRODUCTS |
+| dwh.vRefWarehouse | lhbronze.erp_erp.WAREHOUSES |
 
 ## 3. Об'єкти без залежностей
 
@@ -165,3 +165,137 @@
 | dwh.spUpsertSCDDimension | dwh.spSchemaValidation |
 | dwh.spSilverFullLoad | dwh.spUpsertSCDDimension |
 | dwh.spSilverFullLoad | dwh.spFullFct |
+
+## 6. Silver table -> bronze table
+
+### 6.1. Прямі (33 ребра) — bronze, який читає власний view таблиці
+
+| Object | DependOnObject |
+|---|---|
+| dwh.DimActivityType | lhbronze.erp_erp.DOCTOR_VISITS |
+| dwh.DimAeOutcome | lhbronze.erp_erp.ADVERSE_EVENTS |
+| dwh.DimAeSeriousness | lhbronze.erp_erp.ADVERSE_EVENTS |
+| dwh.DimChain | lhbronze.erp_erp.CUSTOMERS |
+| dwh.DimCity | lhbronze.erp_erp.CUSTOMERS |
+| dwh.DimCity | lhbronze.erp_erp.DOCTORS |
+| dwh.DimCity | lhbronze.erp_erp.WAREHOUSES |
+| dwh.DimClientAccount | lhbronze.erp_erp.CUSTOMERS |
+| dwh.DimDoctor | lhbronze.erp_erp.DOCTORS |
+| dwh.DimEmployee | lhbronze.erp_erp.EMPLOYEES |
+| dwh.DimLegalEntity | lhbronze.erp_erp.CUSTOMERS |
+| dwh.DimLpu | lhbronze.erp_erp.DOCTORS |
+| dwh.DimManufacturer | lhbronze.erp_erp.PRODUCTS |
+| dwh.DimProduct | lhbronze.erp_erp.PRODUCTS |
+| dwh.DimRegion | lhbronze.erp_erp.ADVERSE_EVENTS |
+| dwh.DimRegion | lhbronze.erp_erp.CUSTOMERS |
+| dwh.DimRegion | lhbronze.erp_erp.DOCTORS |
+| dwh.DimRegion | lhbronze.erp_erp.WAREHOUSES |
+| dwh.DimReportSource | lhbronze.erp_erp.ADVERSE_EVENTS |
+| dwh.DimSpecialty | lhbronze.erp_erp.DOCTORS |
+| dwh.DimTerritory | lhbronze.erp_erp.EMPLOYEES |
+| dwh.DimWarehouse | lhbronze.erp_erp.WAREHOUSES |
+| dwh.FctAdverseEvent | lhbronze.erp_erp.ADVERSE_EVENTS |
+| dwh.FctInventoryMovement | lhbronze.erp_erp.INVENTORY_MOVEMENTS |
+| dwh.FctPrescription | lhbronze.erp_erp.PRESCRIPTIONS |
+| dwh.FctSales | lhbronze.erp_erp.SALES_ORDERS |
+| dwh.FctVisit | lhbronze.erp_erp.DOCTOR_VISITS |
+| dwh.RefClientAccount | lhbronze.erp_erp.CUSTOMERS |
+| dwh.RefDoctor | lhbronze.erp_erp.DOCTORS |
+| dwh.RefEmployee | lhbronze.erp_erp.EMPLOYEES |
+| dwh.RefMovementType | lhbronze.erp_erp.INVENTORY_MOVEMENTS |
+| dwh.RefProduct | lhbronze.erp_erp.PRODUCTS |
+| dwh.RefWarehouse | lhbronze.erp_erp.WAREHOUSES |
+
+### 6.2. Транзитивні (83 ребра) — уся лінія до bronze, включно з залежностями через інші Dim/Ref
+
+Для impact-аналізу: «зміна в bronze-таблиці X зачіпає ось ці silver-таблиці».
+
+| Object | DependOnObject |
+|---|---|
+| dwh.DimActivityType | lhbronze.erp_erp.DOCTOR_VISITS |
+| dwh.DimAeOutcome | lhbronze.erp_erp.ADVERSE_EVENTS |
+| dwh.DimAeSeriousness | lhbronze.erp_erp.ADVERSE_EVENTS |
+| dwh.DimChain | lhbronze.erp_erp.CUSTOMERS |
+| dwh.DimCity | lhbronze.erp_erp.ADVERSE_EVENTS |
+| dwh.DimCity | lhbronze.erp_erp.CUSTOMERS |
+| dwh.DimCity | lhbronze.erp_erp.DOCTORS |
+| dwh.DimCity | lhbronze.erp_erp.WAREHOUSES |
+| dwh.DimClientAccount | lhbronze.erp_erp.ADVERSE_EVENTS |
+| dwh.DimClientAccount | lhbronze.erp_erp.CUSTOMERS |
+| dwh.DimClientAccount | lhbronze.erp_erp.DOCTORS |
+| dwh.DimClientAccount | lhbronze.erp_erp.WAREHOUSES |
+| dwh.DimDoctor | lhbronze.erp_erp.ADVERSE_EVENTS |
+| dwh.DimDoctor | lhbronze.erp_erp.CUSTOMERS |
+| dwh.DimDoctor | lhbronze.erp_erp.DOCTORS |
+| dwh.DimDoctor | lhbronze.erp_erp.WAREHOUSES |
+| dwh.DimEmployee | lhbronze.erp_erp.EMPLOYEES |
+| dwh.DimLegalEntity | lhbronze.erp_erp.CUSTOMERS |
+| dwh.DimLpu | lhbronze.erp_erp.ADVERSE_EVENTS |
+| dwh.DimLpu | lhbronze.erp_erp.CUSTOMERS |
+| dwh.DimLpu | lhbronze.erp_erp.DOCTORS |
+| dwh.DimLpu | lhbronze.erp_erp.WAREHOUSES |
+| dwh.DimManufacturer | lhbronze.erp_erp.PRODUCTS |
+| dwh.DimProduct | lhbronze.erp_erp.PRODUCTS |
+| dwh.DimRegion | lhbronze.erp_erp.ADVERSE_EVENTS |
+| dwh.DimRegion | lhbronze.erp_erp.CUSTOMERS |
+| dwh.DimRegion | lhbronze.erp_erp.DOCTORS |
+| dwh.DimRegion | lhbronze.erp_erp.WAREHOUSES |
+| dwh.DimReportSource | lhbronze.erp_erp.ADVERSE_EVENTS |
+| dwh.DimSpecialty | lhbronze.erp_erp.DOCTORS |
+| dwh.DimTerritory | lhbronze.erp_erp.EMPLOYEES |
+| dwh.DimWarehouse | lhbronze.erp_erp.ADVERSE_EVENTS |
+| dwh.DimWarehouse | lhbronze.erp_erp.CUSTOMERS |
+| dwh.DimWarehouse | lhbronze.erp_erp.DOCTORS |
+| dwh.DimWarehouse | lhbronze.erp_erp.WAREHOUSES |
+| dwh.FctAdverseEvent | lhbronze.erp_erp.ADVERSE_EVENTS |
+| dwh.FctAdverseEvent | lhbronze.erp_erp.CUSTOMERS |
+| dwh.FctAdverseEvent | lhbronze.erp_erp.DOCTORS |
+| dwh.FctAdverseEvent | lhbronze.erp_erp.PRODUCTS |
+| dwh.FctAdverseEvent | lhbronze.erp_erp.WAREHOUSES |
+| dwh.FctInventoryMovement | lhbronze.erp_erp.ADVERSE_EVENTS |
+| dwh.FctInventoryMovement | lhbronze.erp_erp.CUSTOMERS |
+| dwh.FctInventoryMovement | lhbronze.erp_erp.DOCTORS |
+| dwh.FctInventoryMovement | lhbronze.erp_erp.EMPLOYEES |
+| dwh.FctInventoryMovement | lhbronze.erp_erp.INVENTORY_MOVEMENTS |
+| dwh.FctInventoryMovement | lhbronze.erp_erp.PRODUCTS |
+| dwh.FctInventoryMovement | lhbronze.erp_erp.WAREHOUSES |
+| dwh.FctPrescription | lhbronze.erp_erp.ADVERSE_EVENTS |
+| dwh.FctPrescription | lhbronze.erp_erp.CUSTOMERS |
+| dwh.FctPrescription | lhbronze.erp_erp.DOCTORS |
+| dwh.FctPrescription | lhbronze.erp_erp.EMPLOYEES |
+| dwh.FctPrescription | lhbronze.erp_erp.PRESCRIPTIONS |
+| dwh.FctPrescription | lhbronze.erp_erp.PRODUCTS |
+| dwh.FctPrescription | lhbronze.erp_erp.WAREHOUSES |
+| dwh.FctSales | lhbronze.erp_erp.ADVERSE_EVENTS |
+| dwh.FctSales | lhbronze.erp_erp.CUSTOMERS |
+| dwh.FctSales | lhbronze.erp_erp.DOCTORS |
+| dwh.FctSales | lhbronze.erp_erp.EMPLOYEES |
+| dwh.FctSales | lhbronze.erp_erp.PRODUCTS |
+| dwh.FctSales | lhbronze.erp_erp.SALES_ORDERS |
+| dwh.FctSales | lhbronze.erp_erp.WAREHOUSES |
+| dwh.FctVisit | lhbronze.erp_erp.ADVERSE_EVENTS |
+| dwh.FctVisit | lhbronze.erp_erp.CUSTOMERS |
+| dwh.FctVisit | lhbronze.erp_erp.DOCTORS |
+| dwh.FctVisit | lhbronze.erp_erp.DOCTOR_VISITS |
+| dwh.FctVisit | lhbronze.erp_erp.EMPLOYEES |
+| dwh.FctVisit | lhbronze.erp_erp.PRODUCTS |
+| dwh.FctVisit | lhbronze.erp_erp.WAREHOUSES |
+| dwh.RefClientAccount | lhbronze.erp_erp.ADVERSE_EVENTS |
+| dwh.RefClientAccount | lhbronze.erp_erp.CUSTOMERS |
+| dwh.RefClientAccount | lhbronze.erp_erp.DOCTORS |
+| dwh.RefClientAccount | lhbronze.erp_erp.WAREHOUSES |
+| dwh.RefDoctor | lhbronze.erp_erp.ADVERSE_EVENTS |
+| dwh.RefDoctor | lhbronze.erp_erp.CUSTOMERS |
+| dwh.RefDoctor | lhbronze.erp_erp.DOCTORS |
+| dwh.RefDoctor | lhbronze.erp_erp.WAREHOUSES |
+| dwh.RefEmployee | lhbronze.erp_erp.EMPLOYEES |
+| dwh.RefMovementType | lhbronze.erp_erp.INVENTORY_MOVEMENTS |
+| dwh.RefProduct | lhbronze.erp_erp.PRODUCTS |
+| dwh.RefWarehouse | lhbronze.erp_erp.ADVERSE_EVENTS |
+| dwh.RefWarehouse | lhbronze.erp_erp.CUSTOMERS |
+| dwh.RefWarehouse | lhbronze.erp_erp.DOCTORS |
+| dwh.RefWarehouse | lhbronze.erp_erp.WAREHOUSES |
+
+### 6.3. Без bronze-залежностей
+
+`dwh.DimDate`, `dwh.DimSrcSystem`, `dwh.DimCurrency`, `dwh.DimAtcClass`, `dwh.DimMovementType`, `dwh.DimOrderStatus` — наповнюються напряму міграціями.

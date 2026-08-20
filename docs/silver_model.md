@@ -12,7 +12,7 @@
 
 ```
 Azure SQL [erp].*            ->  Bronze lakehouse                ->  Silver warehouse
-(10 таблиць ERP)                 lhbronzead.pharma_erp.*             whsilverad.dwh.*
+(10 таблиць ERP)                 lhbronze.erp_erp.*                  whsilverad.dwh.*
                                  (1:1 копія, без трансформацій)      (Dim / Ref / Fct)
 ```
 
@@ -153,11 +153,22 @@ erDiagram
 
 ## 7. Порядок завантаження
 
-Одна процедура-оркестратор:
+Завантаження — **окремий крок після міграцій**, це два різні етапи:
+
+| Етап | Що робить | Що НЕ робить |
+|---|---|---|
+| Міграції `V260819.*` / `V260820.*` | створюють таблиці, view, процедури; наповнюють `DimDate` і статичні виміри | **не завантажують дані з bronze** |
+| `EXEC [dwh].[spSilverFullLoad]` | наповнює `Dim*`, `Ref*`, `Fct*` з bronze | — |
+
+Зокрема, `V260819.1050__silver_create_prc_full_load.sql` містить лише
+`CREATE OR ALTER PROCEDURE [dwh].[spSilverFullLoad]` — його виконання створює процедуру,
+але жодного рядка не завантажує. Дані з'являються тільки після виклику:
 
 ```sql
 EXEC [dwh].[spSilverFullLoad] @load_id = 'manual_full_load';
 ```
+
+У проді цей виклик робить CTL-workflow; вручну — з будь-якого SQL-редактора Fabric.
 
 Порядок усередині (важливий через залежності між view та вже завантаженими таблицями):
 
@@ -183,6 +194,7 @@ EXEC [dwh].[spSilverFullLoad] @load_id = 'manual_full_load';
 | `V260819.1040__silver_insert_DimDate.sql` | наповнення календаря |
 | `V260819.1050__silver_create_prc_full_load.sql` | `spSilverFullLoad` |
 | `V260820.0930__silver_alter_fct_views_src_system.sql` | fix: `vFct*` беруть `SKSrcSystemKeyID` через CTE з агрегатом, а не `CROSS JOIN` |
+| `V260820.1115__silver_alter_views_bronze_source.sql` | fix: перевизначення всіх 28 view на реальне bronze-джерело `[lhbronze].[erp_erp]` |
 
 Іменування: `V<YYMMDD>.<HHMM>__<опис>.sql`, `flyway.outOfOrder=true`, кожна міграція ідемпотентна.
 

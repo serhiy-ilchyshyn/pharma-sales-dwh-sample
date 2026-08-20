@@ -114,14 +114,30 @@ fabric-migrations/flyway/
     ├── V260819.1030__silver_init_creation_create_prc.sql     -- spUpsertSCDDimension / spFullFct
     ├── V260819.1040__silver_insert_DimDate.sql               -- календар
     ├── V260819.1050__silver_create_prc_full_load.sql         -- spSilverFullLoad
-    └── V260820.0930__silver_alter_fct_views_src_system.sql   -- fix: vFct* не залежать від DimSrcSystem
+    ├── V260820.0930__silver_alter_fct_views_src_system.sql   -- fix: vFct* не залежать від DimSrcSystem
+    └── V260820.1115__silver_alter_views_bronze_source.sql    -- fix: bronze = [lhbronze].[erp_erp]
 ```
 
 Опис моделі, ER-схема, bus matrix, порядок завантаження та обробка дефектів джерела —
-[`docs/silver_model.md`](docs/silver_model.md). Запуск завантаження після міграцій:
+[`docs/silver_model.md`](docs/silver_model.md).
+
+### Запуск silver
+
+**Крок 1 — міграції.** Створюють таблиці, view і процедури, наповнюють `DimDate` та статичні
+виміри. Дані з bronze вони **не завантажують**; зокрема `V260819.1050` лише створює
+процедуру `spSilverFullLoad`, а не виконує її.
+
+**Крок 2 — завантаження.** Окремий виклик оркестратора:
 
 ```sql
 EXEC [dwh].[spSilverFullLoad] @load_id = 'manual_full_load';
+```
+
+**Крок 3 — перевірка:**
+
+```sql
+SELECT 'FctSales', COUNT(*) FROM [dwh].[FctSales]
+UNION ALL SELECT 'DimClientAccount', COUNT(*) FROM [dwh].[DimClientAccount] WHERE SKClientAccountID <> -1;
 ```
 
 ## Приклади аналітики

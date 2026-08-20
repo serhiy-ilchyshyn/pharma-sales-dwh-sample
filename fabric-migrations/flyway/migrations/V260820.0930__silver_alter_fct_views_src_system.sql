@@ -22,7 +22,7 @@ WITH dedup_sales AS (
           s.*
         , ROW_NUMBER() OVER (PARTITION BY s.order_line_id ORDER BY s.row_id) AS rn
         , COUNT(1)    OVER (PARTITION BY s.order_line_id)                    AS SrcRowCnt
-    FROM [lhbronzead].[pharma_erp].[SALES_ORDERS] AS s
+    FROM [lhbronze].[erp_erp].[SALES_ORDERS] AS s
 ),
 -- Агрегат без GROUP BY завжди повертає рівно 1 рядок,
 -- тому CROSS JOIN нижче не може обнулити факт, навіть якщо рядка джерельної системи немає.
@@ -96,7 +96,7 @@ WITH dedup_movement AS (
           m.*
         , ROW_NUMBER() OVER (PARTITION BY m.movement_id ORDER BY m.row_id) AS rn
         , COUNT(1)    OVER (PARTITION BY m.movement_id)                    AS SrcRowCnt
-    FROM [lhbronzead].[pharma_erp].[INVENTORY_MOVEMENTS] AS m
+    FROM [lhbronze].[erp_erp].[INVENTORY_MOVEMENTS] AS m
 ),
 -- Агрегат без GROUP BY завжди повертає рівно 1 рядок,
 -- тому CROSS JOIN нижче не може обнулити факт, навіть якщо рядка джерельної системи немає.
@@ -147,7 +147,7 @@ WITH dedup_visit AS (
           v.*
         , ROW_NUMBER() OVER (PARTITION BY v.visit_id ORDER BY v.row_id) AS rn
         , COUNT(1)    OVER (PARTITION BY v.visit_id)                    AS SrcRowCnt
-    FROM [lhbronzead].[pharma_erp].[DOCTOR_VISITS] AS v
+    FROM [lhbronze].[erp_erp].[DOCTOR_VISITS] AS v
 ),
 -- Агрегат без GROUP BY завжди повертає рівно 1 рядок,
 -- тому CROSS JOIN нижче не може обнулити факт, навіть якщо рядка джерельної системи немає.
@@ -194,7 +194,7 @@ WITH dedup_rx AS (
           r.*
         , ROW_NUMBER() OVER (PARTITION BY r.prescription_id ORDER BY r.row_id) AS rn
         , COUNT(1)    OVER (PARTITION BY r.prescription_id)                    AS SrcRowCnt
-    FROM [lhbronzead].[pharma_erp].[PRESCRIPTIONS] AS r
+    FROM [lhbronze].[erp_erp].[PRESCRIPTIONS] AS r
 ),
 -- Агрегат без GROUP BY завжди повертає рівно 1 рядок,
 -- тому CROSS JOIN нижче не може обнулити факт, навіть якщо рядка джерельної системи немає.
@@ -236,7 +236,7 @@ WITH dedup_ae AS (
           a.*
         , ROW_NUMBER() OVER (PARTITION BY a.ae_id, a.case_version ORDER BY a.row_id DESC) AS rn
         , MAX(a.case_version) OVER (PARTITION BY a.ae_id)                                 AS MaxCaseVersion
-    FROM [lhbronzead].[pharma_erp].[ADVERSE_EVENTS] AS a
+    FROM [lhbronze].[erp_erp].[ADVERSE_EVENTS] AS a
 ),
 -- Агрегат без GROUP BY завжди повертає рівно 1 рядок,
 -- тому CROSS JOIN нижче не може обнулити факт, навіть якщо рядка джерельної системи немає.

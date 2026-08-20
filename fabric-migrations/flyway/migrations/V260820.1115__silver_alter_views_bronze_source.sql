@@ -1,14 +1,8 @@
--- ClickUp: PHARMA-SILVER-001
--- Джерельні view для silver-об'єктів. Читають bronze lakehouse
--- [lhbronze].[erp_erp].* (1:1 копія схеми [erp] з 01_ddl_azure_sql.sql).
---
--- Правила (як у grp-ctl-azure-dwh):
---   * перша колонка vDim*/vRef* = натуральний ключ [Id] — процедура
---     [dwh].[spUpsertSCDDimension] визначає natural key саме за ORDINAL_POSITION = 1;
---   * view не містить SK*ID/технічних колонок — їх додає процедура;
---   * усі SK*KeyID у view обгорнуті в ISNULL(..., -1) -> факти без втрат на inner join;
---   * порядок колонок vFct* має точно збігатися з порядком колонок таблиці Fct*
---     починаючи з SKSrcSystemKeyID (spFullFct робить SELECT ... , v_fct.*).
+-- ClickUp: PHARMA-SILVER-002
+-- Fix: bronze-джерело — [lhbronze].[erp_erp], а не [lhbronzead].[pharma_erp].
+-- Через невірний шлях усі v* не повертали рядків, тому після spSilverFullLoad
+-- Dim*/Ref* мали лише службовий рядок -1, а Fct* були порожні.
+-- Міграція перевизначає ВСІ 28 view silver-рівня (включно з правкою src_system у vFct*).
 GO
 --IMPORTANT
 USE [whsilverad];
