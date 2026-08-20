@@ -113,7 +113,8 @@ fabric-migrations/flyway/
     ├── V260819.1020__silver_init_creation_create_view.sql    -- v* view над bronze
     ├── V260819.1030__silver_init_creation_create_prc.sql     -- spUpsertSCDDimension / spFullFct
     ├── V260819.1040__silver_insert_DimDate.sql               -- календар
-    └── V260819.1050__silver_create_prc_full_load.sql         -- spSilverFullLoad
+    ├── V260819.1050__silver_create_prc_full_load.sql         -- spSilverFullLoad
+    └── V260820.0930__silver_alter_fct_views_src_system.sql   -- fix: vFct* не залежать від DimSrcSystem
 ```
 
 Опис моделі, ER-схема, bus matrix, порядок завантаження та обробка дефектів джерела —

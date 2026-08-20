@@ -601,9 +601,16 @@ WITH dedup_sales AS (
         , ROW_NUMBER() OVER (PARTITION BY s.order_line_id ORDER BY s.row_id) AS rn
         , COUNT(1)    OVER (PARTITION BY s.order_line_id)                    AS SrcRowCnt
     FROM [lhbronzead].[pharma_erp].[SALES_ORDERS] AS s
+),
+-- Агрегат без GROUP BY завжди повертає рівно 1 рядок,
+-- тому CROSS JOIN нижче не може обнулити факт, навіть якщо рядка джерельної системи немає.
+src_system AS (
+    SELECT ISNULL(MAX(SKSrcSystemKeyID), -1) AS SKSrcSystemKeyID
+    FROM [whsilverad].[dwh].[DimSrcSystem]
+    WHERE Id = 1 AND EndDate IS NULL
 )
 SELECT
-      ISNULL(ss.SKSrcSystemKeyID, -1)                  AS SKSrcSystemKeyID
+      ss.SKSrcSystemKeyID                              AS SKSrcSystemKeyID
     , ISNULL(s.order_number, 'N/A')                    AS DocumentNumber
     , s.order_line_id                                  AS ItemId
     , CAST(s.order_date AS datetime2(3))               AS Period
@@ -635,7 +642,7 @@ SELECT
            END AS bit)                                 AS IsPeriodOutOfRange
     , CAST(CASE WHEN s.SrcRowCnt > 1 THEN 1 ELSE 0 END AS bit) AS IsSrcDuplicate
 FROM dedup_sales AS s
-CROSS JOIN (SELECT SKSrcSystemKeyID FROM [whsilverad].[dwh].[DimSrcSystem] WHERE Id = 1 AND EndDate IS NULL) AS ss
+CROSS JOIN src_system AS ss
 LEFT JOIN [whsilverad].[dwh].[DimDate] AS dd
     ON dd.CalendarDate = s.order_date
 LEFT JOIN [whsilverad].[dwh].[DimDate] AS dld
@@ -668,9 +675,16 @@ WITH dedup_movement AS (
         , ROW_NUMBER() OVER (PARTITION BY m.movement_id ORDER BY m.row_id) AS rn
         , COUNT(1)    OVER (PARTITION BY m.movement_id)                    AS SrcRowCnt
     FROM [lhbronzead].[pharma_erp].[INVENTORY_MOVEMENTS] AS m
+),
+-- Агрегат без GROUP BY завжди повертає рівно 1 рядок,
+-- тому CROSS JOIN нижче не може обнулити факт, навіть якщо рядка джерельної системи немає.
+src_system AS (
+    SELECT ISNULL(MAX(SKSrcSystemKeyID), -1) AS SKSrcSystemKeyID
+    FROM [whsilverad].[dwh].[DimSrcSystem]
+    WHERE Id = 1 AND EndDate IS NULL
 )
 SELECT
-      ISNULL(ss.SKSrcSystemKeyID, -1)             AS SKSrcSystemKeyID
+      ss.SKSrcSystemKeyID                         AS SKSrcSystemKeyID
     , ISNULL(m.reference_document, 'N/A')         AS DocumentNumber
     , m.movement_id                               AS ItemId
     , CAST(m.movement_date AS datetime2(3))       AS Period
@@ -684,7 +698,7 @@ SELECT
     , CAST(CASE WHEN ABS(ISNULL(m.quantity, 0)) > 100000 THEN 1 ELSE 0 END AS bit) AS IsQtyOutlier
     , CAST(CASE WHEN m.SrcRowCnt > 1 THEN 1 ELSE 0 END AS bit)                     AS IsSrcDuplicate
 FROM dedup_movement AS m
-CROSS JOIN (SELECT SKSrcSystemKeyID FROM [whsilverad].[dwh].[DimSrcSystem] WHERE Id = 1 AND EndDate IS NULL) AS ss
+CROSS JOIN src_system AS ss
 LEFT JOIN [whsilverad].[dwh].[DimDate] AS dd
     ON dd.CalendarDate = CAST(m.movement_date AS date)
 LEFT JOIN [whsilverad].[dwh].[RefWarehouse] AS rwh
@@ -712,9 +726,16 @@ WITH dedup_visit AS (
         , ROW_NUMBER() OVER (PARTITION BY v.visit_id ORDER BY v.row_id) AS rn
         , COUNT(1)    OVER (PARTITION BY v.visit_id)                    AS SrcRowCnt
     FROM [lhbronzead].[pharma_erp].[DOCTOR_VISITS] AS v
+),
+-- Агрегат без GROUP BY завжди повертає рівно 1 рядок,
+-- тому CROSS JOIN нижче не може обнулити факт, навіть якщо рядка джерельної системи немає.
+src_system AS (
+    SELECT ISNULL(MAX(SKSrcSystemKeyID), -1) AS SKSrcSystemKeyID
+    FROM [whsilverad].[dwh].[DimSrcSystem]
+    WHERE Id = 1 AND EndDate IS NULL
 )
 SELECT
-      ISNULL(ss.SKSrcSystemKeyID, -1)          AS SKSrcSystemKeyID
+      ss.SKSrcSystemKeyID                      AS SKSrcSystemKeyID
     , v.visit_id                               AS ItemId
     , CAST(v.visit_date AS datetime2(3))       AS Period
     , ISNULL(dd.SKDateID, -1)                  AS SKDateID
@@ -727,7 +748,7 @@ SELECT
     , 1                                        AS VisitCnt
     , CAST(CASE WHEN v.SrcRowCnt > 1 THEN 1 ELSE 0 END AS bit) AS IsSrcDuplicate
 FROM dedup_visit AS v
-CROSS JOIN (SELECT SKSrcSystemKeyID FROM [whsilverad].[dwh].[DimSrcSystem] WHERE Id = 1 AND EndDate IS NULL) AS ss
+CROSS JOIN src_system AS ss
 LEFT JOIN [whsilverad].[dwh].[DimDate] AS dd
     ON dd.CalendarDate = CAST(v.visit_date AS date)
 LEFT JOIN [whsilverad].[dwh].[RefDoctor] AS rdoc
@@ -752,9 +773,16 @@ WITH dedup_rx AS (
         , ROW_NUMBER() OVER (PARTITION BY r.prescription_id ORDER BY r.row_id) AS rn
         , COUNT(1)    OVER (PARTITION BY r.prescription_id)                    AS SrcRowCnt
     FROM [lhbronzead].[pharma_erp].[PRESCRIPTIONS] AS r
+),
+-- Агрегат без GROUP BY завжди повертає рівно 1 рядок,
+-- тому CROSS JOIN нижче не може обнулити факт, навіть якщо рядка джерельної системи немає.
+src_system AS (
+    SELECT ISNULL(MAX(SKSrcSystemKeyID), -1) AS SKSrcSystemKeyID
+    FROM [whsilverad].[dwh].[DimSrcSystem]
+    WHERE Id = 1 AND EndDate IS NULL
 )
 SELECT
-      ISNULL(ss.SKSrcSystemKeyID, -1)            AS SKSrcSystemKeyID
+      ss.SKSrcSystemKeyID                        AS SKSrcSystemKeyID
     , r.prescription_id                          AS ItemId
     , CAST(r.prescription_date AS datetime2(3))  AS Period
     , ISNULL(dd.SKDateID, -1)                    AS SKDateID
@@ -765,7 +793,7 @@ SELECT
     , r.prescriptions_count                      AS PrescriptionsCnt
     , CAST(CASE WHEN r.SrcRowCnt > 1 THEN 1 ELSE 0 END AS bit) AS IsSrcDuplicate
 FROM dedup_rx AS r
-CROSS JOIN (SELECT SKSrcSystemKeyID FROM [whsilverad].[dwh].[DimSrcSystem] WHERE Id = 1 AND EndDate IS NULL) AS ss
+CROSS JOIN src_system AS ss
 LEFT JOIN [whsilverad].[dwh].[DimDate] AS dd
     ON dd.CalendarDate = r.prescription_date
 LEFT JOIN [whsilverad].[dwh].[RefDoctor] AS rdoc
@@ -787,9 +815,16 @@ WITH dedup_ae AS (
         , ROW_NUMBER() OVER (PARTITION BY a.ae_id, a.case_version ORDER BY a.row_id DESC) AS rn
         , MAX(a.case_version) OVER (PARTITION BY a.ae_id)                                 AS MaxCaseVersion
     FROM [lhbronzead].[pharma_erp].[ADVERSE_EVENTS] AS a
+),
+-- Агрегат без GROUP BY завжди повертає рівно 1 рядок,
+-- тому CROSS JOIN нижче не може обнулити факт, навіть якщо рядка джерельної системи немає.
+src_system AS (
+    SELECT ISNULL(MAX(SKSrcSystemKeyID), -1) AS SKSrcSystemKeyID
+    FROM [whsilverad].[dwh].[DimSrcSystem]
+    WHERE Id = 1 AND EndDate IS NULL
 )
 SELECT
-      ISNULL(ss.SKSrcSystemKeyID, -1)                  AS SKSrcSystemKeyID
+      ss.SKSrcSystemKeyID                              AS SKSrcSystemKeyID
     , a.ae_id                                          AS DocumentNumber
     , CONCAT(a.ae_id, '-', CAST(ISNULL(a.case_version, 0) AS varchar(5))) AS ItemId
     , CAST(a.report_date AS datetime2(3))              AS Period
@@ -809,7 +844,7 @@ SELECT
            END AS bit)                                 AS IsLogicalError
     , 1                                                AS CaseCnt
 FROM dedup_ae AS a
-CROSS JOIN (SELECT SKSrcSystemKeyID FROM [whsilverad].[dwh].[DimSrcSystem] WHERE Id = 1 AND EndDate IS NULL) AS ss
+CROSS JOIN src_system AS ss
 LEFT JOIN [whsilverad].[dwh].[DimDate] AS dd
     ON dd.CalendarDate = a.report_date
 LEFT JOIN [whsilverad].[dwh].[RefProduct] AS rpr

@@ -179,6 +179,7 @@ EXEC [dwh].[spSilverFullLoad] @load_id = 'manual_full_load';
 | `V260819.1030__silver_init_creation_create_prc.sql` | `spSchemaValidation`, `spUpsertSCDDimension`, `spFullFct` |
 | `V260819.1040__silver_insert_DimDate.sql` | наповнення календаря |
 | `V260819.1050__silver_create_prc_full_load.sql` | `spSilverFullLoad` |
+| `V260820.0930__silver_alter_fct_views_src_system.sql` | fix: `vFct*` беруть `SKSrcSystemKeyID` через CTE з агрегатом, а не `CROSS JOIN` |
 
 Іменування: `V<YYMMDD>.<HHMM>__<опис>.sql`, `flyway.outOfOrder=true`, кожна міграція ідемпотентна.
 
