@@ -183,7 +183,68 @@ EXEC [dwh].[spSilverFullLoad] @load_id = 'manual_full_load';
 Повний перелік залежностей між об'єктами (`Object | DependOnObject`) —
 [`docs/silver_dependencies.md`](silver_dependencies.md).
 
-## 8. Міграції
+## 8. Оркестрація (Fabric Data Pipeline, metadata-driven)
+
+Завантаженням керує реєстр об'єктів у самому warehouse, а не жорсткий список у коді:
+
+| Об'єкт | Призначення |
+|---|---|
+| `dwh.EtlSilverObject` | реєстр: `ObjectName`, `ObjectType` (Dim/Ref/Fct), `LoadLevel`, `ScdType`, `PassCnt`, `IsActive` |
+| `dwh.EtlSilverLoadLog` | журнал: `LoadId`, об'єкт, `StartedAt`/`FinishedAt`, `DurationSec`, `RowCnt`, `Status`, `ErrorMessage` |
+| `dwh.spSilverLoadLevel @level, @load_id` | завантажує всі активні об'єкти одного рівня, пише журнал, падає з `THROW` при помилці |
+| `dwh.spSilverFullLoad @load_id` | проходить рівні 1..MAX через `spSilverLoadLevel` |
+
+`LoadLevel` — позиція в топологічному сортуванні графа з
+[`silver_dependencies.md`](silver_dependencies.md):
+
+| Рівень | Об'єкти |
+|---|---|
+| 1 | DimActivityType, DimAeOutcome, DimAeSeriousness, DimChain, DimLegalEntity, DimManufacturer, DimRegion, DimReportSource, DimSpecialty, DimTerritory, RefMovementType |
+| 2 | DimCity, DimEmployee (`PassCnt = 2`), DimProduct |
+| 3 | DimClientAccount, DimLpu, RefEmployee, RefProduct |
+| 4 | DimDoctor, RefClientAccount |
+| 5 | DimWarehouse, RefDoctor |
+| 6 | FctAdverseEvent, FctPrescription, FctVisit, RefWarehouse |
+| 7 | FctInventoryMovement, FctSales |
+
+### Pipeline
+
+`fabric-pipelines/PL_Silver_Full_Load.json` — дві активності:
+
+1. **Lookup `LookupLoadLevels`** (`firstRowOnly = false`):
+   ```sql
+   SELECT DISTINCT LoadLevel FROM [dwh].[EtlSilverObject] WHERE IsActive = 1 ORDER BY LoadLevel
+   ```
+2. **ForEach `ForEachLoadLevel`** (`isSequential = true`), items `@activity('LookupLoadLevels').output.value`,
+   всередині Script activity:
+   ```sql
+   EXEC [dwh].[spSilverLoadLevel] @level = @{item().LoadLevel}, @load_id = '@{pipeline().RunId}';
+   ```
+
+Що це дає:
+
+* **трасування** — `@pipeline().RunId` потрапляє у `CreatedBy` фактів і в `EtlSilverLoadLog`,
+  тож будь-який рядок факту прив'язаний до конкретного запуску pipeline;
+* **рестарт з рівня** — після падіння запускаєте `EXEC dwh.spSilverLoadLevel @level = N` вручну
+  або перезапускаєте pipeline; рівні до N дадуть той самий результат (upsert ідемпотентний);
+* **розширення без правки pipeline** — новий вимір додається рядком у `EtlSilverObject`;
+* **розклад, retry, алерти** — штатними засобами Fabric (Schedule + Activity retry).
+
+JSON у репозиторії — шаблон: перед імпортом підставте `<FABRIC_WORKSPACE_ID>`,
+`<WAREHOUSE_ITEM_ID>`, `<SQL_ENDPOINT>`. Якщо ваша версія Fabric очікує іншу структуру
+`linkedService`, швидше зібрати ці дві активності в UI і вставити SQL з полів вище —
+логіка оркестрації повністю в warehouse, pipeline лише викликає процедуру.
+
+### Контроль після запуску
+
+```sql
+SELECT LoadLevel, ObjectName, Status, RowCnt, DurationSec, ErrorMessage
+FROM [dwh].[EtlSilverLoadLog]
+WHERE LoadId = '<RunId>'
+ORDER BY LoadLevel, StartedAt;
+```
+
+## 9. Міграції
 
 | Файл | Вміст |
 |---|---|
@@ -195,10 +256,11 @@ EXEC [dwh].[spSilverFullLoad] @load_id = 'manual_full_load';
 | `V260819.1050__silver_create_prc_full_load.sql` | `spSilverFullLoad` |
 | `V260820.0930__silver_alter_fct_views_src_system.sql` | fix: `vFct*` беруть `SKSrcSystemKeyID` через CTE з агрегатом, а не `CROSS JOIN` |
 | `V260820.1115__silver_alter_views_bronze_source.sql` | fix: перевизначення всіх 28 view на реальне bronze-джерело `[lhbronze].[erp_erp]` |
+| `V260821.1030__silver_create_etl_orchestration.sql` | `EtlSilverObject`, `EtlSilverLoadLog`, `spSilverLoadLevel`, metadata-driven `spSilverFullLoad` |
 
 Іменування: `V<YYMMDD>.<HHMM>__<опис>.sql`, `flyway.outOfOrder=true`, кожна міграція ідемпотентна.
 
-## 9. Відмінності від прод-репозиторію
+## 10. Відмінності від прод-репозиторію
 
 * `spFullFct` тут — простий `TRUNCATE + INSERT`; у проді використовується варіант зі swap-таблицею
   (`Fct*_new` -> `sp_rename`), щоб уникнути вікна порожньої таблиці.

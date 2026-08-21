@@ -115,7 +115,11 @@ fabric-migrations/flyway/
     ├── V260819.1040__silver_insert_DimDate.sql               -- календар
     ├── V260819.1050__silver_create_prc_full_load.sql         -- spSilverFullLoad
     ├── V260820.0930__silver_alter_fct_views_src_system.sql   -- fix: vFct* не залежать від DimSrcSystem
-    └── V260820.1115__silver_alter_views_bronze_source.sql    -- fix: bronze = [lhbronze].[erp_erp]
+    ├── V260820.1115__silver_alter_views_bronze_source.sql    -- fix: bronze = [lhbronze].[erp_erp]
+    └── V260821.1030__silver_create_etl_orchestration.sql     -- EtlSilverObject + spSilverLoadLevel
+
+fabric-pipelines/
+└── PL_Silver_Full_Load.json                                  -- Data Pipeline (Lookup + ForEach по рівнях)
 ```
 
 Опис моделі, ER-схема, bus matrix, порядок завантаження та обробка дефектів джерела —
@@ -127,11 +131,17 @@ fabric-migrations/flyway/
 виміри. Дані з bronze вони **не завантажують**; зокрема `V260819.1050` лише створює
 процедуру `spSilverFullLoad`, а не виконує її.
 
-**Крок 2 — завантаження.** Окремий виклик оркестратора:
+**Крок 2 — завантаження.** Оркестрація metadata-driven: склад і порядок беруться з
+`dwh.EtlSilverObject` (7 рівнів топологічного сортування), кожен запуск пишеться в
+`dwh.EtlSilverLoadLog`. Вручну:
 
 ```sql
-EXEC [dwh].[spSilverFullLoad] @load_id = 'manual_full_load';
+EXEC [dwh].[spSilverFullLoad] @load_id = 'manual_full_load';   -- усі рівні
+EXEC [dwh].[spSilverLoadLevel] @level = 5, @load_id = 'retry'; -- рестарт з рівня
 ```
+
+Регулярно — через Fabric Data Pipeline `fabric-pipelines/PL_Silver_Full_Load.json`
+(Lookup рівнів -> ForEach -> Script `spSilverLoadLevel`, `load_id = @pipeline().RunId`).
 
 **Крок 3 — перевірка:**
 
