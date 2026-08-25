@@ -1,12 +1,11 @@
 {
   "_comment": [
     "Fabric Data Pipeline: metadata-driven завантаження silver.",
+    "Параметр root_object: '' = повне завантаження; 'lhbronze.erp_erp.CUSTOMERS' або 'dwh.DimRegion'",
+    "= перевантажити лише цей обʼєкт і все, що з нього походить (замикання з [dwh].[EtlObjectDownstream]).",
     "Lookup читає рівні з [dwh].[EtlSilverObject], ForEach (послідовно) викликає",
     "[dwh].[spSilverLoadLevel] для кожного рівня, load_id = RunId запуску pipeline.",
-    "Новий об'єкт silver = рядок у EtlSilverObject; pipeline змінювати не потрібно.",
-    "ПЕРЕД ІМПОРТОМ: підставити <FABRIC_WORKSPACE_ID>, <WAREHOUSE_ITEM_ID>, <SQL_ENDPOINT>",
-    "JSON — шаблон; якщо версія Fabric очікує іншу структуру linkedService, простіше",
-    "зібрати ці 2 активності в UI і вставити SQL з полів typeProperties (див. docs/silver_model.md)."
+    "Новий обʼєкт silver = рядок у EtlSilverObject; pipeline змінювати не потрібно."
   ],
   "properties": {
     "activities": [
@@ -24,7 +23,10 @@
         "typeProperties": {
           "source": {
             "type": "DataWarehouseSource",
-            "sqlReaderQuery": "SELECT DISTINCT LoadLevel FROM [dwh].[EtlSilverObject] WHERE IsActive = 1 ORDER BY LoadLevel",
+            "sqlReaderQuery": {
+              "value": "SELECT DISTINCT o.LoadLevel FROM [dwh].[EtlSilverObject] o WHERE o.IsActive = 1 AND ('@{pipeline().parameters.root_object}' = '' OR EXISTS (SELECT 1 FROM [dwh].[EtlObjectDownstream] d WHERE d.ObjectName = o.ObjectName AND d.RootObject = '@{pipeline().parameters.root_object}')) ORDER BY o.LoadLevel",
+              "type": "Expression"
+            },
             "queryTimeout": "02:00:00",
             "partitionOption": "None",
             "datasetSettings": {
@@ -54,7 +56,9 @@
         "dependsOn": [
           {
             "activity": "LookupLoadLevels",
-            "dependencyConditions": ["Succeeded"]
+            "dependencyConditions": [
+              "Succeeded"
+            ]
           }
         ],
         "typeProperties": {
@@ -80,7 +84,7 @@
                   {
                     "type": "Query",
                     "text": {
-                      "value": "EXEC [dwh].[spSilverLoadLevel] @level = @{item().LoadLevel}, @load_id = '@{pipeline().RunId}';",
+                      "value": "EXEC [dwh].[spSilverLoadLevel] @level = @{item().LoadLevel}, @load_id = '@{pipeline().RunId}', @root_object = '@{pipeline().parameters.root_object}';",
                       "type": "Expression"
                     }
                   }
@@ -106,6 +110,12 @@
     ],
     "annotations": [],
     "lastModifiedByObjectId": "",
-    "lastPublishTime": ""
+    "lastPublishTime": "",
+    "parameters": {
+      "root_object": {
+        "type": "string",
+        "defaultValue": ""
+      }
+    }
   }
 }

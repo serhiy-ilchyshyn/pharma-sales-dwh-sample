@@ -14,6 +14,8 @@
 Azure SQL [erp].*            ->  Bronze lakehouse                ->  Silver warehouse
 (10 таблиць ERP)                 lhbronze.erp_erp.*                  whsilverad.dwh.*
                                  (1:1 копія, без трансформацій)      (Dim / Ref / Fct)
+
+PL_Bronze_Ingest (Copy, Overwrite) -----> PL_Silver_Full_Load (spSilverLoadLevel по рівнях)
 ```
 
 Silver читає bronze **тільки через view** `dwh.v<ObjectName>`; таблиці наповнюються
@@ -235,6 +237,84 @@ JSON у репозиторії — шаблон: перед імпортом п�
 `linkedService`, швидше зібрати ці дві активності в UI і вставити SQL з полів вище —
 логіка оркестрації повністю в warehouse, pipeline лише викликає процедуру.
 
+### Bronze -> silver одним запуском
+
+`fabric-pipelines/PL_Bronze_Ingest.json` — три активності:
+
+1. **Lookup `LookupBronzeObjects`** — перелік таблиць з `dwh.EtlBronzeObject`
+   (10 рядків: `erp.<TABLE>` -> `erp_erp.<TABLE>`, режим `Overwrite`);
+2. **ForEach `ForEachBronzeTable`** (паралельно, `batchCount = 4`) -> **Copy activity**:
+   `SELECT * FROM [@{item().SourceSchema}].[@{item().SourceTable}]` у Lakehouse-таблицю
+   `@item().TargetSchema` / `@item().TargetTable` з `tableActionOption: Overwrite`;
+3. **Invoke pipeline `InvokeSilverFullLoad`** -> запускає `PL_Silver_Full_Load`
+   з `waitOnCompletion: true`, тільки після `Succeeded` усього ForEach.
+
+Розклад вішається на `PL_Bronze_Ingest`; окремий розклад на `PL_Silver_Full_Load`
+краще не ставити, щоб silver не завантажувався двічі (запускати його вручну лише
+для перезавантаження без переносу bronze).
+
+Повне перезавантаження bronze обране свідомо: джерело не має надійного watermark
+(`updated_at` мутують дефектні `UPDATE`-и генератора), а обсяги — сотні тисяч рядків.
+Для інкременту достатньо замінити `sqlReaderQuery` на фільтр по `row_id` більше
+збереженого максимуму й змінити `tableActionOption` на `Append`.
+
+Плейсхолдери перед імпортом: `<AZURE_SQL_CONNECTION_ID>`, `<BRONZE_LAKEHOUSE_ITEM_ID>`,
+`<SILVER_PIPELINE_ITEM_ID>`, `<FABRIC_PIPELINE_CONNECTION_ID>` (з'єднання для Invoke Pipeline).
+
+### Перезавантаження одного джерела з усіма залежностями
+
+Граф залежностей живе в базі, тому «перевантажити джерело X» = «перевантажити X і все,
+що з нього походить»:
+
+| Обʼєкт | Призначення |
+|---|---|
+| `dwh.EtlObjectDependency` | 96 ребер `ObjectName -> DependsOnObject` (згенеровані з визначень `v*`) |
+| `dwh.EtlObjectDownstream` | матеріалізоване транзитивне замикання `RootObject -> ObjectName` |
+| `dwh.spRefreshObjectClosure` | перераховує замикання (WHILE-фікспойнт: рекурсивні CTE у Fabric Warehouse не підтримуються) |
+| `dwh.spSilverLoadSubset @root_object, @load_id` | вантажить лише замикання кореня, у тому ж порядку рівнів |
+
+```sql
+-- усе, що залежить від однієї bronze-таблиці
+EXEC [dwh].[spSilverLoadSubset] @root_object = 'lhbronze.erp_erp.CUSTOMERS', @load_id = 'reload_customers';
+
+-- усе, що залежить від одного silver-виміру (включно з ним самим)
+EXEC [dwh].[spSilverLoadSubset] @root_object = 'dwh.DimRegion', @load_id = 'reload_region';
+
+-- що саме перезавантажиться
+SELECT o.LoadLevel, d.ObjectName
+FROM [dwh].[EtlObjectDownstream] d
+JOIN [dwh].[EtlSilverObject] o ON o.ObjectName = d.ObjectName AND o.IsActive = 1
+WHERE d.RootObject = 'lhbronze.erp_erp.CUSTOMERS'
+ORDER BY o.LoadLevel, d.ObjectName;
+
+-- доступні корені
+SELECT DISTINCT RootObject FROM [dwh].[EtlObjectDownstream] ORDER BY RootObject;
+```
+
+Розміри замикань дуже різні — це наслідок спільних вимірів, а не помилка:
+
+| Корінь | Скільки silver-обʼєктів перевантажиться |
+|---|---|
+| `lhbronze.erp_erp.SALES_ORDERS` | 1 (`FctSales`) |
+| `lhbronze.erp_erp.PRODUCTS` | 8 |
+| `lhbronze.erp_erp.CUSTOMERS` | 16 (через `DimRegion`/`DimCity`, які збираються з кількох джерел) |
+| `lhbronze.erp_erp.ADVERSE_EVENTS` | 17 (теж живить `DimRegion`) |
+| `dwh.RefProduct` | 6 |
+
+### Точкове перезавантаження через pipeline
+
+Обидва pipeline параметризовані:
+
+* `PL_Bronze_Ingest`, параметр **`source_table`**: `''` — усі 10 таблиць і повне завантаження
+  silver; `'CUSTOMERS'` — перекопіювати лише цю таблицю і передати
+  `root_object = 'lhbronze.erp_erp.CUSTOMERS'` у silver;
+* `PL_Silver_Full_Load`, параметр **`root_object`**: `''` — повне завантаження;
+  `'lhbronze.erp_erp.CUSTOMERS'` або `'dwh.DimRegion'` — лише замикання кореня
+  (Lookup рівнів фільтрується по `EtlObjectDownstream`, `spSilverLoadLevel` отримує `@root_object`).
+
+Після зміни `v*` або появи нового обʼєкта: оновити рядки в `EtlObjectDependency`
+і виконати `EXEC [dwh].[spRefreshObjectClosure]`.
+
 ### Контроль після запуску
 
 ```sql
@@ -257,6 +337,8 @@ ORDER BY LoadLevel, StartedAt;
 | `V260820.0930__silver_alter_fct_views_src_system.sql` | fix: `vFct*` беруть `SKSrcSystemKeyID` через CTE з агрегатом, а не `CROSS JOIN` |
 | `V260820.1115__silver_alter_views_bronze_source.sql` | fix: перевизначення всіх 28 view на реальне bronze-джерело `[lhbronze].[erp_erp]` |
 | `V260821.1030__silver_create_etl_orchestration.sql` | `EtlSilverObject`, `EtlSilverLoadLog`, `spSilverLoadLevel`, metadata-driven `spSilverFullLoad` |
+| `V260821.1600__bronze_create_etl_metadata.sql` | `EtlBronzeObject` — реєстр таблиць для `PL_Bronze_Ingest` |
+| `V260825.1100__silver_create_dependency_graph.sql` | `EtlObjectDependency`, `EtlObjectDownstream`, `spRefreshObjectClosure`, `spSilverLoadSubset`, `@root_object` у `spSilverLoadLevel` |
 
 Іменування: `V<YYMMDD>.<HHMM>__<опис>.sql`, `flyway.outOfOrder=true`, кожна міграція ідемпотентна.
 

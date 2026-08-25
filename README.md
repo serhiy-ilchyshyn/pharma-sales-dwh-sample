@@ -83,6 +83,13 @@ python3 generate_sample_data.py --clients 500 --sales-rows 20000 --seed 7
 - по одному **CSV** на таблицю (`data/<Table>.csv`) — для bulk-load/перегляду;
 - **`data/insert_sample_data.sql`** — готовий T-SQL INSERT-скрипт (dim→fact порядок).
 
+### 2b. Догенерувати дані (append)
+
+`02b_generate_more_data.sql` — інкрементальний генератор для ERP-джерела: не робить
+`TRUNCATE`, продовжує наскрізну нумерацію бізнес-ключів, додає факти за новий період,
+опційно нових клієнтів/лікарів і нові версії цін продуктів (SCD2-демо). Обсяги — у секції
+CONFIG на початку файла. Після нього — `EXEC [dwh].[spSilverFullLoad]`.
+
 ### 3. Завантажити дані
 Виконайте згенерований скрипт **після** DDL:
 ```sql
@@ -116,9 +123,12 @@ fabric-migrations/flyway/
     ├── V260819.1050__silver_create_prc_full_load.sql         -- spSilverFullLoad
     ├── V260820.0930__silver_alter_fct_views_src_system.sql   -- fix: vFct* не залежать від DimSrcSystem
     ├── V260820.1115__silver_alter_views_bronze_source.sql    -- fix: bronze = [lhbronze].[erp_erp]
-    └── V260821.1030__silver_create_etl_orchestration.sql     -- EtlSilverObject + spSilverLoadLevel
+    ├── V260821.1030__silver_create_etl_orchestration.sql     -- EtlSilverObject + spSilverLoadLevel
+    ├── V260821.1600__bronze_create_etl_metadata.sql          -- EtlBronzeObject (реєстр для bronze)
+    └── V260825.1100__silver_create_dependency_graph.sql      -- граф залежностей + spSilverLoadSubset
 
 fabric-pipelines/
+├── PL_Bronze_Ingest.json                                     -- Azure SQL -> bronze -> тригер silver
 └── PL_Silver_Full_Load.json                                  -- Data Pipeline (Lookup + ForEach по рівнях)
 ```
 
@@ -138,10 +148,16 @@ fabric-pipelines/
 ```sql
 EXEC [dwh].[spSilverFullLoad] @load_id = 'manual_full_load';   -- усі рівні
 EXEC [dwh].[spSilverLoadLevel] @level = 5, @load_id = 'retry'; -- рестарт з рівня
+-- перезавантажити одне джерело з усіма залежностями:
+EXEC [dwh].[spSilverLoadSubset] @root_object = 'lhbronze.erp_erp.CUSTOMERS', @load_id = 'reload_customers';
 ```
 
 Регулярно — через Fabric Data Pipeline `fabric-pipelines/PL_Silver_Full_Load.json`
 (Lookup рівнів -> ForEach -> Script `spSilverLoadLevel`, `load_id = @pipeline().RunId`).
+
+Увесь ланцюг за один запуск — `fabric-pipelines/PL_Bronze_Ingest.json`: копіює 10 таблиць
+`erp` з Azure SQL у `lhbronze.erp_erp` (перелік — з `dwh.EtlBronzeObject`, паралельно по 4)
+і після успіху викликає `PL_Silver_Full_Load`. Розклад вішайте саме на нього.
 
 **Крок 3 — перевірка:**
 
