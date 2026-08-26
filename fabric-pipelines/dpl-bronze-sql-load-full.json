@@ -1,0 +1,234 @@
+{
+    "name": "dpl-bronze-sql-load-full",
+    "objectId": "92200799-6617-4e0d-9f90-37f931d47299",
+    "properties": {
+        "activities": [
+            {
+                "name": "copyToBronzeStg",
+                "type": "Copy",
+                "dependsOn": [
+                    {
+                        "activity": "setProcessingDateTime",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    }
+                ],
+                "policy": {
+                    "timeout": "0.12:00:00",
+                    "retry": 0,
+                    "retryIntervalInSeconds": 30,
+                    "secureOutput": false,
+                    "secureInput": false
+                },
+                "typeProperties": {
+                    "source": {
+                        "type": "AzureSqlSource",
+                        "sqlReaderQuery": {
+                            "value": "select cast(N'@{pipeline().parameters.executor_run_id}' as [varchar](36)) as [TechExecutorRunID],\n\tcast(N'@{pipeline().RunId}' as [varchar](36)) as [TechProcessorRunID],\n\tconvert(datetime, N'@{variables('processing_datetime')}', 120) as [TechProcessingDateTime],\n\tconvert(datetime, N'@{pipeline().parameters.business_datetime}', 120) as [TechBusinessDateTime],\n\t*\nfrom [@{pipeline().parameters.workflow_parameters.sql_schema_name}].[@{pipeline().parameters.workflow_parameters.sql_table_name}]",
+                            "type": "Expression"
+                        },
+                        "queryTimeout": "02:00:00",
+                        "partitionOption": "None",
+                        "datasetSettings": {
+                            "annotations": [],
+                            "type": "AzureSqlTable",
+                            "schema": [],
+                            "typeProperties": {
+                                "schema": {
+                                    "value": "@pipeline().parameters.workflow_parameters.sql_schema_name",
+                                    "type": "Expression"
+                                },
+                                "table": {
+                                    "value": "@pipeline().parameters.workflow_parameters.sql_table_name",
+                                    "type": "Expression"
+                                },
+                                "database": {
+                                    "value": "@pipeline().parameters.fabric_items_info['connections_info'][0][pipeline().parameters.workflow_parameters['sql_db_name_var_name']]",
+                                    "type": "Expression"
+                                }
+                            },
+                            "externalReferences": {
+                                "connection": "@pipeline().parameters.fabric_items_info['connections_info'][0][pipeline().parameters.workflow_parameters['sql_con_id_var_name']]"
+                            }
+                        }
+                    },
+                    "sink": {
+                        "type": "LakehouseTableSink",
+                        "tableActionOption": "OverwriteSchema",
+                        "partitionOption": "None",
+                        "applyVOrder": false,
+                        "enableTimestampNtz": false,
+                        "datasetSettings": {
+                            "annotations": [],
+                            "linkedService": {
+                                "name": "lhbronzestg",
+                                "properties": {
+                                    "annotations": [],
+                                    "type": "Lakehouse",
+                                    "typeProperties": {
+                                        "workspaceId": "@pipeline().DataFactory",
+                                        "artifactId": "@pipeline().parameters.fabric_items_info['lakehouses_info'][0][pipeline().parameters.workflow_parameters['lh_bronze_stg_id_var_name']]",
+                                        "rootFolder": "Tables"
+                                    }
+                                }
+                            },
+                            "type": "LakehouseTable",
+                            "schema": [],
+                            "typeProperties": {
+                                "schema": {
+                                    "value": "@{replace(toLower(pipeline().parameters.workflow_parameters.sql_system_name), '-', '_')}_@{pipeline().parameters.workflow_parameters.sql_schema_name}",
+                                    "type": "Expression"
+                                },
+                                "table": {
+                                    "value": "@pipeline().parameters.workflow_parameters.sql_table_name",
+                                    "type": "Expression"
+                                }
+                            }
+                        }
+                    },
+                    "enableStaging": false,
+                    "translator": {
+                        "type": "TabularTranslator",
+                        "typeConversion": true,
+                        "typeConversionSettings": {
+                            "allowDataTruncation": true,
+                            "treatBooleanAsNumber": false
+                        }
+                    }
+                }
+            },
+            {
+                "name": "setProcessingDateTime",
+                "type": "SetVariable",
+                "dependsOn": [],
+                "policy": {
+                    "secureOutput": false,
+                    "secureInput": false
+                },
+                "typeProperties": {
+                    "variableName": "processing_datetime",
+                    "value": {
+                        "value": "@formatDateTime(convertTimeZone(utcNow(), 'UTC', 'FLE Standard Time'), 'yyyy-MM-dd HH:mm:ss')",
+                        "type": "Expression"
+                    }
+                }
+            },
+            {
+                "name": "copyToBronze",
+                "type": "Copy",
+                "dependsOn": [
+                    {
+                        "activity": "copyToBronzeStg",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    }
+                ],
+                "policy": {
+                    "timeout": "0.12:00:00",
+                    "retry": 0,
+                    "retryIntervalInSeconds": 30,
+                    "secureOutput": false,
+                    "secureInput": false
+                },
+                "typeProperties": {
+                    "source": {
+                        "type": "LakehouseTableSource",
+                        "datasetSettings": {
+                            "annotations": [],
+                            "linkedService": {
+                                "name": "lhbronzestg",
+                                "properties": {
+                                    "annotations": [],
+                                    "type": "Lakehouse",
+                                    "typeProperties": {
+                                        "workspaceId": "@pipeline().DataFactory",
+                                        "artifactId": "@pipeline().parameters.fabric_items_info['lakehouses_info'][0][pipeline().parameters.workflow_parameters['lh_bronze_stg_id_var_name']]",
+                                        "rootFolder": "Tables"
+                                    }
+                                }
+                            },
+                            "type": "LakehouseTable",
+                            "schema": [],
+                            "typeProperties": {
+                                "schema": {
+                                    "value": "@{replace(toLower(pipeline().parameters.workflow_parameters.sql_system_name), '-', '_')}_@{pipeline().parameters.workflow_parameters.sql_schema_name}",
+                                    "type": "Expression"
+                                },
+                                "table": {
+                                    "value": "@pipeline().parameters.workflow_parameters.sql_table_name",
+                                    "type": "Expression"
+                                }
+                            }
+                        }
+                    },
+                    "sink": {
+                        "type": "LakehouseTableSink",
+                        "tableActionOption": "OverwriteSchema",
+                        "partitionOption": "None",
+                        "applyVOrder": false,
+                        "enableTimestampNtz": false,
+                        "datasetSettings": {
+                            "annotations": [],
+                            "linkedService": {
+                                "name": "lhbronzestg",
+                                "properties": {
+                                    "annotations": [],
+                                    "type": "Lakehouse",
+                                    "typeProperties": {
+                                        "workspaceId": "@pipeline().DataFactory",
+                                        "artifactId": "@pipeline().parameters.fabric_items_info['lakehouses_info'][0][pipeline().parameters.workflow_parameters['lh_bronze_id_var_name']]",
+                                        "rootFolder": "Tables"
+                                    }
+                                }
+                            },
+                            "type": "LakehouseTable",
+                            "schema": [],
+                            "typeProperties": {
+                                "schema": {
+                                    "value": "@{replace(toLower(pipeline().parameters.workflow_parameters.sql_system_name), '-', '_')}_@{pipeline().parameters.workflow_parameters.sql_schema_name}",
+                                    "type": "Expression"
+                                },
+                                "table": {
+                                    "value": "@pipeline().parameters.workflow_parameters.sql_table_name",
+                                    "type": "Expression"
+                                }
+                            }
+                        }
+                    },
+                    "enableStaging": false,
+                    "translator": {
+                        "type": "TabularTranslator",
+                        "typeConversion": true,
+                        "typeConversionSettings": {
+                            "allowDataTruncation": true,
+                            "treatBooleanAsNumber": false
+                        }
+                    }
+                }
+            }
+        ],
+        "parameters": {
+            "executor_run_id": {
+                "type": "string"
+            },
+            "business_datetime": {
+                "type": "string"
+            },
+            "fabric_items_info": {
+                "type": "object"
+            },
+            "workflow_parameters": {
+                "type": "object"
+            }
+        },
+        "variables": {
+            "processing_datetime": {
+                "type": "String"
+            }
+        },
+        "lastModifiedByObjectId": "bb8850b4-3395-48ec-8ec7-293bf1ad78de",
+        "lastPublishTime": "2026-08-20T06:25:48Z"
+    }
+}

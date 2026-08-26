@@ -1,0 +1,121 @@
+{
+    "name": "dpl-silver-sql-load",
+    "objectId": "a5d81645-aff3-45de-b4f5-5d05c95271fb",
+    "properties": {
+        "activities": [
+            {
+                "name": "LookupLoadLevels",
+                "type": "Lookup",
+                "dependsOn": [],
+                "policy": {
+                    "timeout": "0.01:00:00",
+                    "retry": 1,
+                    "retryIntervalInSeconds": 60,
+                    "secureOutput": false,
+                    "secureInput": false
+                },
+                "typeProperties": {
+                    "source": {
+                        "type": "DataWarehouseSource",
+                        "sqlReaderQuery": "SELECT DISTINCT LoadLevel FROM [dwh].[EtlSilverObject] WHERE IsActive = 1 ORDER BY LoadLevel",
+                        "queryTimeout": "02:00:00",
+                        "partitionOption": "None",
+                        "datasetSettings": {
+                            "type": "DataWarehouseTable",
+                            "annotations": [],
+                            "linkedService": {
+                                "name": "whsilver",
+                                "properties": {
+                                    "type": "DataWarehouse",
+                                    "annotations": [],
+                                    "typeProperties": {
+                                        "endpoint": "viqr2bflwtiuvci5miqhwm3h54-l62twngicguehlf2hljthiwqpi.datawarehouse.fabric.microsoft.com",
+                                        "artifactId": "578fc162-5aac-4981-be73-f6a3e928aabf",
+                                        "workspaceId": "343bb55f-11c8-43a8-acba-3ad333a2d07a"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "firstRowOnly": false,
+                    "datasetSettings": {
+                        "annotations": [],
+                        "linkedService": {
+                            "name": "whsilver",
+                            "properties": {
+                                "annotations": [],
+                                "type": "DataWarehouse",
+                                "typeProperties": {
+                                    "endpoint": "viqr2bflwtiuvci5miqhwm3h54-l62twngicguehlf2hljthiwqpi.datawarehouse.fabric.microsoft.com",
+                                    "artifactId": "578fc162-5aac-4981-be73-f6a3e928aabf",
+                                    "workspaceId": "343bb55f-11c8-43a8-acba-3ad333a2d07a"
+                                }
+                            }
+                        },
+                        "type": "DataWarehouseTable",
+                        "schema": []
+                    }
+                }
+            },
+            {
+                "name": "ForEachLoadLevel",
+                "type": "ForEach",
+                "dependsOn": [
+                    {
+                        "activity": "LookupLoadLevels",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    }
+                ],
+                "typeProperties": {
+                    "items": {
+                        "value": "@activity('LookupLoadLevels').output.value",
+                        "type": "Expression"
+                    },
+                    "isSequential": true,
+                    "activities": [
+                        {
+                            "name": "ExecSilverLoadLevel",
+                            "type": "Script",
+                            "dependsOn": [],
+                            "policy": {
+                                "timeout": "0.02:00:00",
+                                "retry": 1,
+                                "retryIntervalInSeconds": 120,
+                                "secureOutput": false,
+                                "secureInput": false
+                            },
+                            "linkedService": {
+                                "name": "whsilver",
+                                "properties": {
+                                    "annotations": [],
+                                    "type": "DataWarehouse",
+                                    "typeProperties": {
+                                        "endpoint": "viqr2bflwtiuvci5miqhwm3h54-l62twngicguehlf2hljthiwqpi.datawarehouse.fabric.microsoft.com",
+                                        "artifactId": "578fc162-5aac-4981-be73-f6a3e928aabf",
+                                        "workspaceId": "343bb55f-11c8-43a8-acba-3ad333a2d07a"
+                                    }
+                                }
+                            },
+                            "typeProperties": {
+                                "scripts": [
+                                    {
+                                        "type": "Query",
+                                        "text": {
+                                            "value": "EXEC [dwh].[spSilverLoadLevel] @level = @{item().LoadLevel}, @load_id = '@{pipeline().RunId}';",
+                                            "type": "Expression"
+                                        }
+                                    }
+                                ],
+                                "scriptBlockExecutionTimeout": "02:00:00"
+                            }
+                        }
+                    ]
+                }
+            }
+        ],
+        "lastModifiedByObjectId": "c4d16a83-6891-4a09-8542-b0147ed80393",
+        "lastPublishTime": "2026-08-21T10:14:50Z"
+    }
+}

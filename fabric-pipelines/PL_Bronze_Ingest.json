@@ -1,200 +1,248 @@
 {
-  "_comment": [
-    "Fabric Data Pipeline: Azure SQL [erp].* -> bronze lakehouse [lhbronze].[erp_erp].* -> тригер silver.",
-    "Параметр source_table: '' = усі 10 таблиць + повне завантаження silver;",
-    "'CUSTOMERS' = перекопіювати лише цю таблицю і перевантажити silver-обʼєкти, що від неї залежать",
-    "(root_object = 'lhbronze.erp_erp.CUSTOMERS' передається у PL_Silver_Full_Load).",
-    "Lookup читає перелік таблиць з [dwh].[EtlBronzeObject], ForEach (паралельно, batchCount=4)",
-    "копіює кожну таблицю з режимом Overwrite, після успіху Invoke pipeline запускає silver і чекає завершення.",
-    "ПЕРЕД ІМПОРТОМ підставити: <AZURE_SQL_CONNECTION_ID>, <BRONZE_LAKEHOUSE_ITEM_ID>,",
-    "<SILVER_PIPELINE_ITEM_ID>, <FABRIC_PIPELINE_CONNECTION_ID>."
-  ],
-  "properties": {
-    "activities": [
-      {
-        "name": "LookupBronzeObjects",
-        "type": "Lookup",
-        "dependsOn": [],
-        "policy": {
-          "timeout": "0.01:00:00",
-          "retry": 1,
-          "retryIntervalInSeconds": 60,
-          "secureOutput": false,
-          "secureInput": false
-        },
-        "typeProperties": {
-          "source": {
-            "type": "DataWarehouseSource",
-            "sqlReaderQuery": {
-              "value": "SELECT SourceSchema, SourceTable, TargetSchema, TargetTable, LoadMode FROM [dwh].[EtlBronzeObject] WHERE IsActive = 1 AND ('@{pipeline().parameters.source_table}' = '' OR SourceTable = '@{pipeline().parameters.source_table}') ORDER BY SourceTable",
-              "type": "Expression"
-            },
-            "queryTimeout": "02:00:00",
-            "partitionOption": "None",
-            "datasetSettings": {
-              "type": "DataWarehouseTable",
-              "typeProperties": {},
-              "annotations": [],
-              "linkedService": {
-                "name": "whsilver",
-                "properties": {
-                  "type": "DataWarehouse",
-                  "annotations": [],
-                  "typeProperties": {
-                    "endpoint": "viqr2bflwtiuvci5miqhwm3h54-l62twngicguehlf2hljthiwqpi.datawarehouse.fabric.microsoft.com",
-                    "artifactId": "578fc162-5aac-4981-be73-f6a3e928aabf",
-                    "workspaceId": "343bb55f-11c8-43a8-acba-3ad333a2d07a"
-                  }
-                }
-              }
-            }
-          },
-          "firstRowOnly": false
-        }
-      },
-      {
-        "name": "ForEachBronzeTable",
-        "type": "ForEach",
-        "dependsOn": [
-          {
-            "activity": "LookupBronzeObjects",
-            "dependencyConditions": [
-              "Succeeded"
-            ]
-          }
-        ],
-        "typeProperties": {
-          "items": {
-            "value": "@activity('LookupBronzeObjects').output.value",
-            "type": "Expression"
-          },
-          "isSequential": false,
-          "batchCount": 4,
-          "activities": [
+    "name": "dpl-bronze-sql-ingestion",
+    "objectId": "bfa7da1c-5a2e-450d-9a76-004fff6802e3",
+    "properties": {
+        "activities": [
             {
-              "name": "CopyErpTableToBronze",
-              "type": "Copy",
-              "dependsOn": [],
-              "policy": {
-                "timeout": "0.02:00:00",
-                "retry": 2,
-                "retryIntervalInSeconds": 120,
-                "secureOutput": false,
-                "secureInput": false
-              },
-              "typeProperties": {
-                "source": {
-                  "type": "AzureSqlSource",
-                  "sqlReaderQuery": {
-                    "value": "SELECT * FROM [@{item().SourceSchema}].[@{item().SourceTable}]",
-                    "type": "Expression"
-                  },
-                  "queryTimeout": "02:00:00",
-                  "partitionOption": "None",
-                  "datasetSettings": {
-                    "type": "AzureSqlTable",
-                    "typeProperties": {
-                      "schema": {
-                        "value": "@item().SourceSchema",
-                        "type": "Expression"
-                      },
-                      "table": {
-                        "value": "@item().SourceTable",
-                        "type": "Expression"
-                      }
-                    },
-                    "externalReferences": {
-                      "connection": "viqr2bflwtiuvci5miqhwm3h54-l62twngicguehlf2hljthiwqpi.datawarehouse.fabric.microsoft.com"
-                    },
-                    "annotations": []
-                  }
+                "name": "setProcessingDateTime",
+                "type": "SetVariable",
+                "dependsOn": [],
+                "policy": {
+                    "secureOutput": false,
+                    "secureInput": false
                 },
-                "sink": {
-                  "type": "LakehouseTableSink",
-                  "tableActionOption": "Overwrite",
-                  "datasetSettings": {
-                    "type": "LakehouseTable",
-                    "typeProperties": {
-                      "schema": {
-                        "value": "@item().TargetSchema",
+                "typeProperties": {
+                    "variableName": "processing_datetime",
+                    "value": {
+                        "value": "@formatDateTime(convertTimeZone(utcNow(), 'UTC', 'FLE Standard Time'), 'yyyy-MM-dd HH:mm:ss')",
                         "type": "Expression"
-                      },
-                      "table": {
-                        "value": "@item().TargetTable",
-                        "type": "Expression"
-                      }
-                    },
-                    "annotations": [],
-                    "linkedService": {
-                      "name": "lhbronze",
-                      "properties": {
-                        "type": "Lakehouse",
-                        "annotations": [],
-                        "typeProperties": {
-                          "artifactId": "6c4fcfc9-dc85-4d5e-89b7-7d362bf87501",
-                          "workspaceId": "343bb55f-11c8-43a8-acba-3ad333a2d07a",
-                          "rootFolder": "Tables"
-                        }
-                      }
                     }
-                  }
-                },
-                "enableStaging": false,
-                "translator": {
-                  "type": "TabularTranslator",
-                  "typeConversion": true,
-                  "typeConversionSettings": {
-                    "allowDataTruncation": false,
-                    "treatBooleanAsNumber": false
-                  }
                 }
-              }
+            },
+            {
+                "name": "LookupBronzeObjects",
+                "type": "Lookup",
+                "dependsOn": [
+                    {
+                        "activity": "setProcessingDateTime",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    }
+                ],
+                "policy": {
+                    "timeout": "0.01:00:00",
+                    "retry": 1,
+                    "retryIntervalInSeconds": 60,
+                    "secureOutput": false,
+                    "secureInput": false
+                },
+                "typeProperties": {
+                    "source": {
+                        "type": "DataWarehouseSource",
+                        "sqlReaderQuery": "SELECT SourceSchema, SourceTable, TargetSchema, TargetTable, LoadMode FROM [dwh].[EtlBronzeObject] WHERE IsActive = 1 AND ('@{pipeline().parameters.source_table}' = '' OR SourceTable = '@{pipeline().parameters.source_table}') ORDER BY SourceTable",
+                        "queryTimeout": "02:00:00",
+                        "partitionOption": "None",
+                        "datasetSettings": {
+                            "type": "DataWarehouseTable",
+                            "annotations": [],
+                            "linkedService": {
+                                "name": "whsilver",
+                                "properties": {
+                                    "type": "DataWarehouse",
+                                    "annotations": [],
+                                    "typeProperties": {
+                                        "endpoint": "viqr2bflwtiuvci5miqhwm3h54-l62twngicguehlf2hljthiwqpi.datawarehouse.fabric.microsoft.com",
+                                        "artifactId": "578fc162-5aac-4981-be73-f6a3e928aabf",
+                                        "workspaceId": "343bb55f-11c8-43a8-acba-3ad333a2d07a"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "firstRowOnly": false,
+                    "datasetSettings": {
+                        "annotations": [],
+                        "linkedService": {
+                            "name": "whsilver",
+                            "properties": {
+                                "annotations": [],
+                                "type": "DataWarehouse",
+                                "typeProperties": {
+                                    "endpoint": "viqr2bflwtiuvci5miqhwm3h54-l62twngicguehlf2hljthiwqpi.datawarehouse.fabric.microsoft.com",
+                                    "artifactId": "578fc162-5aac-4981-be73-f6a3e928aabf",
+                                    "workspaceId": "343bb55f-11c8-43a8-acba-3ad333a2d07a"
+                                }
+                            }
+                        },
+                        "type": "DataWarehouseTable",
+                        "schema": []
+                    }
+                }
+            },
+            {
+                "name": "ForEachBronzeTable",
+                "type": "ForEach",
+                "dependsOn": [
+                    {
+                        "activity": "LookupBronzeObjects",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    }
+                ],
+                "typeProperties": {
+                    "items": {
+                        "value": "@activity('LookupBronzeObjects').output.value",
+                        "type": "Expression"
+                    },
+                    "isSequential": false,
+                    "batchCount": 4,
+                    "activities": [
+                        {
+                            "name": "CopyErpTableToBronze",
+                            "type": "Copy",
+                            "dependsOn": [],
+                            "policy": {
+                                "timeout": "0.02:00:00",
+                                "retry": 2,
+                                "retryIntervalInSeconds": 120,
+                                "secureOutput": false,
+                                "secureInput": false
+                            },
+                            "typeProperties": {
+                                "source": {
+                                    "type": "AzureSqlSource",
+                                    "sqlReaderQuery": {
+                                        "value": "select cast(N'@{if(empty(pipeline().parameters.executor_run_id), pipeline().RunId, pipeline().parameters.executor_run_id)}' as [varchar](36)) as [TechExecutorRunID],\n\tcast(N'@{pipeline().RunId}' as [varchar](36)) as [TechProcessorRunID],\n\tconvert(datetime, N'@{variables('processing_datetime')}', 120) as [TechProcessingDateTime],\n\tconvert(datetime, N'@{if(empty(pipeline().parameters.business_datetime), variables('processing_datetime'), pipeline().parameters.business_datetime)}', 120) as [TechBusinessDateTime],\n\t*\nfrom [@{item().SourceSchema}].[@{item().SourceTable}]",
+                                        "type": "Expression"
+                                    },
+                                    "queryTimeout": "02:00:00",
+                                    "partitionOption": "None",
+                                    "datasetSettings": {
+                                        "annotations": [],
+                                        "type": "AzureSqlTable",
+                                        "schema": [],
+                                        "typeProperties": {
+                                            "schema": {
+                                                "value": "@item().SourceSchema",
+                                                "type": "Expression"
+                                            },
+                                            "table": {
+                                                "value": "@item().SourceTable",
+                                                "type": "Expression"
+                                            },
+                                            "database": "sqldb-ds-dds-d-westeu-01"
+                                        },
+                                        "externalReferences": {
+                                            "connection": "5b8c6fba-3677-4218-a496-fa046222b0b1"
+                                        }
+                                    }
+                                },
+                                "sink": {
+                                    "type": "LakehouseTableSink",
+                                    "tableActionOption": "OverwriteSchema",
+                                    "partitionOption": "None",
+                                    "enableTimestampNtz": false,
+                                    "datasetSettings": {
+                                        "annotations": [],
+                                        "linkedService": {
+                                            "name": "lhbronze",
+                                            "properties": {
+                                                "annotations": [],
+                                                "type": "SqlAnalyticsEndpoint",
+                                                "typeProperties": {
+                                                    "endpoint": "viqr2bflwtiuvci5miqhwm3h54-l62twngicguehlf2hljthiwqpi.datawarehouse.fabric.microsoft.com",
+                                                    "artifactId": "6c4fcfc9-dc85-4d5e-89b7-7d362bf87501",
+                                                    "workspaceId": "343bb55f-11c8-43a8-acba-3ad333a2d07a",
+                                                    "rootFolder": "Tables"
+                                                }
+                                            }
+                                        },
+                                        "type": "LakehouseTable",
+                                        "schema": [],
+                                        "typeProperties": {
+                                            "schema": {
+                                                "value": "@item().TargetSchema",
+                                                "type": "Expression"
+                                            },
+                                            "table": {
+                                                "value": "@item().TargetTable",
+                                                "type": "Expression"
+                                            }
+                                        }
+                                    },
+                                    "applyVOrder": false
+                                },
+                                "enableStaging": false,
+                                "translator": {
+                                    "type": "TabularTranslator",
+                                    "typeConversion": true,
+                                    "typeConversionSettings": {
+                                        "allowDataTruncation": true,
+                                        "treatBooleanAsNumber": false
+                                    }
+                                }
+                            }
+                        }
+                    ]
+                }
+            },
+            {
+                "name": "InvokeSilverFullLoad",
+                "type": "InvokePipeline",
+                "dependsOn": [
+                    {
+                        "activity": "ForEachBronzeTable",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    }
+                ],
+                "policy": {
+                    "timeout": "0.04:00:00",
+                    "retry": 0,
+                    "retryIntervalInSeconds": 30,
+                    "secureOutput": false,
+                    "secureInput": false
+                },
+                "typeProperties": {
+                    "waitOnCompletion": true,
+                    "operationType": "InvokeFabricPipeline",
+                    "pipelineId": "a5d81645-aff3-45de-b4f5-5d05c95271fb",
+                    "workspaceId": "343bb55f-11c8-43a8-acba-3ad333a2d07a",
+                    "parameters": {
+                        "root_object": {
+                            "value": "@if(empty(pipeline().parameters.source_table), '', concat('lhbronze.erp_erp.', pipeline().parameters.source_table))",
+                            "type": "Expression"
+                        }
+                    }
+                },
+                "externalReferences": {
+                    "connection": "50003565-5fe0-40d3-bdb2-ad3ecc987ea0"
+                }
             }
-          ]
-        }
-      },
-      {
-        "name": "InvokeSilverFullLoad",
-        "type": "InvokePipeline",
-        "dependsOn": [
-          {
-            "activity": "ForEachBronzeTable",
-            "dependencyConditions": [
-              "Succeeded"
-            ]
-          }
         ],
-        "policy": {
-          "timeout": "0.04:00:00",
-          "retry": 0,
-          "secureOutput": false,
-          "secureInput": false
-        },
-        "typeProperties": {
-          "operationType": "InvokeFabricPipeline",
-          "workspaceId": "343bb55f-11c8-43a8-acba-3ad333a2d07a",
-          "pipelineId": "a5d81645-aff3-45de-b4f5-5d05c95271fb",
-          "waitOnCompletion": true,
-          "parameters": {
-            "root_object": {
-              "value": "@if(empty(pipeline().parameters.source_table), '', concat('lhbronze.erp_erp.', pipeline().parameters.source_table))",
-              "type": "Expression"
+        "parameters": {
+            "source_table": {
+                "type": "string",
+                "defaultValue": ""
+            },
+            "executor_run_id": {
+                "type": "string",
+                "defaultValue": ""
+            },
+            "business_datetime": {
+                "type": "string",
+                "defaultValue": ""
             }
-          }
         },
-        "externalReferences": {
-          "connection": "viqr2bflwtiuvci5miqhwm3h54-l62twngicguehlf2hljthiwqpi.datawarehouse.fabric.microsoft.com"
-        }
-      }
-    ],
-    "annotations": [],
-    "lastModifiedByObjectId": "",
-    "lastPublishTime": "",
-    "parameters": {
-      "source_table": {
-        "type": "string",
-        "defaultValue": ""
-      }
+        "variables": {
+            "processing_datetime": {
+                "type": "String"
+            }
+        },
+        "lastModifiedByObjectId": "c4d16a83-6891-4a09-8542-b0147ed80393",
+        "lastPublishTime": "2026-08-25T12:48:07Z"
     }
-  }
 }

@@ -26,6 +26,21 @@ Silver читає bronze **тільки через view** `dwh.v<ObjectName>`; �
 `INVENTORY_MOVEMENTS`, `DOCTOR_VISITS`, `PRESCRIPTIONS`, `ADVERSE_EVENTS`
 (включно з `row_id`, `created_at`, `updated_at`).
 
+Крім них bronze-провіженер додає на початок кожної таблиці чотири технічні колонки
+(та сама конвенція, що в `grp-ctl-azure-dwh/fabric-migrations/flyway/lh-provisioner`):
+
+| Колонка | Тип | Призначення |
+|---|---|---|
+| `TechExecutorRunID` | string | ідентифікатор запуску виконавця завантаження |
+| `TechProcessorRunID` | string | ідентифікатор запуску обробника |
+| `TechProcessingDateTime` | timestamp | коли рядок потрапив у bronze |
+| `TechBusinessDateTime` | timestamp | бізнес-дата завантаження |
+
+Silver їх **не читає і не переносить**: усі `v*` мають явні списки колонок, `alias.*`
+трапляється лише всередині CTE і до фінальної проєкції не доходить. Тому поява цих
+колонок нічого в silver не змінює — але їх треба зберігати при будь-якому
+перезаписі bronze (див. розділ 8).
+
 ## 2. Конвенції
 
 | Елемент | Правило |
@@ -252,6 +267,25 @@ JSON у репозиторії — шаблон: перед імпортом п�
 Розклад вішається на `PL_Bronze_Ingest`; окремий розклад на `PL_Silver_Full_Load`
 краще не ставити, щоб silver не завантажувався двічі (запускати його вручну лише
 для перезавантаження без переносу bronze).
+
+Copy-активність відтворює конвенції штатного завантажувача `dpl-bronze-sql-load-full`:
+
+* у `sqlReaderQuery` перед `*` додаються чотири технічні колонки —
+  `TechExecutorRunID` (параметр `executor_run_id`, за замовчуванням `RunId` цього pipeline),
+  `TechProcessorRunID` (`RunId`), `TechProcessingDateTime` (змінна `processing_datetime`,
+  київський час через `convertTimeZone(..., 'FLE Standard Time')`),
+  `TechBusinessDateTime` (параметр `business_datetime`, за замовчуванням = `processing_datetime`);
+* `tableActionOption: OverwriteSchema` замість `Overwrite`;
+* `allowDataTruncation: true`, `applyVOrder: false`, `enableTimestampNtz: false`.
+
+Завдяки цьому наш перенос не ламає контракт bronze: схема таблиці лишається тією самою,
+що її створює штатний завантажувач.
+
+Чого свідомо **не** перенесено з `dpl-bronze-sql-load-full`: двоетапності
+`Azure SQL -> lhbronzestg -> lhbronze`. У нашому pipeline копія йде одразу в `lhbronze`,
+бо staging потрібен їхньому процесу для порівняння зі snapshot і ведення history-лейкхаусу,
+а тут таблиця просто перезаписується. Якщо потрібна повна відповідність стандарту —
+додається ще одна Copy-активність зі staging-лейкхаусом.
 
 Повне перезавантаження bronze обране свідомо: джерело не має надійного watermark
 (`updated_at` мутують дефектні `UPDATE`-и генератора), а обсяги — сотні тисяч рядків.
