@@ -1,0 +1,129 @@
+{
+    "name": "dpl-gold-sql-load",
+    "properties": {
+        "activities": [
+            {
+                "name": "LookupGoldLoadLevels",
+                "type": "Lookup",
+                "dependsOn": [],
+                "policy": {
+                    "timeout": "0.01:00:00",
+                    "retry": 1,
+                    "retryIntervalInSeconds": 60,
+                    "secureOutput": false,
+                    "secureInput": false
+                },
+                "typeProperties": {
+                    "source": {
+                        "type": "DataWarehouseSource",
+                        "sqlReaderQuery": "SELECT DISTINCT LoadLevel FROM [dwh].[EtlGoldObject] WHERE IsActive = 1 ORDER BY LoadLevel",
+                        "queryTimeout": "02:00:00",
+                        "partitionOption": "None",
+                        "datasetSettings": {
+                            "type": "DataWarehouseTable",
+                            "annotations": [],
+                            "linkedService": {
+                                "name": "whgold",
+                                "properties": {
+                                    "type": "DataWarehouse",
+                                    "annotations": [],
+                                    "typeProperties": {
+                                        "endpoint": "viqr2bflwtiuvci5miqhwm3h54-l62twngicguehlf2hljthiwqpi.datawarehouse.fabric.microsoft.com",
+                                        "artifactId": "<WHGOLD_ITEM_ID>",
+                                        "workspaceId": "343bb55f-11c8-43a8-acba-3ad333a2d07a"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "firstRowOnly": false,
+                    "datasetSettings": {
+                        "annotations": [],
+                        "linkedService": {
+                            "name": "whgold",
+                            "properties": {
+                                "annotations": [],
+                                "type": "DataWarehouse",
+                                "typeProperties": {
+                                    "endpoint": "viqr2bflwtiuvci5miqhwm3h54-l62twngicguehlf2hljthiwqpi.datawarehouse.fabric.microsoft.com",
+                                    "artifactId": "<WHGOLD_ITEM_ID>",
+                                    "workspaceId": "343bb55f-11c8-43a8-acba-3ad333a2d07a"
+                                }
+                            }
+                        },
+                        "type": "DataWarehouseTable",
+                        "schema": []
+                    }
+                }
+            },
+            {
+                "name": "ForEachGoldLoadLevel",
+                "type": "ForEach",
+                "dependsOn": [
+                    {
+                        "activity": "LookupGoldLoadLevels",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    }
+                ],
+                "typeProperties": {
+                    "items": {
+                        "value": "@activity('LookupGoldLoadLevels').output.value",
+                        "type": "Expression"
+                    },
+                    "isSequential": true,
+                    "activities": [
+                        {
+                            "name": "ExecGoldLoadLevel",
+                            "type": "Script",
+                            "dependsOn": [],
+                            "policy": {
+                                "timeout": "0.02:00:00",
+                                "retry": 1,
+                                "retryIntervalInSeconds": 120,
+                                "secureOutput": false,
+                                "secureInput": false
+                            },
+                            "linkedService": {
+                                "name": "whgold",
+                                "properties": {
+                                    "annotations": [],
+                                    "type": "DataWarehouse",
+                                    "typeProperties": {
+                                        "endpoint": "viqr2bflwtiuvci5miqhwm3h54-l62twngicguehlf2hljthiwqpi.datawarehouse.fabric.microsoft.com",
+                                        "artifactId": "<WHGOLD_ITEM_ID>",
+                                        "workspaceId": "343bb55f-11c8-43a8-acba-3ad333a2d07a"
+                                    }
+                                }
+                            },
+                            "typeProperties": {
+                                "scripts": [
+                                    {
+                                        "type": "Query",
+                                        "text": {
+                                            "value": "EXEC [dwh].[spGoldLoadLevel] @level = @{item().LoadLevel}, @load_id = '@{pipeline().RunId}';",
+                                            "type": "Expression"
+                                        }
+                                    }
+                                ],
+                                "scriptBlockExecutionTimeout": "02:00:00"
+                            }
+                        }
+                    ]
+                }
+            }
+        ],
+        "parameters": {},
+        "lastModifiedByObjectId": "",
+        "lastPublishTime": ""
+    },
+    "_comment": [
+        "Fabric Data Pipeline: завантаження gold у ОКРЕМОМУ warehouse [whgold], схема [dwh].",
+        "Lookup читає рівні з [dwh].[EtlGoldObject] (у whgold), ForEach послідовно викликає",
+        "[dwh].[spGoldLoadLevel]; load_id = RunId запуску pipeline.",
+        "Новий обʼєкт gold = рядок у EtlGoldObject; pipeline змінювати не треба.",
+        "ПЕРЕД ІМПОРТОМ підставити <WHGOLD_ITEM_ID> (item id warehouse whgold).",
+        "endpoint лишено спільний для workspace — перевірте у властивостях whgold."
+    ]
+}

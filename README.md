@@ -56,6 +56,7 @@ Kimball bus matrix). Нижче — стисла bus matrix:
 - **Surrogate-ключі:** `SK<Name>ID` — PK версії рядка; `SK<Name>KeyID` — durable-ключ,
   стабільний між версіями SCD2. **Факти посилаються саме на `SK*KeyID`.**
 - **SCD Type 2:** виміри історизуються через `StartDate`/`EndDate` (`EndDate IS NULL` = поточна версія).
+- **SCD Type 1:** `DimLpu` перезаписується на місці — демо різниці підходів у [`docs/scd1_demo.md`](docs/scd1_demo.md).
 - **Unknown member:** у кожному вимірі є рядок `-1` для orphan-фактів (гарантує inner join без втрат).
 - **DimDate** — статичний календар (`SKDateKeyID` у форматі `yyyymmdd`), без SCD.
 - **Grain фактів** описаний у шапці кожного `.sql` та в `docs/er_diagram.md`.
@@ -125,15 +126,23 @@ fabric-migrations/flyway/
     ├── V260820.1115__silver_alter_views_bronze_source.sql    -- fix: bronze = [lhbronze].[erp_erp]
     ├── V260821.1030__silver_create_etl_orchestration.sql     -- EtlSilverObject + spSilverLoadLevel
     ├── V260821.1600__bronze_create_etl_metadata.sql          -- EtlBronzeObject (реєстр для bronze)
-    └── V260825.1100__silver_create_dependency_graph.sql      -- граф залежностей + spSilverLoadSubset
+    ├── V260825.1100__silver_create_dependency_graph.sql      -- граф залежностей + spSilverLoadSubset
+    ├── V260826.1030__silver_incremental_fct_load.sql         -- інкремент фактів (watermark SrcModifiedAt)
+    ├── V260826.1600__gold_init_creation.sql                  -- gold (whgold.dwh): 6 вимірів + 7 агрегатів
+    ├── V260826.1610__gold_create_views_and_prc.sql           -- gold: v*, EtlGoldObject, spGoldLoadLevel
+    ├── V260827.0930__gold_drop_legacy_schema_in_silver.sql   -- прибирання старої схеми [gold] у whsilver
+    └── V260827.1400__silver_enable_scd1_dimlpu.sql           -- SCD1 для DimLpu (демо історизації)
 
 fabric-pipelines/
 ├── PL_Bronze_Ingest.json                                     -- Azure SQL -> bronze -> тригер silver
-└── PL_Silver_Full_Load.json                                  -- Data Pipeline (Lookup + ForEach по рівнях)
+├── PL_Silver_Full_Load.json                                  -- silver (Lookup + ForEach по рівнях)
+└── PL_Gold_Full_Load.json                                    -- gold (Lookup + ForEach по рівнях)
 ```
 
 Опис моделі, ER-схема, bus matrix, порядок завантаження та обробка дефектів джерела —
-[`docs/silver_model.md`](docs/silver_model.md).
+[`docs/silver_model.md`](docs/silver_model.md). Gold-рівень — [`docs/gold_model.md`](docs/gold_model.md).
+Опис даних для бізнес-користувачів (джерело, silver, gold, прапорці якості) —
+[`docs/data_dictionary.md`](docs/data_dictionary.md).
 
 ### Запуск silver
 
@@ -150,6 +159,8 @@ EXEC [dwh].[spSilverFullLoad] @load_id = 'manual_full_load';   -- усі рів�
 EXEC [dwh].[spSilverLoadLevel] @level = 5, @load_id = 'retry'; -- рестарт з рівня
 -- перезавантажити одне джерело з усіма залежностями:
 EXEC [dwh].[spSilverLoadSubset] @root_object = 'lhbronze.erp_erp.CUSTOMERS', @load_id = 'reload_customers';
+-- інкремент фактів (тільки нові/змінені рядки):
+EXEC [dwh].[spSilverLoadSubset] @root_object = NULL, @load_id = 'nightly', @force_full = 0;
 ```
 
 Регулярно — через Fabric Data Pipeline `fabric-pipelines/PL_Silver_Full_Load.json`
@@ -159,7 +170,14 @@ EXEC [dwh].[spSilverLoadSubset] @root_object = 'lhbronze.erp_erp.CUSTOMERS', @lo
 `erp` з Azure SQL у `lhbronze.erp_erp` (перелік — з `dwh.EtlBronzeObject`, паралельно по 4)
 і після успіху викликає `PL_Silver_Full_Load`. Розклад вішайте саме на нього.
 
-**Крок 3 — перевірка:**
+**Крок 3 — gold.** Агрегати для звітності — в окремому warehouse `whgold`, схема `dwh`
+(окремий pipeline або вручну, з контексту `whgold`):
+
+```sql
+EXEC [dwh].[spGoldFullLoad] @load_id = 'manual_gold_full_load';
+```
+
+**Крок 4 — перевірка:**
 
 ```sql
 SELECT 'FctSales', COUNT(*) FROM [dwh].[FctSales]

@@ -52,7 +52,7 @@ Silver їх **не читає і не переносить**: усі `v*` маю
 | Джерельний view | `v<TableName>`, **перша колонка = натуральний ключ `Id`** (за нею процедура визначає NK) |
 | Технічні колонки Dim/Ref | `StartDate`, `EndDate`, `IsDeleted`, `CreatedBy`, `ModifiedBy`, `CreatedAt`, `ModifiedAt` |
 | Технічні колонки Fct | `CreatedBy`, `CreatedAt` |
-| Історизація | SCD2: активна версія — `EndDate IS NULL`; зникнення в джерелі -> `IsDeleted = 1` |
+| Історизація | SCD2 (типово): активна версія — `EndDate IS NULL`; зникнення в джерелі -> `IsDeleted = 1`. SCD1 (`DimLpu`): перезапис на місці, `EndDate` завжди порожній — див. [`scd1_demo.md`](scd1_demo.md) |
 | Unknown member | рядок `-1` у кожному Dim/Ref (+ `SKDateID = -1` у `DimDate`) |
 | Значення за замовчуванням | текст -> `'N/A'`, ключ -> `-1` (усі `SK*KeyID` у view обгорнуті в `ISNULL(..., -1)`) |
 
@@ -349,6 +349,48 @@ SELECT DISTINCT RootObject FROM [dwh].[EtlObjectDownstream] ORDER BY RootObject;
 Після зміни `v*` або появи нового обʼєкта: оновити рядки в `EtlObjectDependency`
 і виконати `EXEC [dwh].[spRefreshObjectClosure]`.
 
+### Інкрементальне завантаження фактів
+
+| Обʼєкт | Роль |
+|---|---|
+| `Fct*.SrcModifiedAt` | watermark-колонка (= `erp.<table>.updated_at` з bronze), остання в таблиці й у `vFct*` |
+| `dwh.EtlSilverWatermark` | останнє оброблене значення watermark по кожному факту |
+| `dwh.spIncrementalFct` | вантажить зріз `SrcModifiedAt > watermark`: `DELETE` по `ItemId` + `INSERT`, далі просуває watermark |
+| `dwh.spSetWatermarkFromTable` | вирівнює watermark після повного перезавантаження |
+| `EtlSilverObject.LoadStrategy` | `Full` / `Incremental`; `WatermarkColumn` — назва колонки |
+| `@force_full` | параметр `spSilverLoadLevel` / `spSilverLoadSubset` / `spSilverFullLoad` — ігнорує стратегію і перезаписує факти цілком |
+
+```sql
+-- інкремент (тільки нові/змінені рядки фактів)
+EXEC [dwh].[spSilverLoadSubset] @root_object = NULL, @load_id = 'nightly', @force_full = 0;
+
+-- повне перезавантаження (за замовчуванням)
+EXEC [dwh].[spSilverFullLoad] @load_id = 'weekly_full';
+
+-- стан watermark
+SELECT * FROM [dwh].[EtlSilverWatermark] ORDER BY ObjectName;
+```
+
+**Виміри лишаються повними — і це не спрощення.** `spUpsertSCDDimension` закриває
+(`IsDeleted = 1`) рядки, яких немає у джерельному view. Якщо відфільтрувати view по
+watermark, усі незмінені рядки зникнуть із джерела і будуть помилково позначені видаленими.
+SCD2 і так записує лише реальні зміни, тому повне порівняння тут — коректний режим.
+
+Обмеження інкременту, які треба тримати в голові:
+
+* **видалення в джерелі не видно** — рядок, стертий в `erp`, лишиться у факті до
+  наступного `@force_full = 1`; тому повне перезавантаження варто лишити за розкладом
+  (наприклад, щотижня) поряд із щоденним інкрементом;
+* **зміна без оновлення `updated_at` не потрапить у зріз** — саме так поводяться
+  `UPDATE`-и, що імітують дефекти в `02_generate_data_fixed.sql`;
+* **`Tech*` колонки bronze для watermark не годяться** — bronze перезаписується повністю
+  (`OverwriteSchema`), тож `TechProcessingDateTime` оновлюється в усіх рядків одночасно
+  і зріз дорівнював би повній таблиці.
+
+Після деплою міграції один раз потрібен повний прогін
+(`EXEC [dwh].[spSilverFullLoad] @load_id = 'init_after_incremental'`) — він заповнить
+`SrcModifiedAt` у вже завантажених рядках і вирівняє watermark.
+
 ### Контроль після запуску
 
 ```sql
@@ -373,6 +415,8 @@ ORDER BY LoadLevel, StartedAt;
 | `V260821.1030__silver_create_etl_orchestration.sql` | `EtlSilverObject`, `EtlSilverLoadLog`, `spSilverLoadLevel`, metadata-driven `spSilverFullLoad` |
 | `V260821.1600__bronze_create_etl_metadata.sql` | `EtlBronzeObject` — реєстр таблиць для `PL_Bronze_Ingest` |
 | `V260825.1100__silver_create_dependency_graph.sql` | `EtlObjectDependency`, `EtlObjectDownstream`, `spRefreshObjectClosure`, `spSilverLoadSubset`, `@root_object` у `spSilverLoadLevel` |
+| `V260826.1030__silver_incremental_fct_load.sql` | `SrcModifiedAt` у фактах, `EtlSilverWatermark`, `spIncrementalFct`, `LoadStrategy`, `@force_full` |
+| `V260827.1400__silver_enable_scd1_dimlpu.sql` | виправлена гілка SCD1 у `spUpsertSCDDimension`, `DimLpu` переведено на SCD1 |
 
 Іменування: `V<YYMMDD>.<HHMM>__<опис>.sql`, `flyway.outOfOrder=true`, кожна міграція ідемпотентна.
 
