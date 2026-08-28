@@ -1,0 +1,171 @@
+/// Основна таблиця продажів. Повернення винесені в окремі міри й НЕ входять у суму продажів.
+table 'Продажі за місяць'
+	lineageTag: 2611e9cd-2935-5fde-80d7-370be080f8d9
+
+	column CreatedBy
+		dataType: string
+		isHidden
+		lineageTag: 94c081eb-813f-544c-98c4-a73ab7ead6d7
+		summarizeBy: none
+		sourceColumn: CreatedBy
+		annotation SummarizationSetBy = Automatic
+
+	column CreatedAt
+		dataType: dateTime
+		isHidden
+		lineageTag: 6efb0610-8fef-5d07-a98c-c5867d9273d2
+		summarizeBy: none
+		sourceColumn: CreatedAt
+		annotation SummarizationSetBy = Automatic
+		annotation UnderlyingDateTimeDataType = Date
+
+	column SKProductID
+		dataType: int64
+		isHidden
+		lineageTag: e63090cf-098c-5265-a8e5-22db01b44e73
+		summarizeBy: none
+		sourceColumn: SKProductID
+		annotation SummarizationSetBy = Automatic
+
+	column SKEmployeeID
+		dataType: int64
+		isHidden
+		lineageTag: b05cae73-9e54-5b25-ba0f-909259424dec
+		summarizeBy: none
+		sourceColumn: SKEmployeeID
+		annotation SummarizationSetBy = Automatic
+
+	column 'Регіон продажу'
+		/// Регіон клієнта
+		dataType: string
+		lineageTag: 017e046b-4b53-5daa-b268-27f8582440f8
+		summarizeBy: none
+		sourceColumn: Region
+		annotation SummarizationSetBy = Automatic
+
+	column 'Тип клієнта'
+		dataType: string
+		lineageTag: b1003036-0db4-56bc-948b-305542d5637b
+		summarizeBy: none
+		sourceColumn: AccountType
+		annotation SummarizationSetBy = Automatic
+
+	column TotalNetAmount
+		dataType: decimal
+		isHidden
+		lineageTag: 09da438c-f2b1-5acc-b62b-089bd59eb290
+		summarizeBy: none
+		sourceColumn: TotalNetAmount
+		annotation SummarizationSetBy = Automatic
+
+	column ClientAccountCnt
+		dataType: int64
+		isHidden
+		lineageTag: a718c827-0231-57cb-a032-a1daa245cd72
+		summarizeBy: none
+		sourceColumn: ClientAccountCnt
+		annotation SummarizationSetBy = Automatic
+
+	column ReturnQty
+		dataType: decimal
+		isHidden
+		lineageTag: 0aa87da7-8115-51a9-bca5-b1b6ed1b46f4
+		summarizeBy: none
+		sourceColumn: ReturnQty
+		annotation SummarizationSetBy = Automatic
+
+	column OrderLineCnt
+		dataType: int64
+		isHidden
+		lineageTag: 5c9bade7-a066-5892-8573-1ea25e0197be
+		summarizeBy: none
+		sourceColumn: OrderLineCnt
+		annotation SummarizationSetBy = Automatic
+
+	column TotalQty
+		dataType: decimal
+		isHidden
+		lineageTag: d2eae843-b7b6-5ab0-8bac-c61ba06cc899
+		summarizeBy: none
+		sourceColumn: TotalQty
+		annotation SummarizationSetBy = Automatic
+
+	column ReturnNetAmount
+		dataType: decimal
+		isHidden
+		lineageTag: b80b13dd-3353-5380-b7b4-2dae30eb2e75
+		summarizeBy: none
+		sourceColumn: ReturnNetAmount
+		annotation SummarizationSetBy = Automatic
+
+	column YearMonth
+		dataType: string
+		isHidden
+		lineageTag: 5f73f76c-9ca8-5126-b3dc-20f27f7b8840
+		summarizeBy: none
+		sourceColumn: YearMonth
+		annotation SummarizationSetBy = Automatic
+
+	column YearNum
+		dataType: int64
+		isHidden
+		lineageTag: 1f3d304b-d02f-5550-971a-1d953f29c48f
+		summarizeBy: none
+		sourceColumn: YearNum
+		annotation SummarizationSetBy = Automatic
+
+	column MonthNum
+		dataType: int64
+		isHidden
+		lineageTag: 163b5850-f29b-5f4c-9888-e707203ab743
+		summarizeBy: none
+		sourceColumn: MonthNum
+		annotation SummarizationSetBy = Automatic
+
+	column MonthStartDate
+		dataType: dateTime
+		isHidden
+		lineageTag: b3314272-b5c3-5605-953d-6454b07979e5
+		summarizeBy: none
+		sourceColumn: MonthStartDate
+		annotation SummarizationSetBy = Automatic
+		annotation UnderlyingDateTimeDataType = Date
+
+	/// Сума без повернень, грн
+	measure 'Сума продажів' = SUM('Продажі за місяць'[TotalNetAmount])
+		formatString: #,0
+		lineageTag: f5eb87db-a9e2-5590-ab5d-4d7347301a20
+
+	/// Продані упаковки без повернень
+	measure 'Кількість упаковок' = SUM('Продажі за місяць'[TotalQty])
+		formatString: #,0
+		lineageTag: 0cf596f1-1743-511f-8ad2-c19be75096cf
+
+	measure 'Рядків замовлень' = SUM('Продажі за місяць'[OrderLineCnt])
+		formatString: #,0
+		lineageTag: 5e309b41-234f-58cc-ade6-20500fa5a71f
+
+	/// Сума повернень, грн
+	measure 'Повернення, сума' = SUM('Продажі за місяць'[ReturnNetAmount])
+		formatString: #,0
+		lineageTag: 0106b3e3-4315-5af8-8490-29c10a88d1ae
+
+	measure 'Повернення, упаковки' = SUM('Продажі за місяць'[ReturnQty])
+		formatString: #,0
+		lineageTag: 35f1e5bb-6d97-5da3-9d71-780fade2e596
+
+	/// Повернення до валового обороту
+	measure 'Частка повернень' = DIVIDE([Повернення, сума], [Сума продажів] + [Повернення, сума])
+		formatString: 0.0%
+		lineageTag: 0e0c0807-a85b-559e-9d7f-f7ac1b28b211
+
+	measure 'Середня сума рядка' = DIVIDE([Сума продажів], [Рядків замовлень])
+		formatString: #,0.00
+		lineageTag: d8abf452-fa52-59c4-b4b6-a4b1eb461ce1
+
+	partition 'Продажі за місяць' = entity
+		mode: directLake
+		source
+			entityName: AggSalesMonthly
+			schemaName: dwh
+			expressionSource: DatabaseQuery

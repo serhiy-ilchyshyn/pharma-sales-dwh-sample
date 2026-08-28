@@ -1,0 +1,95 @@
+/// Польова команда: медпредставники та їхні керівники.
+table 'Представник'
+	lineageTag: be9c2cb0-a503-5a00-b6f5-ba87484e6543
+
+	column CreatedBy
+		dataType: string
+		isHidden
+		lineageTag: f4bb0d1f-c240-50a6-bd57-b9dae4a1b564
+		summarizeBy: none
+		sourceColumn: CreatedBy
+		annotation SummarizationSetBy = Automatic
+
+	column CreatedAt
+		dataType: dateTime
+		isHidden
+		lineageTag: 3ea6604f-2bb0-5d8d-9753-694f027d670d
+		summarizeBy: none
+		sourceColumn: CreatedAt
+		annotation SummarizationSetBy = Automatic
+		annotation UnderlyingDateTimeDataType = Date
+
+	column SKEmployeeID
+		dataType: int64
+		isHidden
+		lineageTag: b98a575a-c149-5201-a35e-b7f75e1bb296
+		summarizeBy: none
+		sourceColumn: SKEmployeeID
+		annotation SummarizationSetBy = Automatic
+
+	column Id
+		dataType: string
+		isHidden
+		lineageTag: f3a49f2d-e937-51e6-95db-4fa6c53ce3b7
+		summarizeBy: none
+		sourceColumn: Id
+		annotation SummarizationSetBy = Automatic
+
+	column 'ПІБ представника'
+		dataType: string
+		lineageTag: de18e524-aa4f-5b4c-9293-356116efd85a
+		summarizeBy: none
+		sourceColumn: EmployeeName
+		annotation SummarizationSetBy = Automatic
+
+	column Посада
+		dataType: string
+		lineageTag: 84b7e503-173d-5715-be8d-89c0c4b43052
+		summarizeBy: none
+		sourceColumn: EmployeeRole
+		annotation SummarizationSetBy = Automatic
+
+	column Територія
+		dataType: string
+		lineageTag: 12e1a4f5-6405-50f0-a5d5-1efa34ffcf80
+		summarizeBy: none
+		sourceColumn: Territory
+		annotation SummarizationSetBy = Automatic
+
+	column Лінія
+		/// RX / OTC / обидві
+		dataType: string
+		lineageTag: 3287de70-6a28-56ce-9e40-c49b7a4fe77c
+		summarizeBy: none
+		sourceColumn: ProductLine
+		annotation SummarizationSetBy = Automatic
+
+	column Керівник
+		dataType: string
+		lineageTag: 1c48e368-dd8b-52dd-a943-59f871b9e1dc
+		summarizeBy: none
+		sourceColumn: ManagerName
+		annotation SummarizationSetBy = Automatic
+
+	column 'Дата найму'
+		dataType: dateTime
+		formatString: "dd.MM.yyyy"
+		lineageTag: 1881b5a0-da89-527b-ba0c-070558825aed
+		summarizeBy: none
+		sourceColumn: HireDate
+		annotation SummarizationSetBy = Automatic
+		annotation UnderlyingDateTimeDataType = Date
+
+	column Активний
+		dataType: boolean
+		lineageTag: 70dc2934-d8b1-5fdd-9198-a7b8a8c96665
+		summarizeBy: none
+		sourceColumn: IsActive
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Представник' = entity
+		mode: directLake
+		source
+			entityName: DimEmployee
+			schemaName: dwh
+			expressionSource: DatabaseQuery

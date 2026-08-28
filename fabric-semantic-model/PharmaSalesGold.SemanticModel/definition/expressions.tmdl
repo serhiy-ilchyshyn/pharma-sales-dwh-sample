@@ -1,0 +1,8 @@
+/// Підключення до warehouse [whgold]. Перед першим деплоєм підставте SQL endpoint і item id.
+expression DatabaseQuery =
+		let
+			database = Sql.Database("<SQL_ENDPOINT>", "<WHGOLD_ITEM_ID>")
+		in
+			database
+	lineageTag: c5303798-7403-5ae9-97c6-f93bec9b18f3
+	annotation PBI_IncludeFutureArtifacts = False

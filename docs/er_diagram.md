@@ -1,136 +1,171 @@
-# Схема зв'язків / ER Diagram — Pharma Sales star schema
+# ER-схеми: джерело → silver → gold
 
-Модель побудована як **star / constellation schema** (Kimball): 5 фактових таблиць
-розділяють спільні (conformed) виміри. Виміри — SCD Type 2 (крім `DimDate`).
-Факти посилаються на **durable-ключі** вимірів (`SK*KeyID`), а не на surrogate-ключі версій.
+Три діаграми відповідають трьом шарам задеплоєної моделі. Порядок завантаження й повний
+перелік залежностей — у [`silver_dependencies.md`](silver_dependencies.md).
 
-> GitHub рендерить діаграму Mermaid нижче автоматично. Локально можна переглянути через
-> будь-який Mermaid live-редактор або розширення VS Code "Markdown Preview Mermaid Support".
+---
 
-## Зоряна схема (зв'язки фактів і вимірів)
+## 1. Джерело: Pharma ERP (Azure SQL, схема `erp`)
+
+FK у джерелі не оголошені — усі зв'язки логічні, тому частина посилань веде «в нікуди»
+(це навмисно, silver їх обробляє).
 
 ```mermaid
 erDiagram
-    DimDate            ||--o{ FctSales              : "SKDateKeyID"
-    DimEmployee        ||--o{ FctSales              : "SKEmployeeKeyID"
-    DimClientAccount   ||--o{ FctSales              : "SKClientAccountKeyID"
-    DimProduct         ||--o{ FctSales              : "SKProductKeyID"
+    CUSTOMERS   ||--o{ SALES_ORDERS        : customer_id
+    WAREHOUSES  ||--o{ SALES_ORDERS        : warehouse_id
+    PRODUCTS    ||--o{ SALES_ORDERS        : product_id
+    EMPLOYEES   ||--o{ SALES_ORDERS        : employee_id
 
-    DimDate            ||--o{ FctSalesPlan          : "SKDateKeyID"
-    DimEmployee        ||--o{ FctSalesPlan          : "SKEmployeeKeyID"
-    DimProduct         ||--o{ FctSalesPlan          : "SKProductKeyID"
+    WAREHOUSES  ||--o{ INVENTORY_MOVEMENTS : warehouse_id
+    PRODUCTS    ||--o{ INVENTORY_MOVEMENTS : product_id
+    EMPLOYEES   ||--o{ INVENTORY_MOVEMENTS : employee_id
 
-    DimDate            ||--o{ FctVisit              : "SKDateKeyID"
-    DimEmployee        ||--o{ FctVisit              : "SKEmployeeKeyID"
-    DimClientAccount   ||--o{ FctVisit              : "SKClientAccountKeyID"
-    DimActivityType    ||--o{ FctVisit              : "SKActivityTypeKeyID"
+    DOCTORS     ||--o{ DOCTOR_VISITS       : doctor_id
+    EMPLOYEES   ||--o{ DOCTOR_VISITS       : employee_id
+    PRODUCTS    ||--o{ DOCTOR_VISITS       : product_id
 
-    DimDate            ||--o{ FctTargetFrequency    : "SKDateKeyID"
-    DimEmployee        ||--o{ FctTargetFrequency    : "SKEmployeeKeyID"
-    DimClientAccount   ||--o{ FctTargetFrequency    : "SKClientAccountKeyID"
-    DimActivityType    ||--o{ FctTargetFrequency    : "SKActivityTypeKeyID"
+    DOCTORS     ||--o{ PRESCRIPTIONS       : doctor_id
+    PRODUCTS    ||--o{ PRESCRIPTIONS       : product_id
+    EMPLOYEES   ||--o{ PRESCRIPTIONS       : entered_by_employee_id
 
-    DimDate            ||--o{ FctInventorySnapshot  : "SKDateKeyID"
-    DimClientAccount   ||--o{ FctInventorySnapshot  : "SKClientAccountKeyID"
-    DimProduct         ||--o{ FctInventorySnapshot  : "SKProductKeyID"
+    PRODUCTS    ||--o{ ADVERSE_EVENTS      : product_id
+    DOCTORS     ||--o{ ADVERSE_EVENTS      : reporter_doctor_id
 
-    DimDate {
-        int    SKDateKeyID PK
-        date   DateValue
-        int    YearMonth
-        int    Quarter
-        bit    IsWeekend
-    }
-    DimEmployee {
-        bigint SKEmployeeKeyID PK "durable key"
-        bigint SKEmployeeID "SCD2 version PK"
-        string Name
-        string ProfileName
-        string RegionName
-        datetime StartDate
-        datetime EndDate
-    }
-    DimClientAccount {
-        bigint SKClientAccountKeyID PK "durable key"
-        string Name
-        string AccountType
-        string Category
-        string City
-        datetime StartDate
-        datetime EndDate
-    }
-    DimProduct {
-        bigint SKProductKeyID PK "durable key"
-        string Name
-        string Brand
-        string ProductCategory
-        decimal UnitPrice
-        datetime StartDate
-        datetime EndDate
-    }
-    DimActivityType {
-        bigint SKActivityTypeKeyID PK "durable key"
-        string Name
-        string Category
-        string Channel
-    }
-    FctSales {
-        bigint SKFctSalesID PK
-        int    SKDateKeyID FK
-        bigint SKEmployeeKeyID FK
-        bigint SKClientAccountKeyID FK
-        bigint SKProductKeyID FK
-        int    QuantityUnits
-        decimal NetAmount
-    }
-    FctSalesPlan {
-        bigint SKFctSalesPlanID PK
-        int    SKDateKeyID FK
-        bigint SKEmployeeKeyID FK
-        bigint SKProductKeyID FK
-        int    PlannedUnits
-        decimal PlannedAmount
-    }
-    FctVisit {
-        bigint SKFctVisitID PK
-        int    SKDateKeyID FK
-        bigint SKEmployeeKeyID FK
-        bigint SKClientAccountKeyID FK
-        bigint SKActivityTypeKeyID FK
-        int    DurationMinutes
-        bit    IsCompleted
-    }
-    FctTargetFrequency {
-        bigint SKFctTargetFrequencyID PK
-        int    SKDateKeyID FK
-        bigint SKEmployeeKeyID FK
-        bigint SKClientAccountKeyID FK
-        bigint SKActivityTypeKeyID FK
-        int    QuantityVisitsPlanned
-    }
-    FctInventorySnapshot {
-        bigint SKFctInventorySnapshotID PK
-        int    SKDateKeyID FK
-        bigint SKClientAccountKeyID FK
-        bigint SKProductKeyID FK
-        int    QuantityOnHand
-        decimal StockValue
-    }
+    CUSTOMERS   ||--o{ WAREHOUSES          : owner_customer_id
+    EMPLOYEES   ||--o{ EMPLOYEES           : manager_id
 ```
 
-## Матриця "факт × вимір" (Kimball bus matrix)
+Особливості: `PRODUCTS` має кілька рядків на `product_id` (історія цін), `CUSTOMERS`
+і `DOCTORS` містять дублі однієї сутності під різними кодами, `ADVERSE_EVENTS` —
+кілька версій одного кейсу.
 
-| Fact \ Dimension        | DimDate | DimEmployee | DimClientAccount | DimProduct | DimActivityType |
-|-------------------------|:-------:|:-----------:|:----------------:|:----------:|:---------------:|
-| FctSales                |   ✔     |     ✔       |        ✔         |     ✔      |                 |
-| FctSalesPlan            |   ✔     |     ✔       |                  |     ✔      |                 |
-| FctVisit                |   ✔     |     ✔       |        ✔         |            |       ✔         |
-| FctTargetFrequency      |   ✔     |     ✔       |        ✔         |            |       ✔         |
-| FctInventorySnapshot    |   ✔     |             |        ✔         |     ✔      |                 |
+---
 
-Легенда зернистості (grain):
-- **FctSales** — транзакційний, 1 рядок = рядок продажу (день × співробітник × клієнт × продукт).
-- **FctSalesPlan** — періодичний план, 1 рядок = співробітник × продукт × місяць.
-- **FctVisit** — транзакційний CRM-візит/активність.
-- **FctTargetFrequency** — план частоти візитів (аналог IPPA-плану), 1 рядок = співробітник × клієнт × тип активності × місяць.
-- **FctInventorySnapshot** — періодичний знімок залишків, 1 рядок = клієнт × продукт × дата знімку.
+## 2. Silver (`whsilver.dwh`)
+
+23 виміри, 6 Ref-таблиць, 5 фактів. Факти посилаються **тільки на durable keys** (`SK…KeyID`),
+причому на сутності, що мають Ref-шар, — через `Ref*`, який зводить коди джерела до «золотого» запису.
+
+```mermaid
+erDiagram
+    DimDate            ||--o{ FctSales : SKDateID
+    DimOrderStatus     ||--o{ FctSales : SKOrderStatusKeyID
+    DimCurrency        ||--o{ FctSales : SKCurrencyKeyID
+    RefProduct         ||--o{ FctSales : SKRefProductKeyID
+    RefClientAccount   ||--o{ FctSales : SKRefClientAccountKeyID
+    RefWarehouse       ||--o{ FctSales : SKRefWarehouseKeyID
+    RefEmployee        ||--o{ FctSales : SKRefEmployeeKeyID
+
+    RefProduct         ||--o{ FctInventoryMovement : SKRefProductKeyID
+    RefWarehouse       ||--o{ FctInventoryMovement : SKRefWarehouseKeyID
+    RefEmployee        ||--o{ FctInventoryMovement : SKRefEmployeeKeyID
+    RefMovementType    ||--o{ FctInventoryMovement : SKRefMovementTypeKeyID
+    DimDate            ||--o{ FctInventoryMovement : SKDateID
+
+    RefDoctor          ||--o{ FctVisit : SKRefDoctorKeyID
+    RefEmployee        ||--o{ FctVisit : SKRefEmployeeKeyID
+    RefProduct         ||--o{ FctVisit : SKRefProductKeyID
+    DimActivityType    ||--o{ FctVisit : SKActivityTypeKeyID
+    DimDate            ||--o{ FctVisit : SKDateID
+
+    RefDoctor          ||--o{ FctPrescription : SKRefDoctorKeyID
+    RefProduct         ||--o{ FctPrescription : SKRefProductKeyID
+    RefEmployee        ||--o{ FctPrescription : SKRefEmployeeKeyID
+    DimDate            ||--o{ FctPrescription : SKDateID
+
+    RefProduct         ||--o{ FctAdverseEvent : SKRefProductKeyID
+    RefDoctor          ||--o{ FctAdverseEvent : SKRefDoctorKeyID
+    DimAeSeriousness   ||--o{ FctAdverseEvent : SKAeSeriousnessKeyID
+    DimAeOutcome       ||--o{ FctAdverseEvent : SKAeOutcomeKeyID
+    DimReportSource    ||--o{ FctAdverseEvent : SKReportSourceKeyID
+    DimRegion          ||--o{ FctAdverseEvent : SKRegionKeyID
+    DimDate            ||--o{ FctAdverseEvent : SKDateID
+
+    DimProduct         ||--o{ RefProduct : SKProductKeyID
+    DimClientAccount   ||--o{ RefClientAccount : SKClientAccountKeyID
+    DimDoctor          ||--o{ RefDoctor : SKDoctorKeyID
+    DimEmployee        ||--o{ RefEmployee : SKEmployeeKeyID
+    DimWarehouse       ||--o{ RefWarehouse : SKWarehouseKeyID
+    DimMovementType    ||--o{ RefMovementType : SKMovementTypeKeyID
+
+    DimManufacturer    ||--o{ DimProduct : SKManufacturerKeyID
+    DimAtcClass        ||--o{ DimProduct : SKAtcClassKeyID
+    DimChain           ||--o{ DimClientAccount : SKChainKeyID
+    DimLegalEntity     ||--o{ DimClientAccount : SKLegalEntityKeyID
+    DimCity            ||--o{ DimClientAccount : SKCityKeyID
+    DimRegion          ||--o{ DimCity : SKRegionKeyID
+    DimSpecialty       ||--o{ DimDoctor : SKSpecialtyKeyID
+    DimLpu             ||--o{ DimDoctor : SKLpuKeyID
+    DimTerritory       ||--o{ DimEmployee : SKTerritoryKeyID
+    DimEmployee        ||--o{ DimEmployee : SKEmployeeManagerKeyID
+    DimClientAccount   ||--o{ DimWarehouse : SKClientAccountOwnerKeyID
+```
+
+### Bus matrix silver
+
+| Fct \ Dim | Date | Product | ClientAccount | Warehouse | Employee | Doctor | ActivityType | OrderStatus | MovementType | Currency | Region | AE-виміри |
+|---|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|
+| FctSales | ✔ | ✔ | ✔ | ✔ | ✔ | | | ✔ | | ✔ | | |
+| FctInventoryMovement | ✔ | ✔ | | ✔ | ✔ | | | | ✔ | | | |
+| FctVisit | ✔ | ✔ | | | ✔ | ✔ | ✔ | | | | | |
+| FctPrescription | ✔ | ✔ | | | ✔ | ✔ | | | | | | |
+| FctAdverseEvent | ✔ | ✔ | | | | ✔ | | | | | ✔ | ✔ |
+
+Історизація: усі виміри SCD2 (`EndDate IS NULL` = поточна версія), крім `DimLpu` — він
+переведений на SCD1 для демонстрації різниці підходів ([`scd1_demo.md`](scd1_demo.md)).
+
+---
+
+## 3. Gold (`whgold.dwh`)
+
+Класична зірка без Ref-шару й версій: 6 денормалізованих вимірів і 7 агрегатів.
+Місячні агрегати зв'язані з календарем через `MonthStartDate` (перший день місяця),
+денний — через `SKDateID`.
+
+```mermaid
+erDiagram
+    DimDate          ||--o{ AggSalesDaily : SKDateID
+    DimProduct       ||--o{ AggSalesDaily : SKProductID
+    DimClientAccount ||--o{ AggSalesDaily : SKClientAccountID
+    DimEmployee      ||--o{ AggSalesDaily : SKEmployeeID
+    DimWarehouse     ||--o{ AggSalesDaily : SKWarehouseID
+
+    DimDate          ||--o{ AggSalesMonthly : MonthStartDate
+    DimProduct       ||--o{ AggSalesMonthly : SKProductID
+    DimEmployee      ||--o{ AggSalesMonthly : SKEmployeeID
+
+    DimDate          ||--o{ AggVisitMonthly : MonthStartDate
+    DimEmployee      ||--o{ AggVisitMonthly : SKEmployeeID
+    DimProduct       ||--o{ AggVisitMonthly : SKProductID
+
+    DimDate          ||--o{ AggPrescriptionMonthly : MonthStartDate
+    DimProduct       ||--o{ AggPrescriptionMonthly : SKProductID
+
+    DimDate          ||--o{ AggInventoryMonthly : MonthStartDate
+    DimWarehouse     ||--o{ AggInventoryMonthly : SKWarehouseID
+    DimProduct       ||--o{ AggInventoryMonthly : SKProductID
+
+    DimDate          ||--o{ AggAdverseEventMonthly : MonthStartDate
+    DimProduct       ||--o{ AggAdverseEventMonthly : SKProductID
+
+    DimDate          ||--o{ AggPromoEffectMonthly : MonthStartDate
+    DimProduct       ||--o{ AggPromoEffectMonthly : SKProductID
+```
+
+`AggPromoEffectMonthly` рахується не з фактів, а з трьох інших агрегатів
+(продажі + візити + призначення), тому завантажується на окремому рівні.
+
+Атрибути, яких у зірці немає окремими вимірами (регіон, спеціальність, тип активності,
+серйозність), лежать текстовими колонками в самих агрегатах — це свідоме спрощення
+для швидких зрізів.
+
+---
+
+## 4. Потік
+
+```
+Azure SQL [erp]  →  lhbronze.erp_erp  →  whsilver.dwh  →  whgold.dwh  →  PharmaSalesGold
+   10 таблиць        1:1 копія            34 таблиці        13 таблиць     семантична модель
+                     + Tech* колонки      SCD2/SCD1         агрегати       35 мір, синоніми
+```

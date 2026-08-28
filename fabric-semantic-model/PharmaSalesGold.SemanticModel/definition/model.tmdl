@@ -1,0 +1,24 @@
+model Model
+	culture: uk-UA
+	defaultPowerBIDataSourceVersion: powerBI_V3
+	discourageImplicitMeasures
+	sourceQueryCulture: uk-UA
+	dataAccessOptions
+		legacyRedirects
+		returnErrorValuesAsNull
+
+ref table 'Календар'
+ref table 'Препарат'
+ref table 'Клієнт'
+ref table 'Лікар'
+ref table 'Представник'
+ref table 'Склад'
+ref table 'Продажі за місяць'
+ref table 'Продажі за день'
+ref table 'Візити'
+ref table 'Призначення'
+ref table 'Рухи запасів'
+ref table 'Побічні явища'
+ref table 'Промо проти продажів'
+
+ref cultureInfo uk-UA

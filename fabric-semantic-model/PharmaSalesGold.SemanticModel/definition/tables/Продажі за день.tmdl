@@ -1,0 +1,156 @@
+/// Денний зріз продажів. Тут доступні клієнт, статус замовлення й валюта; повернення сидять усередині сум зі статусом RETURN.
+table 'Продажі за день'
+	lineageTag: 4be67267-8937-5f16-97cb-c66e2ebe5bd7
+
+	column CreatedBy
+		dataType: string
+		isHidden
+		lineageTag: 3dbdf534-88c6-5700-bab2-8479801c663a
+		summarizeBy: none
+		sourceColumn: CreatedBy
+		annotation SummarizationSetBy = Automatic
+
+	column CreatedAt
+		dataType: dateTime
+		isHidden
+		lineageTag: 36b2bf0c-593b-50de-9e01-6799c35ed33e
+		summarizeBy: none
+		sourceColumn: CreatedAt
+		annotation SummarizationSetBy = Automatic
+		annotation UnderlyingDateTimeDataType = Date
+
+	column SKDateID
+		dataType: int64
+		isHidden
+		lineageTag: f7784d8b-19e7-5a28-9177-f48c3925edd6
+		summarizeBy: none
+		sourceColumn: SKDateID
+		annotation SummarizationSetBy = Automatic
+
+	column SKProductID
+		dataType: int64
+		isHidden
+		lineageTag: 6ed0cba7-6571-54f1-8b5d-cbf880ffd04e
+		summarizeBy: none
+		sourceColumn: SKProductID
+		annotation SummarizationSetBy = Automatic
+
+	column SKClientAccountID
+		dataType: int64
+		isHidden
+		lineageTag: 13c18f0c-5ac3-59d7-b5ed-349d4e4d05a0
+		summarizeBy: none
+		sourceColumn: SKClientAccountID
+		annotation SummarizationSetBy = Automatic
+
+	column SKEmployeeID
+		dataType: int64
+		isHidden
+		lineageTag: acf388e5-fbd9-5a57-9025-15758bf38226
+		summarizeBy: none
+		sourceColumn: SKEmployeeID
+		annotation SummarizationSetBy = Automatic
+
+	column SKWarehouseID
+		dataType: int64
+		isHidden
+		lineageTag: fa8bbd0b-fe0c-5055-99f5-e1c344e7ec50
+		summarizeBy: none
+		sourceColumn: SKWarehouseID
+		annotation SummarizationSetBy = Automatic
+
+	column 'Статус замовлення'
+		dataType: string
+		lineageTag: 3b503165-531b-5baf-8fc1-b05ca75e6256
+		summarizeBy: none
+		sourceColumn: OrderStatus
+		annotation SummarizationSetBy = Automatic
+
+	column Валюта
+		dataType: string
+		lineageTag: 8b0f4bb7-994c-50fb-8a80-b1539e6aec9b
+		summarizeBy: none
+		sourceColumn: Currency
+		annotation SummarizationSetBy = Automatic
+
+	column TotalNetAmount
+		dataType: decimal
+		isHidden
+		lineageTag: 1b3bab77-a958-5bac-8f89-2e0011e23181
+		summarizeBy: none
+		sourceColumn: TotalNetAmount
+		annotation SummarizationSetBy = Automatic
+
+	column TotalDiscountAmount
+		dataType: decimal
+		isHidden
+		lineageTag: ffbd885c-a416-5188-a9ba-7c24ba3cc1ab
+		summarizeBy: none
+		sourceColumn: TotalDiscountAmount
+		annotation SummarizationSetBy = Automatic
+
+	column TotalGrossAmount
+		dataType: decimal
+		isHidden
+		lineageTag: 084c4673-4c17-56e6-b6fb-967174718133
+		summarizeBy: none
+		sourceColumn: TotalGrossAmount
+		annotation SummarizationSetBy = Automatic
+
+	column OrderLineCnt
+		dataType: int64
+		isHidden
+		lineageTag: 37389599-d13e-5853-933e-1d5afcdc9b12
+		summarizeBy: none
+		sourceColumn: OrderLineCnt
+		annotation SummarizationSetBy = Automatic
+
+	column TotalQty
+		dataType: decimal
+		isHidden
+		lineageTag: bd903500-4c33-550c-84c8-ce44819ce734
+		summarizeBy: none
+		sourceColumn: TotalQty
+		annotation SummarizationSetBy = Automatic
+
+	column CalendarDate
+		dataType: dateTime
+		isHidden
+		lineageTag: e7ab8c47-23ca-5949-a941-c726ff6cbdef
+		summarizeBy: none
+		sourceColumn: CalendarDate
+		annotation SummarizationSetBy = Automatic
+		annotation UnderlyingDateTimeDataType = Date
+
+	/// Включає повернення (статус RETURN)
+	measure 'Сума продажів за день' = SUM('Продажі за день'[TotalNetAmount])
+		formatString: #,0
+		lineageTag: 3bf1677a-2b02-5830-bf9b-df131685f512
+
+	measure 'Кількість упаковок за день' = SUM('Продажі за день'[TotalQty])
+		formatString: #,0
+		lineageTag: 37ceda4d-ed37-5fd8-ac27-ce1d36e3924b
+
+	measure 'Сума до знижки' = SUM('Продажі за день'[TotalGrossAmount])
+		formatString: #,0
+		lineageTag: 4130c3c5-847f-599c-9054-efc5a8c949ec
+
+	measure 'Сума знижок' = SUM('Продажі за день'[TotalDiscountAmount])
+		formatString: #,0
+		lineageTag: 8bcf82ed-17a4-5bb4-873f-e47a09d47367
+
+	measure 'Середня знижка, %' = DIVIDE(SUM('Продажі за день'[TotalDiscountAmount]), SUM('Продажі за день'[TotalGrossAmount]))
+		formatString: 0.0%
+		lineageTag: 616246f5-b8bb-53dc-b97e-e24a758c218f
+
+	/// Коректно рахується на будь-якому рівні — за день, місяць чи рік
+	measure 'Клієнтів, що купували' = DISTINCTCOUNT('Продажі за день'[SKClientAccountID])
+		formatString: #,0
+		lineageTag: 561d9e91-8b9f-53b0-a67c-080bc0dd921b
+
+	partition 'Продажі за день' = entity
+		mode: directLake
+		source
+			entityName: AggSalesDaily
+			schemaName: dwh
+			expressionSource: DatabaseQuery

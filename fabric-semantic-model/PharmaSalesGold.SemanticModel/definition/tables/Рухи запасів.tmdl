@@ -1,0 +1,137 @@
+/// Рухи товару по складах. Модель зберігає рухи, а не залишки.
+table 'Рухи запасів'
+	lineageTag: a557ec43-7f5e-5d6e-8d5d-dabb8f27d56b
+
+	column CreatedBy
+		dataType: string
+		isHidden
+		lineageTag: e34d2b4c-7ade-586f-bc32-d0d56a053121
+		summarizeBy: none
+		sourceColumn: CreatedBy
+		annotation SummarizationSetBy = Automatic
+
+	column CreatedAt
+		dataType: dateTime
+		isHidden
+		lineageTag: 02b015aa-3d54-5d2d-9e71-a7b26ebfc7be
+		summarizeBy: none
+		sourceColumn: CreatedAt
+		annotation SummarizationSetBy = Automatic
+		annotation UnderlyingDateTimeDataType = Date
+
+	column SKWarehouseID
+		dataType: int64
+		isHidden
+		lineageTag: a3fcb672-d1af-5c2a-b21b-0df7e0d5b2ec
+		summarizeBy: none
+		sourceColumn: SKWarehouseID
+		annotation SummarizationSetBy = Automatic
+
+	column SKProductID
+		dataType: int64
+		isHidden
+		lineageTag: c83a3ceb-4810-5f84-a03f-237c47dd51cc
+		summarizeBy: none
+		sourceColumn: SKProductID
+		annotation SummarizationSetBy = Automatic
+
+	column QtyNet
+		dataType: decimal
+		isHidden
+		lineageTag: 67c83ba5-2215-5dbf-b853-2022ae0fcc78
+		summarizeBy: none
+		sourceColumn: QtyNet
+		annotation SummarizationSetBy = Automatic
+
+	column QtyWriteOff
+		dataType: decimal
+		isHidden
+		lineageTag: 3c59d763-de98-5a50-83bb-a0da8c6eba26
+		summarizeBy: none
+		sourceColumn: QtyWriteOff
+		annotation SummarizationSetBy = Automatic
+
+	column MovementCnt
+		dataType: int64
+		isHidden
+		lineageTag: 05fb61d2-9258-5618-8d2b-139dc56df1a7
+		summarizeBy: none
+		sourceColumn: MovementCnt
+		annotation SummarizationSetBy = Automatic
+
+	column QtyOut
+		dataType: decimal
+		isHidden
+		lineageTag: 55061895-1f69-574e-a78f-ed897bbe8011
+		summarizeBy: none
+		sourceColumn: QtyOut
+		annotation SummarizationSetBy = Automatic
+
+	column QtyIn
+		dataType: decimal
+		isHidden
+		lineageTag: 71f0366b-0f24-55a8-b5c9-d5f62ab15c8c
+		summarizeBy: none
+		sourceColumn: QtyIn
+		annotation SummarizationSetBy = Automatic
+
+	column YearMonth
+		dataType: string
+		isHidden
+		lineageTag: c79c0144-c8d4-5972-a13c-d6ce938c109b
+		summarizeBy: none
+		sourceColumn: YearMonth
+		annotation SummarizationSetBy = Automatic
+
+	column YearNum
+		dataType: int64
+		isHidden
+		lineageTag: 585723aa-8b21-5150-8a98-7f59b4245bc1
+		summarizeBy: none
+		sourceColumn: YearNum
+		annotation SummarizationSetBy = Automatic
+
+	column MonthNum
+		dataType: int64
+		isHidden
+		lineageTag: ebd254f3-ac91-51a4-a68f-cf79baffb175
+		summarizeBy: none
+		sourceColumn: MonthNum
+		annotation SummarizationSetBy = Automatic
+
+	column MonthStartDate
+		dataType: dateTime
+		isHidden
+		lineageTag: 0692a2c8-7548-5588-ac11-46e7591e4c90
+		summarizeBy: none
+		sourceColumn: MonthStartDate
+		annotation SummarizationSetBy = Automatic
+		annotation UnderlyingDateTimeDataType = Date
+
+	measure Прихід = SUM('Рухи запасів'[QtyIn])
+		formatString: #,0
+		lineageTag: 73fd9c09-2239-5ea9-847e-31a5410de7cc
+
+	measure Видача = SUM('Рухи запасів'[QtyOut])
+		formatString: #,0
+		lineageTag: 28879731-38cc-59ae-a009-0369c8fc3220
+
+	measure Списано = SUM('Рухи запасів'[QtyWriteOff])
+		formatString: #,0
+		lineageTag: 0decef4e-bd24-5a49-a34b-49384a740925
+
+	/// Прихід мінус видача та списання
+	measure 'Чистий рух' = SUM('Рухи запасів'[QtyNet])
+		formatString: #,0
+		lineageTag: b3fdba69-3185-56e1-a376-0ead76f6a416
+
+	measure Рухів = SUM('Рухи запасів'[MovementCnt])
+		formatString: #,0
+		lineageTag: 811159a3-2d6f-5f1d-999b-ff529a1ff5fe
+
+	partition 'Рухи запасів' = entity
+		mode: directLake
+		source
+			entityName: AggInventoryMonthly
+			schemaName: dwh
+			expressionSource: DatabaseQuery

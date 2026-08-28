@@ -1,109 +1,85 @@
-# Pharma Sales — Sample Data Warehouse (star schema)
+# Pharma Sales DWH — прототип на Microsoft Fabric
 
-Автономний **приклад моделі даних** для фармацевтичного sales/CRM домену:
-**5 фактових** і **5 вимірних** таблиць, DDL, генератор синтетичних даних і
-візуальна ER-схема зв'язків.
+Наскрізний прототип фармацевтичного sales/CRM сховища: **Azure SQL → bronze → silver → gold →
+семантична модель для Copilot**, з міграціями Flyway, metadata-driven оркестрацією та
+Data Pipeline'ами.
 
-Модель відтворює конвенції реальних Azure Fabric DWH-репозиторіїв : схема `[dwh]`, T-SQL для Microsoft
-Fabric Warehouse, Kimball-виміри типу **SCD Type 2** з durable-ключами, member `-1`
-для невідомих значень, аудитні колонки `CreatedBy/CreatedAt/ModifiedBy/ModifiedAt`.
+Конвенції відтворюють реальний Fabric DWH-репозиторій: SCD Type 2 з durable-ключами,
+member `-1` для невідомих значень, аудитні колонки `CreatedBy/CreatedAt/ModifiedBy/ModifiedAt`,
+міграції формату `V<YYMMDD>.<HHMM>__<опис>.sql`.
 
 ## Що всередині
 
 ```
 pharma-sales-dwh-sample/
-├── README.md
-├── ddl/
-│   ├── 00_schema.sql              -- створення схеми [dwh]
-│   ├── build_all.sql              -- майстер-скрипт (SQLCMD :r), порядок dim -> fact
-│   ├── dimensions/                -- 5 вимірів
-│   │   ├── DimDate.sql
-│   │   ├── DimEmployee.sql
-│   │   ├── DimClientAccount.sql
-│   │   ├── DimProduct.sql
-│   │   └── DimActivityType.sql
-│   └── facts/                     -- 5 фактів
-│       ├── FctSales.sql
-│       ├── FctSalesPlan.sql
-│       ├── FctVisit.sql
-│       ├── FctTargetFrequency.sql
-│       └── FctInventorySnapshot.sql
-├── scripts/
-│   └── generate_sample_data.py    -- генератор даних (тільки stdlib, детермінований)
-├── docs/
-│   ├── er_diagram.md              -- ВІЗУАЛЬНА ER-схема (Mermaid) + bus matrix
-│   └── sample_queries.sql         -- приклади аналітичних запитів
-└── data/                          -- згенеровані CSV + insert_sample_data.sql (не в git)
+├── 01_ddl_azure_sql.sql            -- джерело: DDL схеми [erp]
+├── 02_generate_data_fixed.sql      -- джерело: генератор даних (TRUNCATE + повна генерація)
+├── 02b_generate_more_data.sql      -- джерело: догенерація без TRUNCATE (append-only)
+├── 03_analytics_queries.sql        -- перевірочні запити до джерела
+├── ddl/                            -- знімок DDL задеплоєної моделі (silver + gold)
+├── fabric-migrations/flyway/       -- міграції: усе, що реально розгортає середовище
+├── fabric-pipelines/               -- Data Pipeline (JSON)
+├── fabric-semantic-model/          -- TMDL семантичної моделі PharmaSalesGold
+└── docs/                           -- моделі, залежності, словник даних, промпти, передача
 ```
 
 ## Модель даних
 
-**Виміри (5):** `DimDate`, `DimEmployee`, `DimClientAccount`, `DimProduct`, `DimActivityType`.
-**Факти (5):** `FctSales`, `FctSalesPlan`, `FctVisit`, `FctTargetFrequency`, `FctInventorySnapshot`.
+Три шари в Microsoft Fabric:
 
-Візуальна схема зв'язків — [`docs/er_diagram.md`](docs/er_diagram.md) (Mermaid ERD +
-Kimball bus matrix). Нижче — стисла bus matrix:
+| Шар | Де | Склад |
+|---|---|---|
+| **Джерело** | Azure SQL, схема `erp` | 10 таблиць облікової системи з навмисними дефектами |
+| **Bronze** | `lhbronze.erp_erp` | 1:1 копія джерела + технічні колонки `Tech*` |
+| **Silver** | `whsilver.dwh` | 23 виміри, 6 Ref-таблиць маппінгу, 5 фактів; SCD2 + durable-ключі |
+| **Gold** | `whgold.dwh` | 6 денормалізованих вимірів, 7 агрегатів |
+| **Семантична модель** | `PharmaSalesGold` | 13 таблиць, 35 мір, синоніми для Copilot |
 
-| Fact \ Dimension        | DimDate | DimEmployee | DimClientAccount | DimProduct | DimActivityType |
-|-------------------------|:-------:|:-----------:|:----------------:|:----------:|:---------------:|
-| FctSales                |   ✔     |     ✔       |        ✔         |     ✔      |                 |
-| FctSalesPlan            |   ✔     |     ✔       |                  |     ✔      |                 |
-| FctVisit                |   ✔     |     ✔       |        ✔         |            |       ✔         |
-| FctTargetFrequency      |   ✔     |     ✔       |        ✔         |            |       ✔         |
-| FctInventorySnapshot    |   ✔     |             |        ✔         |     ✔      |                 |
+**Факти silver:** `FctSales` (рядок замовлення), `FctInventoryMovement` (складський рух),
+`FctVisit` (активність), `FctPrescription` (призначення), `FctAdverseEvent` (версія кейсу).
+
+**Агрегати gold:** `AggSalesDaily`, `AggSalesMonthly`, `AggVisitMonthly`,
+`AggPrescriptionMonthly`, `AggInventoryMonthly`, `AggAdverseEventMonthly`,
+`AggPromoEffectMonthly`.
+
+ER-схеми всіх трьох шарів і bus matrix — [`docs/er_diagram.md`](docs/er_diagram.md).
+Знімок DDL задеплоєної моделі — [`ddl/`](ddl/README.md).
 
 ### Ключові конвенції моделювання
-- **Surrogate-ключі:** `SK<Name>ID` — PK версії рядка; `SK<Name>KeyID` — durable-ключ,
+- **Surrogate-ключі:** `SK<Name>ID` — версія рядка; `SK<Name>KeyID` — durable-ключ,
   стабільний між версіями SCD2. **Факти посилаються саме на `SK*KeyID`.**
-- **SCD Type 2:** виміри історизуються через `StartDate`/`EndDate` (`EndDate IS NULL` = поточна версія).
-- **SCD Type 1:** `DimLpu` перезаписується на місці — демо різниці підходів у [`docs/scd1_demo.md`](docs/scd1_demo.md).
-- **Unknown member:** у кожному вимірі є рядок `-1` для orphan-фактів (гарантує inner join без втрат).
-- **DimDate** — статичний календар (`SKDateKeyID` у форматі `yyyymmdd`), без SCD.
-- **Grain фактів** описаний у шапці кожного `.sql` та в `docs/er_diagram.md`.
+- **SCD Type 2** для всіх вимірів: `StartDate`/`EndDate`, поточна версія — `EndDate IS NULL`.
+- **SCD Type 1** для `DimLpu` — перезапис на місці, демо різниці підходів
+  ([`docs/scd1_demo.md`](docs/scd1_demo.md)).
+- **Ref-шар:** `Ref<Entity>` зводить коди джерела до «золотого» запису, тому дублі клієнтів
+  і лікарів не розмножують факти.
+- **Unknown member:** рядок `-1` у кожному вимірі — orphan-факти не зникають зі звітів.
+- **Прапорці якості:** silver нічого не викидає, а позначає (`IsSrcDuplicate`,
+  `IsAmountConsistent`, `IsPeriodOutOfRange`, `IsQtyOutlier`, `IsLogicalError`).
+- **Інкремент:** факти вантажаться по watermark `SrcModifiedAt`, виміри звіряються повністю.
 
 ## Як запустити
 
-### 1. Створити таблиці
-Виконайте DDL у цільовій БД (Microsoft Fabric Warehouse / Azure SQL / SQL Server 2019+).
-В Azure Data Studio або SSMS у **SQLCMD mode**:
-
+### 1. Джерело (Azure SQL)
 ```sql
--- з каталогу ddl/
-:r ./build_all.sql
+-- 01_ddl_azure_sql.sql   -- створює схему [erp] і 10 таблиць
+-- 02_generate_data_fixed.sql  -- наповнює (увага: починається з TRUNCATE усіх таблиць)
 ```
-Або виконайте файли вручну в порядку: `00_schema.sql` → усі `dimensions/*` → усі `facts/*`.
+Догенерувати дані пізніше, не стираючи наявні — `02b_generate_more_data.sql`:
+продовжує наскрізну нумерацію бізнес-ключів, додає факти за новий період, опційно нових
+клієнтів і лікарів та нові версії цін (демо SCD2). Обсяги — у секції CONFIG на початку файла.
 
-### 2. Згенерувати синтетичні дані
-```bash
-cd scripts
-python3 generate_sample_data.py            # за замовчуванням ~15k рядків -> ../data
-# опції:
-python3 generate_sample_data.py --clients 500 --sales-rows 20000 --seed 7
-```
-Генератор (лише стандартна бібліотека Python 3.9+, детермінований за seed) створює:
-- по одному **CSV** на таблицю (`data/<Table>.csv`) — для bulk-load/перегляду;
-- **`data/insert_sample_data.sql`** — готовий T-SQL INSERT-скрипт (dim→fact порядок).
+### 2. Міграції
+Прогнати `fabric-migrations/flyway/migrations` — silver-міграції виконуються в контексті
+`whsilver`, gold-міграції починаються з `USE [whgold]`. Міграції створюють таблиці, view,
+процедури, наповнюють календар і статичні виміри, але **дані з bronze не завантажують**.
 
-### 2b. Догенерувати дані (append)
-
-`02b_generate_more_data.sql` — інкрементальний генератор для ERP-джерела: не робить
-`TRUNCATE`, продовжує наскрізну нумерацію бізнес-ключів, додає факти за новий період,
-опційно нових клієнтів/лікарів і нові версії цін продуктів (SCD2-демо). Обсяги — у секції
-CONFIG на початку файла. Після нього — `EXEC [dwh].[spSilverFullLoad]`.
-
-### 3. Завантажити дані
-Виконайте згенерований скрипт **після** DDL:
+### 3. Завантаження
 ```sql
--- з каталогу data/
-:r ./insert_sample_data.sql
+-- bronze: PL_Bronze_Ingest (параметр source_table = '' -> усі 10 таблиць)
+EXEC [dwh].[spSilverFullLoad] @load_id = 'init';   -- silver, у whsilver
+EXEC [dwh].[spGoldFullLoad]   @load_id = 'init';   -- gold, у whgold
 ```
-або завантажте CSV через `COPY INTO` (Fabric) / `BULK INSERT` (SQL Server) / bcp.
-
-## Гарантії якості даних
-- **Референційна цілісність:** усі FK у фактах вказують на існуючі durable-ключі вимірів.
-- **Детермінізм:** однаковий `--seed` → ідентичні дані.
-- **Реалістичність:** ціни/суми узгоджені (`NetAmount = Gross − Discount`, `StockValue = OnHand × UnitPrice`),
-  демонструється SCD2-історія (частина співробітників має закриту + поточну версію).
 
 ## Silver level (Fabric Warehouse)
 
@@ -131,7 +107,11 @@ fabric-migrations/flyway/
     ├── V260826.1600__gold_init_creation.sql                  -- gold (whgold.dwh): 6 вимірів + 7 агрегатів
     ├── V260826.1610__gold_create_views_and_prc.sql           -- gold: v*, EtlGoldObject, spGoldLoadLevel
     ├── V260827.0930__gold_drop_legacy_schema_in_silver.sql   -- прибирання старої схеми [gold] у whsilver
-    └── V260827.1400__silver_enable_scd1_dimlpu.sql           -- SCD1 для DimLpu (демо історизації)
+    ├── V260827.1400__silver_enable_scd1_dimlpu.sql           -- SCD1 для DimLpu (демо історизації)
+    └── V260828.1000__gold_add_month_date_key.sql             -- MonthStartDate у місячних агрегатах
+
+fabric-semantic-model/
+└── PharmaSalesGold.SemanticModel/                            -- TMDL: 13 таблиць, 35 мір, синоніми
 
 fabric-pipelines/
 ├── PL_Bronze_Ingest.json                                     -- Azure SQL -> bronze -> тригер silver
@@ -139,6 +119,10 @@ fabric-pipelines/
 └── PL_Gold_Full_Load.json                                    -- gold (Lookup + ForEach по рівнях)
 ```
 
+**Стан проєкту, ідентифікатори середовища та відкриті пункти — [`docs/handover.md`](docs/handover.md).**
+
+Промпти для ad-hoc звітності в Copilot — [`docs/copilot_prompts.md`](docs/copilot_prompts.md),
+семантична модель над gold — [`docs/semantic_model.md`](docs/semantic_model.md).
 Опис моделі, ER-схема, bus matrix, порядок завантаження та обробка дефектів джерела —
 [`docs/silver_model.md`](docs/silver_model.md). Gold-рівень — [`docs/gold_model.md`](docs/gold_model.md).
 Опис даних для бізнес-користувачів (джерело, silver, gold, прапорці якості) —
@@ -185,5 +169,15 @@ UNION ALL SELECT 'DimClientAccount', COUNT(*) FROM [dwh].[DimClientAccount] WHER
 ```
 
 ## Приклади аналітики
-Див. [`docs/sample_queries.sql`](docs/sample_queries.sql): продажі vs план, виконання
-call-плану (факт-візити vs `FctTargetFrequency`), залишки на складі тощо.
+
+- [`03_analytics_queries.sql`](03_analytics_queries.sql) — перевірочні запити до **джерела**
+  (демонструють дублі, orphan-ключі та SCD2-версії до очищення).
+- [`docs/copilot_prompts.md`](docs/copilot_prompts.md) — 50 промптів для ad-hoc звітності
+  над gold через Copilot.
+
+## Легасі
+
+`scripts/generate_sample_data.py`, `data/`, `docs/sample_queries.sql` лишилися від початкового
+навчального прикладу «5 фактів + 5 вимірів» (`FctSalesPlan`, `FctTargetFrequency`,
+`FctInventorySnapshot`), якого в задеплоєній моделі немає. Ці файли ні на що не впливають
+і підлягають видаленню.

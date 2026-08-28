@@ -1,0 +1,87 @@
+/// Власні, консигнаційні та транзитні склади.
+table 'Склад'
+	lineageTag: 75d4b32e-6e45-5c8f-9496-3a5669a02a33
+
+	column CreatedBy
+		dataType: string
+		isHidden
+		lineageTag: 83c6a81c-32e5-5c17-bb54-119fc96ee7cb
+		summarizeBy: none
+		sourceColumn: CreatedBy
+		annotation SummarizationSetBy = Automatic
+
+	column CreatedAt
+		dataType: dateTime
+		isHidden
+		lineageTag: b763ecea-2c40-57d6-aa2b-47597edf4434
+		summarizeBy: none
+		sourceColumn: CreatedAt
+		annotation SummarizationSetBy = Automatic
+		annotation UnderlyingDateTimeDataType = Date
+
+	column SKWarehouseID
+		dataType: int64
+		isHidden
+		lineageTag: 2a36613a-3b0b-5384-81fe-080fa1bfaacf
+		summarizeBy: none
+		sourceColumn: SKWarehouseID
+		annotation SummarizationSetBy = Automatic
+
+	column Id
+		dataType: string
+		isHidden
+		lineageTag: a0686b68-bb2f-5387-a4ce-cbeb7ec2439e
+		summarizeBy: none
+		sourceColumn: Id
+		annotation SummarizationSetBy = Automatic
+
+	column 'Назва складу'
+		dataType: string
+		lineageTag: 1117f905-25d5-5350-a4e7-d54896502e9b
+		summarizeBy: none
+		sourceColumn: WarehouseName
+		annotation SummarizationSetBy = Automatic
+
+	column 'Код складу'
+		dataType: string
+		lineageTag: 848777b7-4a17-5620-b539-bcb72748fe97
+		summarizeBy: none
+		sourceColumn: WarehouseCode
+		annotation SummarizationSetBy = Automatic
+
+	column 'Тип складу'
+		/// Власний / консигнаційний / транзитний
+		dataType: string
+		lineageTag: e928ed02-1ecb-5338-ad46-29926dd03711
+		summarizeBy: none
+		sourceColumn: WarehouseType
+		annotation SummarizationSetBy = Automatic
+
+	column Власник
+		/// Для консигнаційних складів — клієнт-дистрибʼютор
+		dataType: string
+		lineageTag: e1453228-df73-5107-8db4-8973149e38b8
+		summarizeBy: none
+		sourceColumn: OwnerAccountName
+		annotation SummarizationSetBy = Automatic
+
+	column 'Регіон складу'
+		dataType: string
+		lineageTag: 133ff3ce-8192-565f-9a75-7b3de7f3626e
+		summarizeBy: none
+		sourceColumn: Region
+		annotation SummarizationSetBy = Automatic
+
+	column 'Місто складу'
+		dataType: string
+		lineageTag: 4d42b872-5b62-5754-8d40-8ee807aa6262
+		summarizeBy: none
+		sourceColumn: City
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Склад' = entity
+		mode: directLake
+		source
+			entityName: DimWarehouse
+			schemaName: dwh
+			expressionSource: DatabaseQuery

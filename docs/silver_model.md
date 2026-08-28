@@ -89,62 +89,10 @@ Silver їх **не читає і не переносить**: усі `v*` маю
 | FctPrescription | ✔ | ✔ | | | ✔ | ✔ | | | | | | |
 | FctAdverseEvent | ✔ | ✔ | | | | ✔ | | | | | ✔ | ✔ |
 
-## 5. ER-схема (ключові зв'язки)
+## 5. ER-схема
 
-```mermaid
-erDiagram
-    DimDate            ||--o{ FctSales : SKDateID
-    DimOrderStatus     ||--o{ FctSales : SKOrderStatusKeyID
-    DimCurrency        ||--o{ FctSales : SKCurrencyKeyID
-    RefProduct         ||--o{ FctSales : SKRefProductKeyID
-    RefClientAccount   ||--o{ FctSales : SKRefClientAccountKeyID
-    RefWarehouse       ||--o{ FctSales : SKRefWarehouseKeyID
-    RefEmployee        ||--o{ FctSales : SKRefEmployeeKeyID
-
-    RefProduct         ||--o{ FctInventoryMovement : SKRefProductKeyID
-    RefWarehouse       ||--o{ FctInventoryMovement : SKRefWarehouseKeyID
-    RefEmployee        ||--o{ FctInventoryMovement : SKRefEmployeeKeyID
-    RefMovementType    ||--o{ FctInventoryMovement : SKRefMovementTypeKeyID
-    DimDate            ||--o{ FctInventoryMovement : SKDateID
-
-    RefDoctor          ||--o{ FctVisit : SKRefDoctorKeyID
-    RefEmployee        ||--o{ FctVisit : SKRefEmployeeKeyID
-    RefProduct         ||--o{ FctVisit : SKRefProductKeyID
-    DimActivityType    ||--o{ FctVisit : SKActivityTypeKeyID
-    DimDate            ||--o{ FctVisit : SKDateID
-
-    RefDoctor          ||--o{ FctPrescription : SKRefDoctorKeyID
-    RefProduct         ||--o{ FctPrescription : SKRefProductKeyID
-    RefEmployee        ||--o{ FctPrescription : SKRefEmployeeKeyID
-    DimDate            ||--o{ FctPrescription : SKDateID
-
-    RefProduct         ||--o{ FctAdverseEvent : SKRefProductKeyID
-    RefDoctor          ||--o{ FctAdverseEvent : SKRefDoctorKeyID
-    DimAeSeriousness   ||--o{ FctAdverseEvent : SKAeSeriousnessKeyID
-    DimAeOutcome       ||--o{ FctAdverseEvent : SKAeOutcomeKeyID
-    DimReportSource    ||--o{ FctAdverseEvent : SKReportSourceKeyID
-    DimRegion          ||--o{ FctAdverseEvent : SKRegionKeyID
-    DimDate            ||--o{ FctAdverseEvent : SKDateID
-
-    DimProduct         ||--o{ RefProduct : SKProductKeyID
-    DimClientAccount   ||--o{ RefClientAccount : SKClientAccountKeyID
-    DimDoctor          ||--o{ RefDoctor : SKDoctorKeyID
-    DimEmployee        ||--o{ RefEmployee : SKEmployeeKeyID
-    DimWarehouse       ||--o{ RefWarehouse : SKWarehouseKeyID
-    DimMovementType    ||--o{ RefMovementType : SKMovementTypeKeyID
-
-    DimManufacturer    ||--o{ DimProduct : SKManufacturerKeyID
-    DimAtcClass        ||--o{ DimProduct : SKAtcClassKeyID
-    DimChain           ||--o{ DimClientAccount : SKChainKeyID
-    DimLegalEntity     ||--o{ DimClientAccount : SKLegalEntityKeyID
-    DimCity            ||--o{ DimClientAccount : SKCityKeyID
-    DimRegion          ||--o{ DimCity : SKRegionKeyID
-    DimSpecialty       ||--o{ DimDoctor : SKSpecialtyKeyID
-    DimLpu             ||--o{ DimDoctor : SKLpuKeyID
-    DimTerritory       ||--o{ DimEmployee : SKTerritoryKeyID
-    DimEmployee        ||--o{ DimEmployee : SKEmployeeManagerKeyID
-    DimClientAccount   ||--o{ DimWarehouse : SKClientAccountOwnerKeyID
-```
+ER-схеми всіх трьох шарів (джерело, silver, gold) і bus matrix — в
+[`er_diagram.md`](er_diagram.md), щоб не тримати дві копії однієї діаграми.
 
 ## 6. Як silver закриває дефекти джерела
 

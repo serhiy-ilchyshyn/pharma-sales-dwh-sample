@@ -1,0 +1,123 @@
+/// Призначення лікарів по місяцях.
+table 'Призначення'
+	lineageTag: d489e151-c191-5866-9053-91271c9b37a9
+
+	column CreatedBy
+		dataType: string
+		isHidden
+		lineageTag: 4fca9990-e6ef-5fd6-a026-f232022cb945
+		summarizeBy: none
+		sourceColumn: CreatedBy
+		annotation SummarizationSetBy = Automatic
+
+	column CreatedAt
+		dataType: dateTime
+		isHidden
+		lineageTag: 1f34bbc0-bebc-510a-bede-3b626221145f
+		summarizeBy: none
+		sourceColumn: CreatedAt
+		annotation SummarizationSetBy = Automatic
+		annotation UnderlyingDateTimeDataType = Date
+
+	column SKProductID
+		dataType: int64
+		isHidden
+		lineageTag: cd5d9acd-deb1-5a7b-84c4-242ac3094347
+		summarizeBy: none
+		sourceColumn: SKProductID
+		annotation SummarizationSetBy = Automatic
+
+	column 'Спеціальність, що призначає'
+		dataType: string
+		lineageTag: 95e56767-758f-5725-bcf3-cee67d060376
+		summarizeBy: none
+		sourceColumn: Specialty
+		annotation SummarizationSetBy = Automatic
+
+	column 'Регіон призначення'
+		dataType: string
+		lineageTag: 433223d1-22a4-53d7-a9c5-1d458dd335dd
+		summarizeBy: none
+		sourceColumn: Region
+		annotation SummarizationSetBy = Automatic
+
+	column TotalPatientsCnt
+		dataType: int64
+		isHidden
+		lineageTag: 634e4a22-4d49-5739-8532-17ae9c74d8ca
+		summarizeBy: none
+		sourceColumn: TotalPatientsCnt
+		annotation SummarizationSetBy = Automatic
+
+	column TotalPrescriptionsCnt
+		dataType: int64
+		isHidden
+		lineageTag: ef474c2c-e2c8-5439-917d-d1bad544e0e4
+		summarizeBy: none
+		sourceColumn: TotalPrescriptionsCnt
+		annotation SummarizationSetBy = Automatic
+
+	column DoctorCnt
+		dataType: int64
+		isHidden
+		lineageTag: 77068f5b-ce16-520a-85ea-c4f01d7c8f3f
+		summarizeBy: none
+		sourceColumn: DoctorCnt
+		annotation SummarizationSetBy = Automatic
+
+	column YearMonth
+		dataType: string
+		isHidden
+		lineageTag: 781ae0cc-c5ef-59db-86c2-139ef980cf53
+		summarizeBy: none
+		sourceColumn: YearMonth
+		annotation SummarizationSetBy = Automatic
+
+	column YearNum
+		dataType: int64
+		isHidden
+		lineageTag: 7432aa98-e6f2-54fb-a40f-a81975b6d3ff
+		summarizeBy: none
+		sourceColumn: YearNum
+		annotation SummarizationSetBy = Automatic
+
+	column MonthNum
+		dataType: int64
+		isHidden
+		lineageTag: 6f738cf5-2d21-5c15-9f0d-60855a8360c0
+		summarizeBy: none
+		sourceColumn: MonthNum
+		annotation SummarizationSetBy = Automatic
+
+	column MonthStartDate
+		dataType: dateTime
+		isHidden
+		lineageTag: 47676f6d-2554-53f2-afe4-ffa069d38ff1
+		summarizeBy: none
+		sourceColumn: MonthStartDate
+		annotation SummarizationSetBy = Automatic
+		annotation UnderlyingDateTimeDataType = Date
+
+	measure Призначення = SUM('Призначення'[TotalPrescriptionsCnt])
+		formatString: #,0
+		lineageTag: 37c0e206-5bb9-507c-b5f4-21497ef2327e
+
+	measure Пацієнти = SUM('Призначення'[TotalPatientsCnt])
+		formatString: #,0
+		lineageTag: 249d15f3-471e-5e39-89ab-302912d0bf9f
+
+	measure 'Призначень на пацієнта' = DIVIDE([Призначення], [Пацієнти])
+		formatString: #,0.00
+		lineageTag: f9110036-820a-525f-a5f0-b23adee93ae5
+
+	/// Розраховано в межах місяця; за кількох місяців одразу показує порожньо.
+	measure 'Лікарів, що призначали (місяць)' = IF(HASONEVALUE('Призначення'[YearMonth]), SUM('Призначення'[DoctorCnt]))
+		formatString: #,0
+		lineageTag: ad615979-086e-5555-b816-cfa743535fa5
+
+	partition 'Призначення' = entity
+		mode: directLake
+		source
+			entityName: AggPrescriptionMonthly
+			schemaName: dwh
+			expressionSource: DatabaseQuery

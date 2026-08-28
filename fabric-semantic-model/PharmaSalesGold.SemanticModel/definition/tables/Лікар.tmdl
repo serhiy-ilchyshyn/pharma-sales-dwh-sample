@@ -1,0 +1,93 @@
+/// База лікарів після склеювання дублів: спеціальність, медзаклад, сегмент.
+table 'Лікар'
+	lineageTag: 3a68fa5d-62b3-5612-ac7c-869326e424db
+
+	column CreatedBy
+		dataType: string
+		isHidden
+		lineageTag: 73a25d77-be09-598f-9173-1477e8066e2b
+		summarizeBy: none
+		sourceColumn: CreatedBy
+		annotation SummarizationSetBy = Automatic
+
+	column CreatedAt
+		dataType: dateTime
+		isHidden
+		lineageTag: ee95813c-c815-5835-b200-eb490a5368bf
+		summarizeBy: none
+		sourceColumn: CreatedAt
+		annotation SummarizationSetBy = Automatic
+		annotation UnderlyingDateTimeDataType = Date
+
+	column SKDoctorID
+		dataType: int64
+		isHidden
+		lineageTag: 363dcec6-e60d-586a-80cd-1c741726be9f
+		summarizeBy: none
+		sourceColumn: SKDoctorID
+		annotation SummarizationSetBy = Automatic
+
+	column Id
+		dataType: string
+		isHidden
+		lineageTag: 6dd6930d-582d-5abf-9c5e-ec4c652845fc
+		summarizeBy: none
+		sourceColumn: Id
+		annotation SummarizationSetBy = Automatic
+
+	column 'ПІБ лікаря'
+		dataType: string
+		lineageTag: ef893863-c761-5c15-ac5e-727ea1a79adf
+		summarizeBy: none
+		sourceColumn: DoctorName
+		annotation SummarizationSetBy = Automatic
+
+	column Спеціальність
+		dataType: string
+		lineageTag: a95b91c3-40dc-5f02-a4c5-80db99929135
+		summarizeBy: none
+		sourceColumn: Specialty
+		annotation SummarizationSetBy = Automatic
+
+	column Медзаклад
+		dataType: string
+		lineageTag: 49f43500-8472-5474-9f8b-143698188ad1
+		summarizeBy: none
+		sourceColumn: Lpu
+		annotation SummarizationSetBy = Automatic
+
+	column 'Регіон лікаря'
+		dataType: string
+		lineageTag: bc78f94b-459c-5a78-87cb-9695e44ee3f9
+		summarizeBy: none
+		sourceColumn: Region
+		annotation SummarizationSetBy = Automatic
+
+	column 'Місто лікаря'
+		dataType: string
+		lineageTag: 686705bf-7db0-5579-8817-728402d0bd8a
+		summarizeBy: none
+		sourceColumn: City
+		annotation SummarizationSetBy = Automatic
+
+	column Сегмент
+		/// A / B / C / N
+		dataType: string
+		lineageTag: e3abc5ee-9fe4-56ea-a1e0-1275787c3254
+		summarizeBy: none
+		sourceColumn: Segment
+		annotation SummarizationSetBy = Automatic
+
+	column Цільовий
+		dataType: boolean
+		lineageTag: 04379d48-8d61-5f48-b257-d07026a2ac43
+		summarizeBy: none
+		sourceColumn: IsTarget
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Лікар' = entity
+		mode: directLake
+		source
+			entityName: DimDoctor
+			schemaName: dwh
+			expressionSource: DatabaseQuery

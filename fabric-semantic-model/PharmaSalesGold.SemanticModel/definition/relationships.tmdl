@@ -1,0 +1,79 @@
+relationship 65a7af2a-29b4-53be-9979-cbbbc6d0df5d
+	fromColumn: 'Продажі за місяць'.MonthStartDate
+	toColumn: 'Календар'.Дата
+
+relationship e4f98112-f951-5f53-bdec-9fde8b63aa6f
+	fromColumn: 'Візити'.MonthStartDate
+	toColumn: 'Календар'.Дата
+
+relationship 639a89fe-e339-5a23-9ca4-5aaac6a9ee54
+	fromColumn: 'Призначення'.MonthStartDate
+	toColumn: 'Календар'.Дата
+
+relationship c5ecae7b-d208-51b4-9b97-f7d2fe3cb49a
+	fromColumn: 'Рухи запасів'.MonthStartDate
+	toColumn: 'Календар'.Дата
+
+relationship 9d41155b-6d64-5f21-b319-cd368f6057bf
+	fromColumn: 'Побічні явища'.MonthStartDate
+	toColumn: 'Календар'.Дата
+
+relationship c2b15997-ac51-5bc6-b2ea-56ad533cdfd6
+	fromColumn: 'Промо проти продажів'.MonthStartDate
+	toColumn: 'Календар'.Дата
+
+relationship 510ada3b-bda1-5636-906d-cbe02568c3c3
+	fromColumn: 'Продажі за день'.SKDateID
+	toColumn: 'Календар'.SKDateID
+
+relationship 5b6c72d5-45ff-5409-a127-259127678300
+	fromColumn: 'Продажі за день'.SKProductID
+	toColumn: 'Препарат'.SKProductID
+
+relationship dc2fb8d8-1253-5926-b2b0-25cca5a631a0
+	fromColumn: 'Продажі за день'.SKClientAccountID
+	toColumn: 'Клієнт'.SKClientAccountID
+
+relationship 21bb1fdc-3cd0-5585-a03e-dbf30703c149
+	fromColumn: 'Продажі за день'.SKEmployeeID
+	toColumn: 'Представник'.SKEmployeeID
+
+relationship 76028c5a-8bbf-5a32-9447-4a648861db14
+	fromColumn: 'Продажі за день'.SKWarehouseID
+	toColumn: 'Склад'.SKWarehouseID
+
+relationship 0a894cc4-1f8b-56e7-9855-83d8332754f5
+	fromColumn: 'Продажі за місяць'.SKProductID
+	toColumn: 'Препарат'.SKProductID
+
+relationship 58e7eecf-2624-5d07-b55f-7ab0c6d63c91
+	fromColumn: 'Продажі за місяць'.SKEmployeeID
+	toColumn: 'Представник'.SKEmployeeID
+
+relationship 552b2c20-01ad-574b-ad36-863084494d8a
+	fromColumn: 'Візити'.SKEmployeeID
+	toColumn: 'Представник'.SKEmployeeID
+
+relationship 75ee86b9-23d4-5db2-9176-4a77d97360cd
+	fromColumn: 'Візити'.SKProductID
+	toColumn: 'Препарат'.SKProductID
+
+relationship 79a34931-66f7-573a-8aee-33d9230985c6
+	fromColumn: 'Призначення'.SKProductID
+	toColumn: 'Препарат'.SKProductID
+
+relationship a1d490e2-4431-50a1-babb-af147f2afaec
+	fromColumn: 'Рухи запасів'.SKWarehouseID
+	toColumn: 'Склад'.SKWarehouseID
+
+relationship c5ef656b-1316-5b53-94bf-5a4503a193c1
+	fromColumn: 'Рухи запасів'.SKProductID
+	toColumn: 'Препарат'.SKProductID
+
+relationship 9c1b9bc2-b5a3-5d4e-a9d2-97041a62a983
+	fromColumn: 'Побічні явища'.SKProductID
+	toColumn: 'Препарат'.SKProductID
+
+relationship ee91f367-59cf-5d67-b660-ff04fbf2ad3c
+	fromColumn: 'Промо проти продажів'.SKProductID
+	toColumn: 'Препарат'.SKProductID

@@ -1,0 +1,337 @@
+cultureInfo uk-UA
+
+	linguisticMetadata =
+			{
+			  "Version": "1.0.0",
+			  "Language": "uk-UA",
+			  "DynamicImprovement": "HighConfidence",
+			  "Entities": {
+			    "Препарат": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "Препарат"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "препарат": {}
+			        },
+			        {
+			          "продукт": {}
+			        },
+			        {
+			          "ліки": {}
+			        },
+			        {
+			          "товар": {}
+			        },
+			        {
+			          "product": {}
+			        },
+			        {
+			          "drug": {}
+			        }
+			      ]
+			    },
+			    "Клієнт": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "Клієнт"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "клієнт": {}
+			        },
+			        {
+			          "аптека": {}
+			        },
+			        {
+			          "контрагент": {}
+			        },
+			        {
+			          "customer": {}
+			        },
+			        {
+			          "account": {}
+			        },
+			        {
+			          "pharmacy": {}
+			        }
+			      ]
+			    },
+			    "Лікар": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "Лікар"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "лікар": {}
+			        },
+			        {
+			          "HCP": {}
+			        },
+			        {
+			          "doctor": {}
+			        },
+			        {
+			          "physician": {}
+			        }
+			      ]
+			    },
+			    "Представник": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "Представник"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "представник": {}
+			        },
+			        {
+			          "медпред": {}
+			        },
+			        {
+			          "медичний представник": {}
+			        },
+			        {
+			          "rep": {}
+			        },
+			        {
+			          "employee": {}
+			        }
+			      ]
+			    },
+			    "Склад": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "Склад"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "склад": {}
+			        },
+			        {
+			          "warehouse": {}
+			        }
+			      ]
+			    },
+			    "Календар": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "Календар"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "календар": {}
+			        },
+			        {
+			          "дата": {}
+			        },
+			        {
+			          "період": {}
+			        },
+			        {
+			          "date": {}
+			        },
+			        {
+			          "calendar": {}
+			        }
+			      ]
+			    },
+			    "Лікар.Медзаклад": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "Лікар",
+			          "ConceptualProperty": "Медзаклад"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "медзаклад": {}
+			        },
+			        {
+			          "ЛПУ": {}
+			        },
+			        {
+			          "лікарня": {}
+			        },
+			        {
+			          "клініка": {}
+			        },
+			        {
+			          "hospital": {}
+			        }
+			      ]
+			    },
+			    "Продажі за місяць.Сума продажів": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "Продажі за місяць",
+			          "ConceptualProperty": "Сума продажів"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "сума продажів": {}
+			        },
+			        {
+			          "продажі": {}
+			        },
+			        {
+			          "виручка": {}
+			        },
+			        {
+			          "оборот": {}
+			        },
+			        {
+			          "sales": {}
+			        },
+			        {
+			          "revenue": {}
+			        }
+			      ]
+			    },
+			    "Продажі за місяць.Кількість упаковок": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "Продажі за місяць",
+			          "ConceptualProperty": "Кількість упаковок"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "упаковки": {}
+			        },
+			        {
+			          "обсяг": {}
+			        },
+			        {
+			          "packs": {}
+			        },
+			        {
+			          "units": {}
+			        }
+			      ]
+			    },
+			    "Продажі за місяць.Повернення, сума": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "Продажі за місяць",
+			          "ConceptualProperty": "Повернення, сума"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "повернення": {}
+			        },
+			        {
+			          "returns": {}
+			        }
+			      ]
+			    },
+			    "Візити.Візити": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "Візити",
+			          "ConceptualProperty": "Візити"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "візити": {}
+			        },
+			        {
+			          "активності": {}
+			        },
+			        {
+			          "visits": {}
+			        },
+			        {
+			          "calls": {}
+			        }
+			      ]
+			    },
+			    "Призначення.Призначення": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "Призначення",
+			          "ConceptualProperty": "Призначення"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "призначення": {}
+			        },
+			        {
+			          "рецепти": {}
+			        },
+			        {
+			          "prescriptions": {}
+			        }
+			      ]
+			    },
+			    "Рухи запасів.Списано": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "Рухи запасів",
+			          "ConceptualProperty": "Списано"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "списання": {}
+			        },
+			        {
+			          "списано": {}
+			        },
+			        {
+			          "write-off": {}
+			        }
+			      ]
+			    },
+			    "Побічні явища.Кейси": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "Побічні явища",
+			          "ConceptualProperty": "Кейси"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "кейси": {}
+			        },
+			        {
+			          "побічні явища": {}
+			        },
+			        {
+			          "небажані явища": {}
+			        },
+			        {
+			          "adverse events": {}
+			        }
+			      ]
+			    }
+			  }
+			}
+
+		contentType: json

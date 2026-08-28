@@ -1,0 +1,123 @@
+/// Каталог препаратів: бренд, МНН, АТС-класифікація, форма, виробник.
+table 'Препарат'
+	lineageTag: e200b4cf-7058-5538-ad95-fe7d21d40eac
+
+	column CreatedBy
+		dataType: string
+		isHidden
+		lineageTag: 63662678-622d-5e58-94eb-9b201c60bace
+		summarizeBy: none
+		sourceColumn: CreatedBy
+		annotation SummarizationSetBy = Automatic
+
+	column CreatedAt
+		dataType: dateTime
+		isHidden
+		lineageTag: a7d09ab0-c222-56ca-9c55-120afc6793d2
+		summarizeBy: none
+		sourceColumn: CreatedAt
+		annotation SummarizationSetBy = Automatic
+		annotation UnderlyingDateTimeDataType = Date
+
+	column SKProductID
+		dataType: int64
+		isHidden
+		lineageTag: 76aa931f-225c-5d54-a8a6-22237ecb62a9
+		summarizeBy: none
+		sourceColumn: SKProductID
+		annotation SummarizationSetBy = Automatic
+
+	column Id
+		dataType: string
+		isHidden
+		lineageTag: 4f51995f-bc07-5b11-905f-4cda60fb85f0
+		summarizeBy: none
+		sourceColumn: Id
+		annotation SummarizationSetBy = Automatic
+
+	column 'Назва препарату'
+		dataType: string
+		lineageTag: ddae0223-ea44-58b8-a8e3-499c271e88bd
+		summarizeBy: none
+		sourceColumn: ProductName
+		annotation SummarizationSetBy = Automatic
+
+	column SKU
+		dataType: string
+		lineageTag: df7137fa-35ac-5c51-89a7-ee0c2a32fbf6
+		summarizeBy: none
+		sourceColumn: SkuCode
+		annotation SummarizationSetBy = Automatic
+
+	column МНН
+		/// Міжнародна непатентована назва
+		dataType: string
+		lineageTag: dd6cf5e6-b533-5bea-b934-e8f7d398f343
+		summarizeBy: none
+		sourceColumn: INN
+		annotation SummarizationSetBy = Automatic
+
+	column АТС-код
+		dataType: string
+		lineageTag: bc5beb40-11ed-5bcb-a2b9-ee55187fc221
+		summarizeBy: none
+		sourceColumn: AtcCode
+		annotation SummarizationSetBy = Automatic
+
+	column АТС-клас
+		/// Анатомічна група першого рівня
+		dataType: string
+		lineageTag: d002e137-9966-5cb1-ba9e-29d4a9f4898e
+		summarizeBy: none
+		sourceColumn: AtcClass
+		annotation SummarizationSetBy = Automatic
+
+	column 'Форма випуску'
+		dataType: string
+		lineageTag: 7e74170a-8cf1-56e2-a404-b26b0db6dd68
+		summarizeBy: none
+		sourceColumn: ReleaseForm
+		annotation SummarizationSetBy = Automatic
+
+	column Дозування
+		dataType: string
+		lineageTag: 88ce7e86-6140-57b7-9df1-e1b027ff954d
+		summarizeBy: none
+		sourceColumn: Dosage
+		annotation SummarizationSetBy = Automatic
+
+	column Виробник
+		dataType: string
+		lineageTag: c1c30d57-7e74-5584-83b3-7a18f20ff0f2
+		summarizeBy: none
+		sourceColumn: Manufacturer
+		annotation SummarizationSetBy = Automatic
+
+	column 'RX / OTC'
+		/// Рецептурний чи безрецептурний
+		dataType: string
+		lineageTag: f9ff926d-3832-5d10-9862-7ca36cd5f17c
+		summarizeBy: none
+		sourceColumn: RxOtcType
+		annotation SummarizationSetBy = Automatic
+
+	column 'Базова ціна, грн'
+		dataType: decimal
+		lineageTag: d05413f4-0de0-51a7-ae36-a59a5bbf44a1
+		summarizeBy: none
+		sourceColumn: BasePriceUAH
+		annotation SummarizationSetBy = Automatic
+
+	column Активний
+		dataType: boolean
+		lineageTag: 7b1107fd-7b8a-55ce-ae04-7df0eefc5f51
+		summarizeBy: none
+		sourceColumn: IsActive
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Препарат' = entity
+		mode: directLake
+		source
+			entityName: DimProduct
+			schemaName: dwh
+			expressionSource: DatabaseQuery

@@ -1,0 +1,144 @@
+/// Візити, зразки, призначення й продажі зведені до спільного розрізу: місяць × препарат × регіон.
+table 'Промо проти продажів'
+	lineageTag: b4af1c38-be1e-5b4b-b4c8-f01d41ba9c27
+
+	column CreatedBy
+		dataType: string
+		isHidden
+		lineageTag: a1a3f204-930a-5bee-96bd-b44a6227b746
+		summarizeBy: none
+		sourceColumn: CreatedBy
+		annotation SummarizationSetBy = Automatic
+
+	column CreatedAt
+		dataType: dateTime
+		isHidden
+		lineageTag: 07255cc9-5767-5a99-a1bb-c1d1c54b0c8f
+		summarizeBy: none
+		sourceColumn: CreatedAt
+		annotation SummarizationSetBy = Automatic
+		annotation UnderlyingDateTimeDataType = Date
+
+	column SKProductID
+		dataType: int64
+		isHidden
+		lineageTag: c5ec2fac-db24-521e-a6f8-16aeabc66651
+		summarizeBy: none
+		sourceColumn: SKProductID
+		annotation SummarizationSetBy = Automatic
+
+	column 'Регіон промо'
+		dataType: string
+		lineageTag: 332c28ca-6d7f-5d7c-ba32-2a33145f0445
+		summarizeBy: none
+		sourceColumn: Region
+		annotation SummarizationSetBy = Automatic
+
+	column TotalNetAmount
+		dataType: decimal
+		isHidden
+		lineageTag: 4c5c6ea8-bbbe-52eb-b784-1dd00c7b0155
+		summarizeBy: none
+		sourceColumn: TotalNetAmount
+		annotation SummarizationSetBy = Automatic
+
+	column NetAmountPerVisit
+		dataType: decimal
+		isHidden
+		lineageTag: 757a9a6a-0008-5eaf-9a9f-2e080a890d6d
+		summarizeBy: none
+		sourceColumn: NetAmountPerVisit
+		annotation SummarizationSetBy = Automatic
+
+	column TotalQty
+		dataType: decimal
+		isHidden
+		lineageTag: f259c469-0c4c-50f5-9eb6-2f44ad3b2aef
+		summarizeBy: none
+		sourceColumn: TotalQty
+		annotation SummarizationSetBy = Automatic
+
+	column TotalSamplesQty
+		dataType: int64
+		isHidden
+		lineageTag: 0bb57c77-77ad-5c24-99a2-797ee59f79e9
+		summarizeBy: none
+		sourceColumn: TotalSamplesQty
+		annotation SummarizationSetBy = Automatic
+
+	column TotalPrescriptionsCnt
+		dataType: int64
+		isHidden
+		lineageTag: d7047dd1-3c5a-5850-8cd0-d20f242fec8c
+		summarizeBy: none
+		sourceColumn: TotalPrescriptionsCnt
+		annotation SummarizationSetBy = Automatic
+
+	column VisitCnt
+		dataType: int64
+		isHidden
+		lineageTag: f0d14a00-e6c0-56a9-883b-b7e8f1f33273
+		summarizeBy: none
+		sourceColumn: VisitCnt
+		annotation SummarizationSetBy = Automatic
+
+	column YearMonth
+		dataType: string
+		isHidden
+		lineageTag: 74288d33-d461-50b4-aa47-f242d58af71c
+		summarizeBy: none
+		sourceColumn: YearMonth
+		annotation SummarizationSetBy = Automatic
+
+	column YearNum
+		dataType: int64
+		isHidden
+		lineageTag: a46add0a-184e-5a6e-95c8-d49d1076c64d
+		summarizeBy: none
+		sourceColumn: YearNum
+		annotation SummarizationSetBy = Automatic
+
+	column MonthNum
+		dataType: int64
+		isHidden
+		lineageTag: 8962d9ee-1c87-553e-ba6c-0dcf76567878
+		summarizeBy: none
+		sourceColumn: MonthNum
+		annotation SummarizationSetBy = Automatic
+
+	column MonthStartDate
+		dataType: dateTime
+		isHidden
+		lineageTag: 76d55ea5-d9f3-5ead-8d0e-6943b7a07054
+		summarizeBy: none
+		sourceColumn: MonthStartDate
+		annotation SummarizationSetBy = Automatic
+		annotation UnderlyingDateTimeDataType = Date
+
+	measure 'Промо: візити' = SUM('Промо проти продажів'[VisitCnt])
+		formatString: #,0
+		lineageTag: 7f0e85b7-5278-561d-8931-e7e1a51f0363
+
+	measure 'Промо: зразки' = SUM('Промо проти продажів'[TotalSamplesQty])
+		formatString: #,0
+		lineageTag: b3077093-6825-5175-961a-efe562c7871f
+
+	measure 'Промо: призначення' = SUM('Промо проти продажів'[TotalPrescriptionsCnt])
+		formatString: #,0
+		lineageTag: 20df5405-d859-52a0-9731-e5eda9b0d479
+
+	measure 'Промо: сума продажів' = SUM('Промо проти продажів'[TotalNetAmount])
+		formatString: #,0
+		lineageTag: 5f1f9697-3081-5df4-b058-77865cd7f48a
+
+	/// Відношення, а не сума: перераховується на кожному рівні, тому підсумовувати його не можна.
+	measure 'Сума продажів на візит' = DIVIDE([Промо: сума продажів], [Промо: візити])
+		formatString: #,0.00
+		lineageTag: 2df36ff5-48f9-505c-8979-f1cf96f9796d
+
+	partition 'Промо проти продажів' = entity
+		mode: directLake
+		source
+			entityName: AggPromoEffectMonthly
+			schemaName: dwh
+			expressionSource: DatabaseQuery

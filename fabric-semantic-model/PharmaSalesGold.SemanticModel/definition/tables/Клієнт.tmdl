@@ -1,0 +1,108 @@
+/// Аптеки, лікарняні аптеки та дистрибʼютори після склеювання дублів.
+table 'Клієнт'
+	lineageTag: 52c9ab8c-71ad-5e23-a6d7-f1edb3a580e1
+
+	column CreatedBy
+		dataType: string
+		isHidden
+		lineageTag: 7143e271-a5ab-592a-98d4-7a194f62d6c8
+		summarizeBy: none
+		sourceColumn: CreatedBy
+		annotation SummarizationSetBy = Automatic
+
+	column CreatedAt
+		dataType: dateTime
+		isHidden
+		lineageTag: 4c1f86af-d82e-5a1e-85ff-1f409e2413dd
+		summarizeBy: none
+		sourceColumn: CreatedAt
+		annotation SummarizationSetBy = Automatic
+		annotation UnderlyingDateTimeDataType = Date
+
+	column SKClientAccountID
+		dataType: int64
+		isHidden
+		lineageTag: 659f366b-515b-5002-84d2-6b686a57cf6b
+		summarizeBy: none
+		sourceColumn: SKClientAccountID
+		annotation SummarizationSetBy = Automatic
+
+	column Id
+		dataType: string
+		isHidden
+		lineageTag: ec6ed2e6-613e-556d-a8b2-bacecf65b471
+		summarizeBy: none
+		sourceColumn: Id
+		annotation SummarizationSetBy = Automatic
+
+	column 'Назва клієнта'
+		dataType: string
+		lineageTag: e3f1dc5c-8d42-5a6a-b5fc-459c78129f71
+		summarizeBy: none
+		sourceColumn: AccountName
+		annotation SummarizationSetBy = Automatic
+
+	column 'Тип клієнта'
+		/// Аптека / лікарняна аптека / дистрибʼютор
+		dataType: string
+		lineageTag: 0d506cfe-d5d2-502d-be23-eaa83d140cc4
+		summarizeBy: none
+		sourceColumn: AccountType
+		annotation SummarizationSetBy = Automatic
+
+	column Мережа
+		dataType: string
+		lineageTag: 654ec4bd-9fba-520d-820d-f287db714e7c
+		summarizeBy: none
+		sourceColumn: Chain
+		annotation SummarizationSetBy = Automatic
+
+	column 'Юридична особа'
+		dataType: string
+		lineageTag: 48d62967-cd22-5253-8479-0b44dec21a4b
+		summarizeBy: none
+		sourceColumn: LegalEntityName
+		annotation SummarizationSetBy = Automatic
+
+	column ЄДРПОУ
+		dataType: string
+		lineageTag: 18806cb1-a92b-5d57-a805-b6c8c36ed823
+		summarizeBy: none
+		sourceColumn: EDRPOU
+		annotation SummarizationSetBy = Automatic
+
+	column 'Регіон клієнта'
+		dataType: string
+		lineageTag: e35d77d1-8e1d-5123-b534-1268c8c15ca2
+		summarizeBy: none
+		sourceColumn: Region
+		annotation SummarizationSetBy = Automatic
+
+	column 'Місто клієнта'
+		dataType: string
+		lineageTag: 5b19dff8-dbea-521a-8359-eba073e43ade
+		summarizeBy: none
+		sourceColumn: City
+		annotation SummarizationSetBy = Automatic
+
+	column Активний
+		dataType: boolean
+		lineageTag: fe451d9d-3725-5421-98ee-e308adbf7a04
+		summarizeBy: none
+		sourceColumn: IsActive
+		annotation SummarizationSetBy = Automatic
+
+	column 'Кодів у джерелі'
+		/// Скільки кодів облікової системи злилися в цього клієнта
+		dataType: int64
+		lineageTag: 07930be9-82d1-5e29-8986-0f169d093c59
+		summarizeBy: none
+		sourceColumn: SrcDuplicateCnt
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Клієнт' = entity
+		mode: directLake
+		source
+			entityName: DimClientAccount
+			schemaName: dwh
+			expressionSource: DatabaseQuery

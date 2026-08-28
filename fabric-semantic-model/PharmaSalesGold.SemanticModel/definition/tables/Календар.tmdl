@@ -1,0 +1,105 @@
+/// Календар для аналізу по днях, місяцях, кварталах і фінансових періодах.
+table 'Календар'
+	dataCategory: Time
+	lineageTag: 774dd8be-a84c-5561-87a0-e0e63b67ae3c
+
+	column CreatedBy
+		dataType: string
+		isHidden
+		lineageTag: 10173bca-e856-5175-a876-ea32573b66b5
+		summarizeBy: none
+		sourceColumn: CreatedBy
+		annotation SummarizationSetBy = Automatic
+
+	column CreatedAt
+		dataType: dateTime
+		isHidden
+		lineageTag: 3bd83d4a-622c-55f9-bca8-be39e45f29f3
+		summarizeBy: none
+		sourceColumn: CreatedAt
+		annotation SummarizationSetBy = Automatic
+		annotation UnderlyingDateTimeDataType = Date
+
+	column SKDateID
+		dataType: int64
+		isHidden
+		lineageTag: da00372b-08d2-5b04-bad3-ae62a0be3c23
+		summarizeBy: none
+		sourceColumn: SKDateID
+		annotation SummarizationSetBy = Automatic
+
+	column Дата
+		/// Календарна дата
+		dataType: dateTime
+		isKey
+		formatString: "dd.MM.yyyy"
+		lineageTag: 4883e4f3-c314-5bc4-8364-f89b1ac49366
+		summarizeBy: none
+		sourceColumn: CalendarDate
+		annotation SummarizationSetBy = Automatic
+		annotation UnderlyingDateTimeDataType = Date
+
+	column 'День місяця'
+		dataType: int64
+		lineageTag: c91a545f-79a9-5db0-9f2e-88cddbe93d6e
+		summarizeBy: none
+		sourceColumn: DayOfMonth
+		annotation SummarizationSetBy = Automatic
+
+	column 'Номер місяця'
+		dataType: int64
+		lineageTag: f170c5d5-4192-5362-9879-88e2bb39f18f
+		summarizeBy: none
+		sourceColumn: MonthNum
+		annotation SummarizationSetBy = Automatic
+
+	column Місяць
+		/// Назва місяця
+		dataType: string
+		lineageTag: 7da1abc5-249a-5eaf-ac6c-566f0a4106b9
+		summarizeBy: none
+		sourceColumn: MonthName
+		annotation SummarizationSetBy = Automatic
+
+	column Квартал
+		dataType: int64
+		lineageTag: 1b1bf76a-51b3-506b-8445-20446e46b9fd
+		summarizeBy: none
+		sourceColumn: QuarterNum
+		annotation SummarizationSetBy = Automatic
+
+	column Рік
+		dataType: int64
+		lineageTag: 06baaa70-8493-5f76-9f4c-ea3b50fe12e7
+		summarizeBy: none
+		sourceColumn: YearNum
+		annotation SummarizationSetBy = Automatic
+
+	column Рік-місяць
+		/// Формат РРРР-ММ, за ним зʼєднані місячні агрегати
+		dataType: string
+		lineageTag: 2623bd06-083a-5e32-83d7-a26466072af8
+		summarizeBy: none
+		sourceColumn: YearMonth
+		annotation SummarizationSetBy = Automatic
+
+	column 'Фінансовий рік'
+		dataType: int64
+		lineageTag: 81b80caf-50f6-59b8-aa2c-ed5fbee457be
+		summarizeBy: none
+		sourceColumn: FiscalYear
+		annotation SummarizationSetBy = Automatic
+
+	column 'Фінансовий квартал'
+		dataType: int64
+		lineageTag: dac0c04d-2c5c-5899-8fc5-c8d1775c63b7
+		summarizeBy: none
+		sourceColumn: FiscalQuarter
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Календар' = entity
+		mode: directLake
+		source
+			entityName: DimDate
+			schemaName: dwh
+			expressionSource: DatabaseQuery

@@ -1,0 +1,153 @@
+/// Активність польової команди по місяцях.
+table 'Візити'
+	lineageTag: 87502904-1009-583c-83b7-37185075c753
+
+	column CreatedBy
+		dataType: string
+		isHidden
+		lineageTag: c464ed17-e699-58e0-8c7f-14fa82e94ecd
+		summarizeBy: none
+		sourceColumn: CreatedBy
+		annotation SummarizationSetBy = Automatic
+
+	column CreatedAt
+		dataType: dateTime
+		isHidden
+		lineageTag: f7893a8f-5f8c-54c1-b2f9-9dcbacd38b87
+		summarizeBy: none
+		sourceColumn: CreatedAt
+		annotation SummarizationSetBy = Automatic
+		annotation UnderlyingDateTimeDataType = Date
+
+	column SKEmployeeID
+		dataType: int64
+		isHidden
+		lineageTag: fcae1f48-a719-5d16-b8d2-f4adc20e60a0
+		summarizeBy: none
+		sourceColumn: SKEmployeeID
+		annotation SummarizationSetBy = Automatic
+
+	column SKProductID
+		dataType: int64
+		isHidden
+		lineageTag: d493f408-1cd6-5c47-8af8-1137a6f1bc9e
+		summarizeBy: none
+		sourceColumn: SKProductID
+		annotation SummarizationSetBy = Automatic
+
+	column 'Спеціальність лікаря'
+		dataType: string
+		lineageTag: 80671abc-ff1d-5415-85f8-493003338138
+		summarizeBy: none
+		sourceColumn: Specialty
+		annotation SummarizationSetBy = Automatic
+
+	column 'Тип активності'
+		/// Візит / круглий стіл / e-detailing / симпозіум
+		dataType: string
+		lineageTag: 7c95b91b-3d88-5b50-a4c6-3fd9d6082bdc
+		summarizeBy: none
+		sourceColumn: ActivityType
+		annotation SummarizationSetBy = Automatic
+
+	column 'Регіон візиту'
+		/// Регіон лікаря
+		dataType: string
+		lineageTag: 5f0d15ed-9dd2-5598-844d-1c1e90b88d75
+		summarizeBy: none
+		sourceColumn: Region
+		annotation SummarizationSetBy = Automatic
+
+	column DoctorCnt
+		dataType: int64
+		isHidden
+		lineageTag: 958fb116-e934-5a53-8a29-70d7317033f2
+		summarizeBy: none
+		sourceColumn: DoctorCnt
+		annotation SummarizationSetBy = Automatic
+
+	column TotalDurationMin
+		dataType: int64
+		isHidden
+		lineageTag: adf0ab9f-58be-5ba6-87ee-24c6abacb96c
+		summarizeBy: none
+		sourceColumn: TotalDurationMin
+		annotation SummarizationSetBy = Automatic
+
+	column TotalSamplesQty
+		dataType: int64
+		isHidden
+		lineageTag: 92408345-667c-5af2-88fa-7b7bbbda0315
+		summarizeBy: none
+		sourceColumn: TotalSamplesQty
+		annotation SummarizationSetBy = Automatic
+
+	column VisitCnt
+		dataType: int64
+		isHidden
+		lineageTag: 94022899-b710-5457-8e82-68a12da3d4d7
+		summarizeBy: none
+		sourceColumn: VisitCnt
+		annotation SummarizationSetBy = Automatic
+
+	column YearMonth
+		dataType: string
+		isHidden
+		lineageTag: fd30ea83-8441-53bf-b613-10f3a9e22c77
+		summarizeBy: none
+		sourceColumn: YearMonth
+		annotation SummarizationSetBy = Automatic
+
+	column YearNum
+		dataType: int64
+		isHidden
+		lineageTag: 04e79760-e9d6-5419-bb25-78727f3e88ef
+		summarizeBy: none
+		sourceColumn: YearNum
+		annotation SummarizationSetBy = Automatic
+
+	column MonthNum
+		dataType: int64
+		isHidden
+		lineageTag: b7fd376d-679d-58aa-93bd-15a2d15085a4
+		summarizeBy: none
+		sourceColumn: MonthNum
+		annotation SummarizationSetBy = Automatic
+
+	column MonthStartDate
+		dataType: dateTime
+		isHidden
+		lineageTag: 9e3f141a-6dbe-59f7-904f-9dc9a75da3c2
+		summarizeBy: none
+		sourceColumn: MonthStartDate
+		annotation SummarizationSetBy = Automatic
+		annotation UnderlyingDateTimeDataType = Date
+
+	measure Візити = SUM('Візити'[VisitCnt])
+		formatString: #,0
+		lineageTag: 1105f711-0c71-574c-8469-a26e8cb04bde
+
+	measure 'Тривалість візитів, хв' = SUM('Візити'[TotalDurationMin])
+		formatString: #,0
+		lineageTag: b137fbb5-47c3-58c8-b07d-c6762adeaf92
+
+	/// Хвилин
+	measure 'Середня тривалість візиту' = DIVIDE([Тривалість візитів, хв], [Візити])
+		formatString: #,0.0
+		lineageTag: cd38b526-d53f-5a1d-b960-26b446994637
+
+	measure 'Роздано зразків' = SUM('Візити'[TotalSamplesQty])
+		formatString: #,0
+		lineageTag: 3b8ddeeb-e857-5424-b12b-5aee622e4819
+
+	/// Розраховано в межах місяця. За кількох місяців одразу показує порожньо — лікарі повторюються і сума була б завищена.
+	measure 'Лікарів охоплено (місяць)' = IF(HASONEVALUE('Візити'[YearMonth]), SUM('Візити'[DoctorCnt]))
+		formatString: #,0
+		lineageTag: eebeda69-ed9f-5320-bbee-fa014d6bc3a2
+
+	partition 'Візити' = entity
+		mode: directLake
+		source
+			entityName: AggVisitMonthly
+			schemaName: dwh
+			expressionSource: DatabaseQuery

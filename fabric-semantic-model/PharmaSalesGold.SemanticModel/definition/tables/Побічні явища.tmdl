@@ -1,0 +1,120 @@
+/// Кейси фармаконагляду по місяцях. Рахуються останні версії кейсів.
+table 'Побічні явища'
+	lineageTag: 16a012a9-3b1d-5f1e-b60e-d02e0efbe3c4
+
+	column CreatedBy
+		dataType: string
+		isHidden
+		lineageTag: 0f01e459-d5bc-577f-8a6f-cf692669498e
+		summarizeBy: none
+		sourceColumn: CreatedBy
+		annotation SummarizationSetBy = Automatic
+
+	column CreatedAt
+		dataType: dateTime
+		isHidden
+		lineageTag: 9f2bd7ea-ee7a-5976-bb13-ad2a8acdd087
+		summarizeBy: none
+		sourceColumn: CreatedAt
+		annotation SummarizationSetBy = Automatic
+		annotation UnderlyingDateTimeDataType = Date
+
+	column SKProductID
+		dataType: int64
+		isHidden
+		lineageTag: feff46bb-bbe9-589b-960e-d59ff7add453
+		summarizeBy: none
+		sourceColumn: SKProductID
+		annotation SummarizationSetBy = Automatic
+
+	column Серйозність
+		/// Non-serious / Serious / Critical
+		dataType: string
+		lineageTag: 9f1b7cd9-1304-58bb-8684-cf2e6c504824
+		summarizeBy: none
+		sourceColumn: Seriousness
+		annotation SummarizationSetBy = Automatic
+
+	column 'Регіон кейсу'
+		dataType: string
+		lineageTag: 138098c9-a9bb-551d-87e2-3f8c93082caa
+		summarizeBy: none
+		sourceColumn: Region
+		annotation SummarizationSetBy = Automatic
+
+	column FatalCnt
+		dataType: int64
+		isHidden
+		lineageTag: 02062404-f727-556d-87d0-ebed2e23aae2
+		summarizeBy: none
+		sourceColumn: FatalCnt
+		annotation SummarizationSetBy = Automatic
+
+	column LogicalErrorCnt
+		dataType: int64
+		isHidden
+		lineageTag: e2131608-dbd3-5691-9ae2-61eee988c9df
+		summarizeBy: none
+		sourceColumn: LogicalErrorCnt
+		annotation SummarizationSetBy = Automatic
+
+	column CaseCnt
+		dataType: int64
+		isHidden
+		lineageTag: b15633fd-3136-5fab-8cba-67c1be719888
+		summarizeBy: none
+		sourceColumn: CaseCnt
+		annotation SummarizationSetBy = Automatic
+
+	column YearMonth
+		dataType: string
+		isHidden
+		lineageTag: 3eff5782-ea89-5823-9638-45b022339501
+		summarizeBy: none
+		sourceColumn: YearMonth
+		annotation SummarizationSetBy = Automatic
+
+	column YearNum
+		dataType: int64
+		isHidden
+		lineageTag: 656a2795-6879-5c34-a38e-aca07ea8b9c4
+		summarizeBy: none
+		sourceColumn: YearNum
+		annotation SummarizationSetBy = Automatic
+
+	column MonthNum
+		dataType: int64
+		isHidden
+		lineageTag: 92f6e78a-df30-5d9b-845c-7dc2939f573f
+		summarizeBy: none
+		sourceColumn: MonthNum
+		annotation SummarizationSetBy = Automatic
+
+	column MonthStartDate
+		dataType: dateTime
+		isHidden
+		lineageTag: 01c29026-b07b-5a69-86d2-c7d38fd123eb
+		summarizeBy: none
+		sourceColumn: MonthStartDate
+		annotation SummarizationSetBy = Automatic
+		annotation UnderlyingDateTimeDataType = Date
+
+	measure Кейси = SUM('Побічні явища'[CaseCnt])
+		formatString: #,0
+		lineageTag: e2514978-0327-5bf1-98ac-742064abb00e
+
+	measure 'Летальні кейси' = SUM('Побічні явища'[FatalCnt])
+		formatString: #,0
+		lineageTag: 24bac26a-0013-55ce-83cf-2d558180af9c
+
+	/// Критична серйозність із наслідком «одужав»
+	measure 'Логічні помилки в кейсах' = SUM('Побічні явища'[LogicalErrorCnt])
+		formatString: #,0
+		lineageTag: b40116d9-f7d1-5798-9fdf-610b0896e8c7
+
+	partition 'Побічні явища' = entity
+		mode: directLake
+		source
+			entityName: AggAdverseEventMonthly
+			schemaName: dwh
+			expressionSource: DatabaseQuery
