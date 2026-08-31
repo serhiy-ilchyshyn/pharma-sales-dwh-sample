@@ -49,8 +49,8 @@ table 'Препарат'
 		sourceColumn: SkuCode
 		annotation SummarizationSetBy = Automatic
 
+	/// Міжнародна непатентована назва
 	column МНН
-		/// Міжнародна непатентована назва
 		dataType: string
 		lineageTag: dd6cf5e6-b533-5bea-b934-e8f7d398f343
 		summarizeBy: none
@@ -64,8 +64,8 @@ table 'Препарат'
 		sourceColumn: AtcCode
 		annotation SummarizationSetBy = Automatic
 
+	/// Анатомічна група першого рівня
 	column АТС-клас
-		/// Анатомічна група першого рівня
 		dataType: string
 		lineageTag: d002e137-9966-5cb1-ba9e-29d4a9f4898e
 		summarizeBy: none
@@ -93,8 +93,8 @@ table 'Препарат'
 		sourceColumn: Manufacturer
 		annotation SummarizationSetBy = Automatic
 
+	/// Рецептурний чи безрецептурний
 	column 'RX / OTC'
-		/// Рецептурний чи безрецептурний
 		dataType: string
 		lineageTag: f9ff926d-3832-5d10-9862-7ca36cd5f17c
 		summarizeBy: none

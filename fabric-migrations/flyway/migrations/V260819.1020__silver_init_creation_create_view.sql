@@ -11,7 +11,7 @@
 --     починаючи з SKSrcSystemKeyID (spFullFct робить SELECT ... , v_fct.*).
 GO
 --IMPORTANT
-USE [whsilverad];
+USE [whsilver];
 --IMPORTANT
 GO
 
@@ -56,7 +56,7 @@ SELECT
     , c.CityName                            AS Name
     , ISNULL(reg.SKRegionKeyID, -1)         AS SKRegionKeyID
 FROM dedup_city AS c
-LEFT JOIN [whsilverad].[dwh].[DimRegion] AS reg
+LEFT JOIN [whsilver].[dwh].[DimRegion] AS reg
     ON  reg.Id = c.RegionName
     AND reg.EndDate IS NULL
 GO
@@ -149,10 +149,10 @@ SELECT
     , CAST(CASE WHEN atc.SKAtcClassKeyID IS NULL THEN 0 ELSE 1 END AS bit) AS IsAtcCodeValid
     , CAST(lp.created_at AS datetime2(3))       AS SrcCreatedAt
 FROM latest_product AS lp
-LEFT JOIN [whsilverad].[dwh].[DimManufacturer] AS man
+LEFT JOIN [whsilver].[dwh].[DimManufacturer] AS man
     ON  man.Id = LTRIM(RTRIM(lp.manufacturer))
     AND man.EndDate IS NULL
-LEFT JOIN [whsilverad].[dwh].[DimAtcClass] AS atc
+LEFT JOIN [whsilver].[dwh].[DimAtcClass] AS atc
     ON  atc.Id = LEFT(LTRIM(RTRIM(lp.atc_code)), 1)
     AND atc.SKAtcClassKeyID <> -1
     AND atc.EndDate IS NULL
@@ -195,16 +195,16 @@ SELECT
     , g.SrcDuplicateCnt                   AS SrcDuplicateCnt
     , CAST(g.created_at AS datetime2(3))  AS SrcCreatedAt
 FROM golden AS g
-LEFT JOIN [whsilverad].[dwh].[DimChain] AS ch
+LEFT JOIN [whsilver].[dwh].[DimChain] AS ch
     ON  ch.Id = LTRIM(RTRIM(g.chain_name))
     AND ch.EndDate IS NULL
-LEFT JOIN [whsilverad].[dwh].[DimLegalEntity] AS le
+LEFT JOIN [whsilver].[dwh].[DimLegalEntity] AS le
     ON  le.Id = LTRIM(RTRIM(g.edrpou))
     AND le.EndDate IS NULL
-LEFT JOIN [whsilverad].[dwh].[DimRegion] AS reg
+LEFT JOIN [whsilver].[dwh].[DimRegion] AS reg
     ON  reg.Id = LTRIM(RTRIM(g.region))
     AND reg.EndDate IS NULL
-LEFT JOIN [whsilverad].[dwh].[DimCity] AS cty
+LEFT JOIN [whsilver].[dwh].[DimCity] AS cty
     ON  cty.Id = CONCAT(ISNULL(NULLIF(LTRIM(RTRIM(g.region)), ''), 'N/A'), '|', LTRIM(RTRIM(g.city)))
     AND cty.EndDate IS NULL
 WHERE g.customer_id = g.GoldenCustomerId
@@ -240,10 +240,10 @@ SELECT
     , ISNULL(reg.SKRegionKeyID, -1) AS SKRegionKeyID
     , ISNULL(cty.SKCityKeyID, -1)   AS SKCityKeyID
 FROM lpu AS l
-LEFT JOIN [whsilverad].[dwh].[DimRegion] AS reg
+LEFT JOIN [whsilver].[dwh].[DimRegion] AS reg
     ON  reg.Id = l.RegionName
     AND reg.EndDate IS NULL
-LEFT JOIN [whsilverad].[dwh].[DimCity] AS cty
+LEFT JOIN [whsilver].[dwh].[DimCity] AS cty
     ON  cty.Id = CONCAT(ISNULL(NULLIF(l.RegionName, ''), 'N/A'), '|', l.CityName)
     AND cty.EndDate IS NULL
 GO
@@ -294,16 +294,16 @@ SELECT
     , g.SrcDuplicateCnt                   AS SrcDuplicateCnt
     , CAST(g.created_at AS datetime2(3))  AS SrcCreatedAt
 FROM golden AS g
-LEFT JOIN [whsilverad].[dwh].[DimSpecialty] AS spec
+LEFT JOIN [whsilver].[dwh].[DimSpecialty] AS spec
     ON  spec.Id = UPPER(LTRIM(RTRIM(g.specialty)))
     AND spec.EndDate IS NULL
-LEFT JOIN [whsilverad].[dwh].[DimLpu] AS lpu
+LEFT JOIN [whsilver].[dwh].[DimLpu] AS lpu
     ON  lpu.Id = UPPER(LTRIM(RTRIM(g.lpu_name)))
     AND lpu.EndDate IS NULL
-LEFT JOIN [whsilverad].[dwh].[DimRegion] AS reg
+LEFT JOIN [whsilver].[dwh].[DimRegion] AS reg
     ON  reg.Id = LTRIM(RTRIM(g.region))
     AND reg.EndDate IS NULL
-LEFT JOIN [whsilverad].[dwh].[DimCity] AS cty
+LEFT JOIN [whsilver].[dwh].[DimCity] AS cty
     ON  cty.Id = CONCAT(ISNULL(NULLIF(LTRIM(RTRIM(g.region)), ''), 'N/A'), '|', LTRIM(RTRIM(g.city)))
     AND cty.EndDate IS NULL
 WHERE g.doctor_id = g.GoldenDoctorId
@@ -333,10 +333,10 @@ SELECT
     , le.is_active                        AS IsActive
     , CAST(le.created_at AS datetime2(3)) AS SrcCreatedAt
 FROM latest_employee AS le
-LEFT JOIN [whsilverad].[dwh].[DimTerritory] AS ter
+LEFT JOIN [whsilver].[dwh].[DimTerritory] AS ter
     ON  ter.Id = LTRIM(RTRIM(le.territory))
     AND ter.EndDate IS NULL
-LEFT JOIN [whsilverad].[dwh].[DimEmployee] AS mgr
+LEFT JOIN [whsilver].[dwh].[DimEmployee] AS mgr
     ON  mgr.Id = le.manager_id
     AND mgr.EndDate IS NULL
     AND mgr.SKEmployeeKeyID <> -1
@@ -360,13 +360,13 @@ SELECT
     , ISNULL(cty.SKCityKeyID, -1)             AS SKCityKeyID
     , CAST(lw.created_at AS datetime2(3))     AS SrcCreatedAt
 FROM latest_warehouse AS lw
-LEFT JOIN [whsilverad].[dwh].[RefClientAccount] AS rca
+LEFT JOIN [whsilver].[dwh].[RefClientAccount] AS rca
     ON  rca.Id = lw.owner_customer_id
     AND rca.EndDate IS NULL
-LEFT JOIN [whsilverad].[dwh].[DimRegion] AS reg
+LEFT JOIN [whsilver].[dwh].[DimRegion] AS reg
     ON  reg.Id = LTRIM(RTRIM(lw.region))
     AND reg.EndDate IS NULL
-LEFT JOIN [whsilverad].[dwh].[DimCity] AS cty
+LEFT JOIN [whsilver].[dwh].[DimCity] AS cty
     ON  cty.Id = CONCAT(ISNULL(NULLIF(LTRIM(RTRIM(lw.region)), ''), 'N/A'), '|', LTRIM(RTRIM(lw.city)))
     AND cty.EndDate IS NULL
 WHERE lw.rn = 1
@@ -437,8 +437,8 @@ SELECT
     , ISNULL(lp.brand_name, 'N/A')     AS RawBrandName
     , ISNULL(dp.SKProductKeyID, -1)    AS SKProductKeyID
 FROM latest_product AS lp
-CROSS JOIN (SELECT SKSrcSystemKeyID FROM [whsilverad].[dwh].[DimSrcSystem] WHERE Id = 1 AND EndDate IS NULL) AS ss
-LEFT JOIN [whsilverad].[dwh].[DimProduct] AS dp
+CROSS JOIN (SELECT SKSrcSystemKeyID FROM [whsilver].[dwh].[DimSrcSystem] WHERE Id = 1 AND EndDate IS NULL) AS ss
+LEFT JOIN [whsilver].[dwh].[DimProduct] AS dp
     ON  dp.Id = lp.product_id
     AND dp.EndDate IS NULL
 WHERE lp.rn = 1
@@ -468,8 +468,8 @@ SELECT
     , CAST(CASE WHEN g.customer_id = g.GoldenCustomerId THEN 1 ELSE 0 END AS bit) AS IsGoldenRecord
     , ISNULL(dca.SKClientAccountKeyID, -1)            AS SKClientAccountKeyID
 FROM golden AS g
-CROSS JOIN (SELECT SKSrcSystemKeyID FROM [whsilverad].[dwh].[DimSrcSystem] WHERE Id = 1 AND EndDate IS NULL) AS ss
-LEFT JOIN [whsilverad].[dwh].[DimClientAccount] AS dca
+CROSS JOIN (SELECT SKSrcSystemKeyID FROM [whsilver].[dwh].[DimSrcSystem] WHERE Id = 1 AND EndDate IS NULL) AS ss
+LEFT JOIN [whsilver].[dwh].[DimClientAccount] AS dca
     ON  dca.Id = g.GoldenCustomerId
     AND dca.EndDate IS NULL
 GO
@@ -511,8 +511,8 @@ SELECT
     , CAST(CASE WHEN g.doctor_id = g.GoldenDoctorId THEN 1 ELSE 0 END AS bit) AS IsGoldenRecord
     , ISNULL(dd.SKDoctorKeyID, -1)      AS SKDoctorKeyID
 FROM golden AS g
-CROSS JOIN (SELECT SKSrcSystemKeyID FROM [whsilverad].[dwh].[DimSrcSystem] WHERE Id = 1 AND EndDate IS NULL) AS ss
-LEFT JOIN [whsilverad].[dwh].[DimDoctor] AS dd
+CROSS JOIN (SELECT SKSrcSystemKeyID FROM [whsilver].[dwh].[DimSrcSystem] WHERE Id = 1 AND EndDate IS NULL) AS ss
+LEFT JOIN [whsilver].[dwh].[DimDoctor] AS dd
     ON  dd.Id = g.GoldenDoctorId
     AND dd.EndDate IS NULL
 GO
@@ -530,8 +530,8 @@ SELECT
     , ISNULL(le.full_name, 'N/A')      AS RawFullName
     , ISNULL(de.SKEmployeeKeyID, -1)   AS SKEmployeeKeyID
 FROM latest_employee AS le
-CROSS JOIN (SELECT SKSrcSystemKeyID FROM [whsilverad].[dwh].[DimSrcSystem] WHERE Id = 1 AND EndDate IS NULL) AS ss
-LEFT JOIN [whsilverad].[dwh].[DimEmployee] AS de
+CROSS JOIN (SELECT SKSrcSystemKeyID FROM [whsilver].[dwh].[DimSrcSystem] WHERE Id = 1 AND EndDate IS NULL) AS ss
+LEFT JOIN [whsilver].[dwh].[DimEmployee] AS de
     ON  de.Id = le.employee_id
     AND de.EndDate IS NULL
 WHERE le.rn = 1
@@ -550,8 +550,8 @@ SELECT
     , ISNULL(lw.name, 'N/A')           AS RawName
     , ISNULL(dw.SKWarehouseKeyID, -1)  AS SKWarehouseKeyID
 FROM latest_warehouse AS lw
-CROSS JOIN (SELECT SKSrcSystemKeyID FROM [whsilverad].[dwh].[DimSrcSystem] WHERE Id = 1 AND EndDate IS NULL) AS ss
-LEFT JOIN [whsilverad].[dwh].[DimWarehouse] AS dw
+CROSS JOIN (SELECT SKSrcSystemKeyID FROM [whsilver].[dwh].[DimSrcSystem] WHERE Id = 1 AND EndDate IS NULL) AS ss
+LEFT JOIN [whsilver].[dwh].[DimWarehouse] AS dw
     ON  dw.Id = lw.warehouse_id
     AND dw.EndDate IS NULL
 WHERE lw.rn = 1
@@ -583,8 +583,8 @@ SELECT
     , m.RawMovementType                  AS RawMovementType
     , ISNULL(dmt.SKMovementTypeKeyID, -1) AS SKMovementTypeKeyID
 FROM mapped AS m
-CROSS JOIN (SELECT SKSrcSystemKeyID FROM [whsilverad].[dwh].[DimSrcSystem] WHERE Id = 1 AND EndDate IS NULL) AS ss
-LEFT JOIN [whsilverad].[dwh].[DimMovementType] AS dmt
+CROSS JOIN (SELECT SKSrcSystemKeyID FROM [whsilver].[dwh].[DimSrcSystem] WHERE Id = 1 AND EndDate IS NULL) AS ss
+LEFT JOIN [whsilver].[dwh].[DimMovementType] AS dmt
     ON  dmt.Id = m.MovementTypeId
     AND dmt.SKMovementTypeKeyID <> -1
     AND dmt.EndDate IS NULL
@@ -606,7 +606,7 @@ WITH dedup_sales AS (
 -- тому CROSS JOIN нижче не може обнулити факт, навіть якщо рядка джерельної системи немає.
 src_system AS (
     SELECT ISNULL(MAX(SKSrcSystemKeyID), -1) AS SKSrcSystemKeyID
-    FROM [whsilverad].[dwh].[DimSrcSystem]
+    FROM [whsilver].[dwh].[DimSrcSystem]
     WHERE Id = 1 AND EndDate IS NULL
 )
 SELECT
@@ -643,26 +643,26 @@ SELECT
     , CAST(CASE WHEN s.SrcRowCnt > 1 THEN 1 ELSE 0 END AS bit) AS IsSrcDuplicate
 FROM dedup_sales AS s
 CROSS JOIN src_system AS ss
-LEFT JOIN [whsilverad].[dwh].[DimDate] AS dd
+LEFT JOIN [whsilver].[dwh].[DimDate] AS dd
     ON dd.CalendarDate = s.order_date
-LEFT JOIN [whsilverad].[dwh].[DimDate] AS dld
+LEFT JOIN [whsilver].[dwh].[DimDate] AS dld
     ON dld.CalendarDate = s.delivery_date
-LEFT JOIN [whsilverad].[dwh].[RefClientAccount] AS rca
+LEFT JOIN [whsilver].[dwh].[RefClientAccount] AS rca
     ON  rca.Id = s.customer_id
     AND rca.EndDate IS NULL
-LEFT JOIN [whsilverad].[dwh].[RefWarehouse] AS rwh
+LEFT JOIN [whsilver].[dwh].[RefWarehouse] AS rwh
     ON  rwh.Id = s.warehouse_id
     AND rwh.EndDate IS NULL
-LEFT JOIN [whsilverad].[dwh].[RefProduct] AS rpr
+LEFT JOIN [whsilver].[dwh].[RefProduct] AS rpr
     ON  rpr.Id = s.product_id
     AND rpr.EndDate IS NULL
-LEFT JOIN [whsilverad].[dwh].[RefEmployee] AS remp
+LEFT JOIN [whsilver].[dwh].[RefEmployee] AS remp
     ON  remp.Id = s.employee_id
     AND remp.EndDate IS NULL
-LEFT JOIN [whsilverad].[dwh].[DimOrderStatus] AS dos
+LEFT JOIN [whsilver].[dwh].[DimOrderStatus] AS dos
     ON  dos.Id = LTRIM(RTRIM(s.status))
     AND dos.EndDate IS NULL
-LEFT JOIN [whsilverad].[dwh].[DimCurrency] AS cur
+LEFT JOIN [whsilver].[dwh].[DimCurrency] AS cur
     ON  cur.Id = LTRIM(RTRIM(s.currency))
     AND cur.EndDate IS NULL
 WHERE s.rn = 1
@@ -680,7 +680,7 @@ WITH dedup_movement AS (
 -- тому CROSS JOIN нижче не може обнулити факт, навіть якщо рядка джерельної системи немає.
 src_system AS (
     SELECT ISNULL(MAX(SKSrcSystemKeyID), -1) AS SKSrcSystemKeyID
-    FROM [whsilverad].[dwh].[DimSrcSystem]
+    FROM [whsilver].[dwh].[DimSrcSystem]
     WHERE Id = 1 AND EndDate IS NULL
 )
 SELECT
@@ -699,21 +699,21 @@ SELECT
     , CAST(CASE WHEN m.SrcRowCnt > 1 THEN 1 ELSE 0 END AS bit)                     AS IsSrcDuplicate
 FROM dedup_movement AS m
 CROSS JOIN src_system AS ss
-LEFT JOIN [whsilverad].[dwh].[DimDate] AS dd
+LEFT JOIN [whsilver].[dwh].[DimDate] AS dd
     ON dd.CalendarDate = CAST(m.movement_date AS date)
-LEFT JOIN [whsilverad].[dwh].[RefWarehouse] AS rwh
+LEFT JOIN [whsilver].[dwh].[RefWarehouse] AS rwh
     ON  rwh.Id = m.warehouse_id
     AND rwh.EndDate IS NULL
-LEFT JOIN [whsilverad].[dwh].[RefProduct] AS rpr
+LEFT JOIN [whsilver].[dwh].[RefProduct] AS rpr
     ON  rpr.Id = m.product_id
     AND rpr.EndDate IS NULL
-LEFT JOIN [whsilverad].[dwh].[RefEmployee] AS remp
+LEFT JOIN [whsilver].[dwh].[RefEmployee] AS remp
     ON  remp.Id = m.employee_id
     AND remp.EndDate IS NULL
-LEFT JOIN [whsilverad].[dwh].[RefMovementType] AS rmt
+LEFT JOIN [whsilver].[dwh].[RefMovementType] AS rmt
     ON  rmt.Id = LTRIM(RTRIM(m.movement_type))
     AND rmt.EndDate IS NULL
-LEFT JOIN [whsilverad].[dwh].[DimMovementType] AS dmt
+LEFT JOIN [whsilver].[dwh].[DimMovementType] AS dmt
     ON  dmt.SKMovementTypeKeyID = rmt.SKMovementTypeKeyID
     AND dmt.EndDate IS NULL
 WHERE m.rn = 1
@@ -731,7 +731,7 @@ WITH dedup_visit AS (
 -- тому CROSS JOIN нижче не може обнулити факт, навіть якщо рядка джерельної системи немає.
 src_system AS (
     SELECT ISNULL(MAX(SKSrcSystemKeyID), -1) AS SKSrcSystemKeyID
-    FROM [whsilverad].[dwh].[DimSrcSystem]
+    FROM [whsilver].[dwh].[DimSrcSystem]
     WHERE Id = 1 AND EndDate IS NULL
 )
 SELECT
@@ -749,18 +749,18 @@ SELECT
     , CAST(CASE WHEN v.SrcRowCnt > 1 THEN 1 ELSE 0 END AS bit) AS IsSrcDuplicate
 FROM dedup_visit AS v
 CROSS JOIN src_system AS ss
-LEFT JOIN [whsilverad].[dwh].[DimDate] AS dd
+LEFT JOIN [whsilver].[dwh].[DimDate] AS dd
     ON dd.CalendarDate = CAST(v.visit_date AS date)
-LEFT JOIN [whsilverad].[dwh].[RefDoctor] AS rdoc
+LEFT JOIN [whsilver].[dwh].[RefDoctor] AS rdoc
     ON  rdoc.Id = v.doctor_id
     AND rdoc.EndDate IS NULL
-LEFT JOIN [whsilverad].[dwh].[RefEmployee] AS remp
+LEFT JOIN [whsilver].[dwh].[RefEmployee] AS remp
     ON  remp.Id = v.employee_id
     AND remp.EndDate IS NULL
-LEFT JOIN [whsilverad].[dwh].[RefProduct] AS rpr
+LEFT JOIN [whsilver].[dwh].[RefProduct] AS rpr
     ON  rpr.Id = v.product_id
     AND rpr.EndDate IS NULL
-LEFT JOIN [whsilverad].[dwh].[DimActivityType] AS dat
+LEFT JOIN [whsilver].[dwh].[DimActivityType] AS dat
     ON  dat.Id = LTRIM(RTRIM(v.activity_type))
     AND dat.EndDate IS NULL
 WHERE v.rn = 1
@@ -778,7 +778,7 @@ WITH dedup_rx AS (
 -- тому CROSS JOIN нижче не може обнулити факт, навіть якщо рядка джерельної системи немає.
 src_system AS (
     SELECT ISNULL(MAX(SKSrcSystemKeyID), -1) AS SKSrcSystemKeyID
-    FROM [whsilverad].[dwh].[DimSrcSystem]
+    FROM [whsilver].[dwh].[DimSrcSystem]
     WHERE Id = 1 AND EndDate IS NULL
 )
 SELECT
@@ -794,15 +794,15 @@ SELECT
     , CAST(CASE WHEN r.SrcRowCnt > 1 THEN 1 ELSE 0 END AS bit) AS IsSrcDuplicate
 FROM dedup_rx AS r
 CROSS JOIN src_system AS ss
-LEFT JOIN [whsilverad].[dwh].[DimDate] AS dd
+LEFT JOIN [whsilver].[dwh].[DimDate] AS dd
     ON dd.CalendarDate = r.prescription_date
-LEFT JOIN [whsilverad].[dwh].[RefDoctor] AS rdoc
+LEFT JOIN [whsilver].[dwh].[RefDoctor] AS rdoc
     ON  rdoc.Id = r.doctor_id
     AND rdoc.EndDate IS NULL
-LEFT JOIN [whsilverad].[dwh].[RefProduct] AS rpr
+LEFT JOIN [whsilver].[dwh].[RefProduct] AS rpr
     ON  rpr.Id = r.product_id
     AND rpr.EndDate IS NULL
-LEFT JOIN [whsilverad].[dwh].[RefEmployee] AS remp
+LEFT JOIN [whsilver].[dwh].[RefEmployee] AS remp
     ON  remp.Id = r.entered_by_employee_id
     AND remp.EndDate IS NULL
 WHERE r.rn = 1
@@ -820,7 +820,7 @@ WITH dedup_ae AS (
 -- тому CROSS JOIN нижче не може обнулити факт, навіть якщо рядка джерельної системи немає.
 src_system AS (
     SELECT ISNULL(MAX(SKSrcSystemKeyID), -1) AS SKSrcSystemKeyID
-    FROM [whsilverad].[dwh].[DimSrcSystem]
+    FROM [whsilver].[dwh].[DimSrcSystem]
     WHERE Id = 1 AND EndDate IS NULL
 )
 SELECT
@@ -845,24 +845,24 @@ SELECT
     , 1                                                AS CaseCnt
 FROM dedup_ae AS a
 CROSS JOIN src_system AS ss
-LEFT JOIN [whsilverad].[dwh].[DimDate] AS dd
+LEFT JOIN [whsilver].[dwh].[DimDate] AS dd
     ON dd.CalendarDate = a.report_date
-LEFT JOIN [whsilverad].[dwh].[RefProduct] AS rpr
+LEFT JOIN [whsilver].[dwh].[RefProduct] AS rpr
     ON  rpr.Id = a.product_id
     AND rpr.EndDate IS NULL
-LEFT JOIN [whsilverad].[dwh].[RefDoctor] AS rdoc
+LEFT JOIN [whsilver].[dwh].[RefDoctor] AS rdoc
     ON  rdoc.Id = a.reporter_doctor_id
     AND rdoc.EndDate IS NULL
-LEFT JOIN [whsilverad].[dwh].[DimAeSeriousness] AS dser
+LEFT JOIN [whsilver].[dwh].[DimAeSeriousness] AS dser
     ON  dser.Id = LTRIM(RTRIM(a.seriousness))
     AND dser.EndDate IS NULL
-LEFT JOIN [whsilverad].[dwh].[DimAeOutcome] AS dout
+LEFT JOIN [whsilver].[dwh].[DimAeOutcome] AS dout
     ON  dout.Id = LTRIM(RTRIM(a.outcome))
     AND dout.EndDate IS NULL
-LEFT JOIN [whsilverad].[dwh].[DimReportSource] AS drs
+LEFT JOIN [whsilver].[dwh].[DimReportSource] AS drs
     ON  drs.Id = LTRIM(RTRIM(a.report_source))
     AND drs.EndDate IS NULL
-LEFT JOIN [whsilverad].[dwh].[DimRegion] AS reg
+LEFT JOIN [whsilver].[dwh].[DimRegion] AS reg
     ON  reg.Id = LTRIM(RTRIM(a.region))
     AND reg.EndDate IS NULL
 WHERE a.rn = 1

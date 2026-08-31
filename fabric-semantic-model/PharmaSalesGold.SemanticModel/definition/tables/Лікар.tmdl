@@ -70,8 +70,8 @@ table 'Лікар'
 		sourceColumn: City
 		annotation SummarizationSetBy = Automatic
 
+	/// A / B / C / N
 	column Сегмент
-		/// A / B / C / N
 		dataType: string
 		lineageTag: e3abc5ee-9fe4-56ea-a1e0-1275787c3254
 		summarizeBy: none

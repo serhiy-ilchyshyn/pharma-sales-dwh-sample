@@ -13,7 +13,7 @@
 --   Рядок -1 ("невідомо") є в кожному вимірі та довіднику -> inner join без втрат.
 GO
 --IMPORTANT
-USE [whsilverad];
+USE [whsilver];
 --IMPORTANT
 GO
 
@@ -21,9 +21,9 @@ GO
    СТАТИЧНІ / ТЕХНІЧНІ ВИМІРИ
    ========================================================= */
 
-DROP TABLE IF EXISTS [whsilverad].[dwh].[DimDate]
+DROP TABLE IF EXISTS [whsilver].[dwh].[DimDate]
 GO
-CREATE TABLE [whsilverad].[dwh].[DimDate]
+CREATE TABLE [whsilver].[dwh].[DimDate]
 (
 	[SKDateID] [int] NOT NULL,
 	[CalendarDate] [date] NOT NULL,
@@ -47,9 +47,9 @@ CREATE TABLE [whsilverad].[dwh].[DimDate]
 )
 GO
 
-DROP TABLE IF EXISTS [whsilverad].[dwh].[DimSrcSystem]
+DROP TABLE IF EXISTS [whsilver].[dwh].[DimSrcSystem]
 GO
-CREATE TABLE [whsilverad].[dwh].[DimSrcSystem]
+CREATE TABLE [whsilver].[dwh].[DimSrcSystem]
 (
 	[SKSrcSystemID] [bigint] NOT NULL,
 	[SKSrcSystemKeyID] [bigint] NOT NULL,
@@ -65,9 +65,9 @@ CREATE TABLE [whsilverad].[dwh].[DimSrcSystem]
 )
 GO
 
-DROP TABLE IF EXISTS [whsilverad].[dwh].[DimCurrency]
+DROP TABLE IF EXISTS [whsilver].[dwh].[DimCurrency]
 GO
-CREATE TABLE [whsilverad].[dwh].[DimCurrency]
+CREATE TABLE [whsilver].[dwh].[DimCurrency]
 (
 	[SKCurrencyID] [bigint] NOT NULL,
 	[SKCurrencyKeyID] [bigint] NOT NULL,
@@ -84,9 +84,9 @@ CREATE TABLE [whsilverad].[dwh].[DimCurrency]
 )
 GO
 
-DROP TABLE IF EXISTS [whsilverad].[dwh].[DimAtcClass]
+DROP TABLE IF EXISTS [whsilver].[dwh].[DimAtcClass]
 GO
-CREATE TABLE [whsilverad].[dwh].[DimAtcClass]
+CREATE TABLE [whsilver].[dwh].[DimAtcClass]
 (
 	[SKAtcClassID] [bigint] NOT NULL,
 	[SKAtcClassKeyID] [bigint] NOT NULL,
@@ -103,9 +103,9 @@ CREATE TABLE [whsilverad].[dwh].[DimAtcClass]
 )
 GO
 
-DROP TABLE IF EXISTS [whsilverad].[dwh].[DimMovementType]
+DROP TABLE IF EXISTS [whsilver].[dwh].[DimMovementType]
 GO
-CREATE TABLE [whsilverad].[dwh].[DimMovementType]
+CREATE TABLE [whsilver].[dwh].[DimMovementType]
 (
 	[SKMovementTypeID] [bigint] NOT NULL,
 	[SKMovementTypeKeyID] [bigint] NOT NULL,
@@ -123,9 +123,9 @@ CREATE TABLE [whsilverad].[dwh].[DimMovementType]
 )
 GO
 
-DROP TABLE IF EXISTS [whsilverad].[dwh].[DimOrderStatus]
+DROP TABLE IF EXISTS [whsilver].[dwh].[DimOrderStatus]
 GO
-CREATE TABLE [whsilverad].[dwh].[DimOrderStatus]
+CREATE TABLE [whsilver].[dwh].[DimOrderStatus]
 (
 	[SKOrderStatusID] [bigint] NOT NULL,
 	[SKOrderStatusKeyID] [bigint] NOT NULL,
@@ -148,9 +148,9 @@ GO
    ГЕОГРАФІЯ ТА ОРГАНІЗАЦІЙНІ ВИМІРИ
    ========================================================= */
 
-DROP TABLE IF EXISTS [whsilverad].[dwh].[DimRegion]
+DROP TABLE IF EXISTS [whsilver].[dwh].[DimRegion]
 GO
-CREATE TABLE [whsilverad].[dwh].[DimRegion]
+CREATE TABLE [whsilver].[dwh].[DimRegion]
 (
 	[SKRegionID] [bigint] NOT NULL,
 	[SKRegionKeyID] [bigint] NOT NULL,
@@ -166,9 +166,9 @@ CREATE TABLE [whsilverad].[dwh].[DimRegion]
 )
 GO
 
-DROP TABLE IF EXISTS [whsilverad].[dwh].[DimCity]
+DROP TABLE IF EXISTS [whsilver].[dwh].[DimCity]
 GO
-CREATE TABLE [whsilverad].[dwh].[DimCity]
+CREATE TABLE [whsilver].[dwh].[DimCity]
 (
 	[SKCityID] [bigint] NOT NULL,
 	[SKCityKeyID] [bigint] NOT NULL,
@@ -185,9 +185,9 @@ CREATE TABLE [whsilverad].[dwh].[DimCity]
 )
 GO
 
-DROP TABLE IF EXISTS [whsilverad].[dwh].[DimTerritory]
+DROP TABLE IF EXISTS [whsilver].[dwh].[DimTerritory]
 GO
-CREATE TABLE [whsilverad].[dwh].[DimTerritory]
+CREATE TABLE [whsilver].[dwh].[DimTerritory]
 (
 	[SKTerritoryID] [bigint] NOT NULL,
 	[SKTerritoryKeyID] [bigint] NOT NULL,
@@ -203,9 +203,9 @@ CREATE TABLE [whsilverad].[dwh].[DimTerritory]
 )
 GO
 
-DROP TABLE IF EXISTS [whsilverad].[dwh].[DimChain]
+DROP TABLE IF EXISTS [whsilver].[dwh].[DimChain]
 GO
-CREATE TABLE [whsilverad].[dwh].[DimChain]
+CREATE TABLE [whsilver].[dwh].[DimChain]
 (
 	[SKChainID] [bigint] NOT NULL,
 	[SKChainKeyID] [bigint] NOT NULL,
@@ -221,9 +221,9 @@ CREATE TABLE [whsilverad].[dwh].[DimChain]
 )
 GO
 
-DROP TABLE IF EXISTS [whsilverad].[dwh].[DimLegalEntity]
+DROP TABLE IF EXISTS [whsilver].[dwh].[DimLegalEntity]
 GO
-CREATE TABLE [whsilverad].[dwh].[DimLegalEntity]
+CREATE TABLE [whsilver].[dwh].[DimLegalEntity]
 (
 	[SKLegalEntityID] [bigint] NOT NULL,
 	[SKLegalEntityKeyID] [bigint] NOT NULL,
@@ -245,9 +245,9 @@ GO
    ПРОДУКТОВІ ВИМІРИ
    ========================================================= */
 
-DROP TABLE IF EXISTS [whsilverad].[dwh].[DimManufacturer]
+DROP TABLE IF EXISTS [whsilver].[dwh].[DimManufacturer]
 GO
-CREATE TABLE [whsilverad].[dwh].[DimManufacturer]
+CREATE TABLE [whsilver].[dwh].[DimManufacturer]
 (
 	[SKManufacturerID] [bigint] NOT NULL,
 	[SKManufacturerKeyID] [bigint] NOT NULL,
@@ -263,9 +263,9 @@ CREATE TABLE [whsilverad].[dwh].[DimManufacturer]
 )
 GO
 
-DROP TABLE IF EXISTS [whsilverad].[dwh].[DimProduct]
+DROP TABLE IF EXISTS [whsilver].[dwh].[DimProduct]
 GO
-CREATE TABLE [whsilverad].[dwh].[DimProduct]
+CREATE TABLE [whsilver].[dwh].[DimProduct]
 (
 	[SKProductID] [bigint] NOT NULL,
 	[SKProductKeyID] [bigint] NOT NULL,
@@ -299,9 +299,9 @@ GO
    КЛІЄНТИ, HCP ТА ПЕРСОНАЛ
    ========================================================= */
 
-DROP TABLE IF EXISTS [whsilverad].[dwh].[DimClientAccount]
+DROP TABLE IF EXISTS [whsilver].[dwh].[DimClientAccount]
 GO
-CREATE TABLE [whsilverad].[dwh].[DimClientAccount]
+CREATE TABLE [whsilver].[dwh].[DimClientAccount]
 (
 	[SKClientAccountID] [bigint] NOT NULL,
 	[SKClientAccountKeyID] [bigint] NOT NULL,
@@ -326,9 +326,9 @@ CREATE TABLE [whsilverad].[dwh].[DimClientAccount]
 )
 GO
 
-DROP TABLE IF EXISTS [whsilverad].[dwh].[DimSpecialty]
+DROP TABLE IF EXISTS [whsilver].[dwh].[DimSpecialty]
 GO
-CREATE TABLE [whsilverad].[dwh].[DimSpecialty]
+CREATE TABLE [whsilver].[dwh].[DimSpecialty]
 (
 	[SKSpecialtyID] [bigint] NOT NULL,
 	[SKSpecialtyKeyID] [bigint] NOT NULL,
@@ -344,9 +344,9 @@ CREATE TABLE [whsilverad].[dwh].[DimSpecialty]
 )
 GO
 
-DROP TABLE IF EXISTS [whsilverad].[dwh].[DimLpu]
+DROP TABLE IF EXISTS [whsilver].[dwh].[DimLpu]
 GO
-CREATE TABLE [whsilverad].[dwh].[DimLpu]
+CREATE TABLE [whsilver].[dwh].[DimLpu]
 (
 	[SKLpuID] [bigint] NOT NULL,
 	[SKLpuKeyID] [bigint] NOT NULL,
@@ -364,9 +364,9 @@ CREATE TABLE [whsilverad].[dwh].[DimLpu]
 )
 GO
 
-DROP TABLE IF EXISTS [whsilverad].[dwh].[DimDoctor]
+DROP TABLE IF EXISTS [whsilver].[dwh].[DimDoctor]
 GO
-CREATE TABLE [whsilverad].[dwh].[DimDoctor]
+CREATE TABLE [whsilver].[dwh].[DimDoctor]
 (
 	[SKDoctorID] [bigint] NOT NULL,
 	[SKDoctorKeyID] [bigint] NOT NULL,
@@ -393,9 +393,9 @@ CREATE TABLE [whsilverad].[dwh].[DimDoctor]
 )
 GO
 
-DROP TABLE IF EXISTS [whsilverad].[dwh].[DimEmployee]
+DROP TABLE IF EXISTS [whsilver].[dwh].[DimEmployee]
 GO
-CREATE TABLE [whsilverad].[dwh].[DimEmployee]
+CREATE TABLE [whsilver].[dwh].[DimEmployee]
 (
 	[SKEmployeeID] [bigint] NOT NULL,
 	[SKEmployeeKeyID] [bigint] NOT NULL,
@@ -418,9 +418,9 @@ CREATE TABLE [whsilverad].[dwh].[DimEmployee]
 )
 GO
 
-DROP TABLE IF EXISTS [whsilverad].[dwh].[DimWarehouse]
+DROP TABLE IF EXISTS [whsilver].[dwh].[DimWarehouse]
 GO
-CREATE TABLE [whsilverad].[dwh].[DimWarehouse]
+CREATE TABLE [whsilver].[dwh].[DimWarehouse]
 (
 	[SKWarehouseID] [bigint] NOT NULL,
 	[SKWarehouseKeyID] [bigint] NOT NULL,
@@ -446,9 +446,9 @@ GO
    ВИМІРИ АКТИВНОСТЕЙ ТА ФАРМАКОНАГЛЯДУ
    ========================================================= */
 
-DROP TABLE IF EXISTS [whsilverad].[dwh].[DimActivityType]
+DROP TABLE IF EXISTS [whsilver].[dwh].[DimActivityType]
 GO
-CREATE TABLE [whsilverad].[dwh].[DimActivityType]
+CREATE TABLE [whsilver].[dwh].[DimActivityType]
 (
 	[SKActivityTypeID] [bigint] NOT NULL,
 	[SKActivityTypeKeyID] [bigint] NOT NULL,
@@ -466,9 +466,9 @@ CREATE TABLE [whsilverad].[dwh].[DimActivityType]
 )
 GO
 
-DROP TABLE IF EXISTS [whsilverad].[dwh].[DimAeSeriousness]
+DROP TABLE IF EXISTS [whsilver].[dwh].[DimAeSeriousness]
 GO
-CREATE TABLE [whsilverad].[dwh].[DimAeSeriousness]
+CREATE TABLE [whsilver].[dwh].[DimAeSeriousness]
 (
 	[SKAeSeriousnessID] [bigint] NOT NULL,
 	[SKAeSeriousnessKeyID] [bigint] NOT NULL,
@@ -485,9 +485,9 @@ CREATE TABLE [whsilverad].[dwh].[DimAeSeriousness]
 )
 GO
 
-DROP TABLE IF EXISTS [whsilverad].[dwh].[DimAeOutcome]
+DROP TABLE IF EXISTS [whsilver].[dwh].[DimAeOutcome]
 GO
-CREATE TABLE [whsilverad].[dwh].[DimAeOutcome]
+CREATE TABLE [whsilver].[dwh].[DimAeOutcome]
 (
 	[SKAeOutcomeID] [bigint] NOT NULL,
 	[SKAeOutcomeKeyID] [bigint] NOT NULL,
@@ -505,9 +505,9 @@ CREATE TABLE [whsilverad].[dwh].[DimAeOutcome]
 )
 GO
 
-DROP TABLE IF EXISTS [whsilverad].[dwh].[DimReportSource]
+DROP TABLE IF EXISTS [whsilver].[dwh].[DimReportSource]
 GO
-CREATE TABLE [whsilverad].[dwh].[DimReportSource]
+CREATE TABLE [whsilver].[dwh].[DimReportSource]
 (
 	[SKReportSourceID] [bigint] NOT NULL,
 	[SKReportSourceKeyID] [bigint] NOT NULL,
@@ -528,9 +528,9 @@ GO
    REFERENCE TABLES (маппінг ключів джерела -> durable keys)
    ========================================================= */
 
-DROP TABLE IF EXISTS [whsilverad].[dwh].[RefProduct]
+DROP TABLE IF EXISTS [whsilver].[dwh].[RefProduct]
 GO
-CREATE TABLE [whsilverad].[dwh].[RefProduct]
+CREATE TABLE [whsilver].[dwh].[RefProduct]
 (
 	[SKRefProductID] [bigint] NOT NULL,
 	[SKRefProductKeyID] [bigint] NOT NULL,
@@ -549,9 +549,9 @@ CREATE TABLE [whsilverad].[dwh].[RefProduct]
 )
 GO
 
-DROP TABLE IF EXISTS [whsilverad].[dwh].[RefClientAccount]
+DROP TABLE IF EXISTS [whsilver].[dwh].[RefClientAccount]
 GO
-CREATE TABLE [whsilverad].[dwh].[RefClientAccount]
+CREATE TABLE [whsilver].[dwh].[RefClientAccount]
 (
 	[SKRefClientAccountID] [bigint] NOT NULL,
 	[SKRefClientAccountKeyID] [bigint] NOT NULL,
@@ -571,9 +571,9 @@ CREATE TABLE [whsilverad].[dwh].[RefClientAccount]
 )
 GO
 
-DROP TABLE IF EXISTS [whsilverad].[dwh].[RefDoctor]
+DROP TABLE IF EXISTS [whsilver].[dwh].[RefDoctor]
 GO
-CREATE TABLE [whsilverad].[dwh].[RefDoctor]
+CREATE TABLE [whsilver].[dwh].[RefDoctor]
 (
 	[SKRefDoctorID] [bigint] NOT NULL,
 	[SKRefDoctorKeyID] [bigint] NOT NULL,
@@ -593,9 +593,9 @@ CREATE TABLE [whsilverad].[dwh].[RefDoctor]
 )
 GO
 
-DROP TABLE IF EXISTS [whsilverad].[dwh].[RefEmployee]
+DROP TABLE IF EXISTS [whsilver].[dwh].[RefEmployee]
 GO
-CREATE TABLE [whsilverad].[dwh].[RefEmployee]
+CREATE TABLE [whsilver].[dwh].[RefEmployee]
 (
 	[SKRefEmployeeID] [bigint] NOT NULL,
 	[SKRefEmployeeKeyID] [bigint] NOT NULL,
@@ -613,9 +613,9 @@ CREATE TABLE [whsilverad].[dwh].[RefEmployee]
 )
 GO
 
-DROP TABLE IF EXISTS [whsilverad].[dwh].[RefWarehouse]
+DROP TABLE IF EXISTS [whsilver].[dwh].[RefWarehouse]
 GO
-CREATE TABLE [whsilverad].[dwh].[RefWarehouse]
+CREATE TABLE [whsilver].[dwh].[RefWarehouse]
 (
 	[SKRefWarehouseID] [bigint] NOT NULL,
 	[SKRefWarehouseKeyID] [bigint] NOT NULL,
@@ -633,9 +633,9 @@ CREATE TABLE [whsilverad].[dwh].[RefWarehouse]
 )
 GO
 
-DROP TABLE IF EXISTS [whsilverad].[dwh].[RefMovementType]
+DROP TABLE IF EXISTS [whsilver].[dwh].[RefMovementType]
 GO
-CREATE TABLE [whsilverad].[dwh].[RefMovementType]
+CREATE TABLE [whsilver].[dwh].[RefMovementType]
 (
 	[SKRefMovementTypeID] [bigint] NOT NULL,
 	[SKRefMovementTypeKeyID] [bigint] NOT NULL,
@@ -657,9 +657,9 @@ GO
    ФАКТИ (повне перезавантаження через [dwh].[spFullFct])
    ========================================================= */
 
-DROP TABLE IF EXISTS [whsilverad].[dwh].[FctSales]
+DROP TABLE IF EXISTS [whsilver].[dwh].[FctSales]
 GO
-CREATE TABLE [whsilverad].[dwh].[FctSales]
+CREATE TABLE [whsilver].[dwh].[FctSales]
 (
 	[SKFctSalesID] [bigint] NULL,
 	[CreatedBy] [varchar](100) NOT NULL,
@@ -690,9 +690,9 @@ CREATE TABLE [whsilverad].[dwh].[FctSales]
 )
 GO
 
-DROP TABLE IF EXISTS [whsilverad].[dwh].[FctInventoryMovement]
+DROP TABLE IF EXISTS [whsilver].[dwh].[FctInventoryMovement]
 GO
-CREATE TABLE [whsilverad].[dwh].[FctInventoryMovement]
+CREATE TABLE [whsilver].[dwh].[FctInventoryMovement]
 (
 	[SKFctInventoryMovementID] [bigint] NULL,
 	[CreatedBy] [varchar](100) NOT NULL,
@@ -713,9 +713,9 @@ CREATE TABLE [whsilverad].[dwh].[FctInventoryMovement]
 )
 GO
 
-DROP TABLE IF EXISTS [whsilverad].[dwh].[FctVisit]
+DROP TABLE IF EXISTS [whsilver].[dwh].[FctVisit]
 GO
-CREATE TABLE [whsilverad].[dwh].[FctVisit]
+CREATE TABLE [whsilver].[dwh].[FctVisit]
 (
 	[SKFctVisitID] [bigint] NULL,
 	[CreatedBy] [varchar](100) NOT NULL,
@@ -735,9 +735,9 @@ CREATE TABLE [whsilverad].[dwh].[FctVisit]
 )
 GO
 
-DROP TABLE IF EXISTS [whsilverad].[dwh].[FctPrescription]
+DROP TABLE IF EXISTS [whsilver].[dwh].[FctPrescription]
 GO
-CREATE TABLE [whsilverad].[dwh].[FctPrescription]
+CREATE TABLE [whsilver].[dwh].[FctPrescription]
 (
 	[SKFctPrescriptionID] [bigint] NULL,
 	[CreatedBy] [varchar](100) NOT NULL,
@@ -755,9 +755,9 @@ CREATE TABLE [whsilverad].[dwh].[FctPrescription]
 )
 GO
 
-DROP TABLE IF EXISTS [whsilverad].[dwh].[FctAdverseEvent]
+DROP TABLE IF EXISTS [whsilver].[dwh].[FctAdverseEvent]
 GO
-CREATE TABLE [whsilverad].[dwh].[FctAdverseEvent]
+CREATE TABLE [whsilver].[dwh].[FctAdverseEvent]
 (
 	[SKFctAdverseEventID] [bigint] NULL,
 	[CreatedBy] [varchar](100) NOT NULL,

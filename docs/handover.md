@@ -21,7 +21,7 @@
 | Silver `whsilver.dwh` | 34 таблиці, 28 view, SCD2 + SCD1, інкремент фактів — задеплоєно, працює |
 | Gold `whgold.dwh` | 6 вимірів + 7 агрегатів — задеплоєно, дані є |
 | Оркестрація | metadata-driven, pipeline'и в Fabric працюють |
-| Семантична модель | **написана, не задеплоєна** |
+| Семантична модель | `PharmaSalesGold` задеплоєна в воркспейс через `deploy_semantic_model.py` |
 
 ## 2. Ідентифікатори середовища
 
@@ -33,7 +33,9 @@
 | Azure SQL | connection `5b8c6fba-3677-4218-a496-fa046222b0b1`, БД `sqldb-ds-dds-d-westeu-01` |
 | Pipeline bronze | `dpl-bronze-sql-ingestion` — `bfa7da1c-5a2e-450d-9a76-004fff6802e3` |
 | Pipeline silver | `dpl-silver-sql-load` — `a5d81645-aff3-45de-b4f5-5d05c95271fb` |
-| Warehouse `whgold` | **id невідомий** — потрібен для gold-пайплайна та семантичної моделі |
+| Pipeline gold | `dpl-gold-sql-load` — опублікований у воркспейсі |
+| Воркспейс | `fcw-plt-dds-d-westeu-01`, git integration підключений (гілка `main`) |
+| Warehouse `whgold` | `dc20f929-0e9a-4619-9cf3-4a9fb9117c07` |
 
 ## 3. Ключові рішення і чому саме так
 
@@ -81,8 +83,8 @@ Bronze перезаписується повністю (`OverwriteSchema`), то
 
 | # | Що зробити | Деталі |
 |---|---|---|
-| 1 | Задеплоїти `V260828.1000__gold_add_month_date_key.sql` | додає `MonthStartDate`; далі `EXEC [dwh].[spGoldFullLoad]` у `whgold` |
-| 2 | Задеплоїти семантичну модель | підставити `<SQL_ENDPOINT>` і `<WHGOLD_ITEM_ID>` в `expressions.tmdl`, синхронізувати через git integration |
+| 1 | **Задеплоїти `V260828.1000__gold_add_month_date_key.sql`** | додає `MonthStartDate`; далі `EXEC [dwh].[spGoldFullLoad]` у `whgold`. Без цієї колонки шість звʼязків семантичної моделі з календарем биті |
+| 2 | Перевірити модель після деплою | облікові дані підключення до `whgold`, дані в таблицях, три промпти в Copilot — `semantic_model.md` §5.5 |
 | 3 | Перезалити `PL_Silver_Full_Load` | у Fabric лежить стара версія без параметра `root_object` — адресне перезавантаження там ще не працює |
 | 4 | Опублікувати `PL_Gold_Full_Load` | підставити `<WHGOLD_ITEM_ID>`; після публікації додати Invoke на нього в silver-пайплайн, щоб ланцюг закривався одним запуском |
 | 5 | Розклад інкременту | щодня `@force_full = 0`, раз на тиждень `= 1`; зараз параметр у silver-пайплайні не проброшений |

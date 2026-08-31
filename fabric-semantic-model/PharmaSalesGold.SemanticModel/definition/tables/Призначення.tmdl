@@ -41,12 +41,12 @@ table 'Призначення'
 		sourceColumn: Region
 		annotation SummarizationSetBy = Automatic
 
-	column TotalPatientsCnt
+	column DoctorCnt
 		dataType: int64
 		isHidden
-		lineageTag: 634e4a22-4d49-5739-8532-17ae9c74d8ca
+		lineageTag: 77068f5b-ce16-520a-85ea-c4f01d7c8f3f
 		summarizeBy: none
-		sourceColumn: TotalPatientsCnt
+		sourceColumn: DoctorCnt
 		annotation SummarizationSetBy = Automatic
 
 	column TotalPrescriptionsCnt
@@ -57,12 +57,12 @@ table 'Призначення'
 		sourceColumn: TotalPrescriptionsCnt
 		annotation SummarizationSetBy = Automatic
 
-	column DoctorCnt
+	column TotalPatientsCnt
 		dataType: int64
 		isHidden
-		lineageTag: 77068f5b-ce16-520a-85ea-c4f01d7c8f3f
+		lineageTag: 634e4a22-4d49-5739-8532-17ae9c74d8ca
 		summarizeBy: none
-		sourceColumn: DoctorCnt
+		sourceColumn: TotalPatientsCnt
 		annotation SummarizationSetBy = Automatic
 
 	column YearMonth

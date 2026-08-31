@@ -42,16 +42,16 @@ table 'Візити'
 		sourceColumn: Specialty
 		annotation SummarizationSetBy = Automatic
 
+	/// Візит / круглий стіл / e-detailing / симпозіум
 	column 'Тип активності'
-		/// Візит / круглий стіл / e-detailing / симпозіум
 		dataType: string
 		lineageTag: 7c95b91b-3d88-5b50-a4c6-3fd9d6082bdc
 		summarizeBy: none
 		sourceColumn: ActivityType
 		annotation SummarizationSetBy = Automatic
 
+	/// Регіон лікаря
 	column 'Регіон візиту'
-		/// Регіон лікаря
 		dataType: string
 		lineageTag: 5f0d15ed-9dd2-5598-844d-1c1e90b88d75
 		summarizeBy: none
@@ -66,20 +66,20 @@ table 'Візити'
 		sourceColumn: DoctorCnt
 		annotation SummarizationSetBy = Automatic
 
-	column TotalDurationMin
-		dataType: int64
-		isHidden
-		lineageTag: adf0ab9f-58be-5ba6-87ee-24c6abacb96c
-		summarizeBy: none
-		sourceColumn: TotalDurationMin
-		annotation SummarizationSetBy = Automatic
-
 	column TotalSamplesQty
 		dataType: int64
 		isHidden
 		lineageTag: 92408345-667c-5af2-88fa-7b7bbbda0315
 		summarizeBy: none
 		sourceColumn: TotalSamplesQty
+		annotation SummarizationSetBy = Automatic
+
+	column TotalDurationMin
+		dataType: int64
+		isHidden
+		lineageTag: adf0ab9f-58be-5ba6-87ee-24c6abacb96c
+		summarizeBy: none
+		sourceColumn: TotalDurationMin
 		annotation SummarizationSetBy = Automatic
 
 	column VisitCnt

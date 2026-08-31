@@ -28,8 +28,8 @@ table 'Календар'
 		sourceColumn: SKDateID
 		annotation SummarizationSetBy = Automatic
 
+	/// Календарна дата
 	column Дата
-		/// Календарна дата
 		dataType: dateTime
 		isKey
 		formatString: "dd.MM.yyyy"
@@ -53,8 +53,8 @@ table 'Календар'
 		sourceColumn: MonthNum
 		annotation SummarizationSetBy = Automatic
 
+	/// Назва місяця
 	column Місяць
-		/// Назва місяця
 		dataType: string
 		lineageTag: 7da1abc5-249a-5eaf-ac6c-566f0a4106b9
 		summarizeBy: none
@@ -75,8 +75,8 @@ table 'Календар'
 		sourceColumn: YearNum
 		annotation SummarizationSetBy = Automatic
 
+	/// Формат РРРР-ММ, за ним зʼєднані місячні агрегати
 	column Рік-місяць
-		/// Формат РРРР-ММ, за ним зʼєднані місячні агрегати
 		dataType: string
 		lineageTag: 2623bd06-083a-5e32-83d7-a26466072af8
 		summarizeBy: none

@@ -23,7 +23,7 @@
 --     (OverwriteSchema), тому TechProcessingDateTime оновлюється в усіх рядків одразу.
 GO
 --IMPORTANT
-USE [whsilverad];
+USE [whsilver];
 --IMPORTANT
 GO
 
@@ -76,7 +76,7 @@ WITH dedup_sales AS (
 -- тому CROSS JOIN нижче не може обнулити факт, навіть якщо рядка джерельної системи немає.
 src_system AS (
     SELECT ISNULL(MAX(SKSrcSystemKeyID), -1) AS SKSrcSystemKeyID
-    FROM [whsilverad].[dwh].[DimSrcSystem]
+    FROM [whsilver].[dwh].[DimSrcSystem]
     WHERE Id = 1 AND EndDate IS NULL
 )
 SELECT
@@ -114,26 +114,26 @@ SELECT
     , CAST(s.updated_at AS datetime2(3))       AS SrcModifiedAt
 FROM dedup_sales AS s
 CROSS JOIN src_system AS ss
-LEFT JOIN [whsilverad].[dwh].[DimDate] AS dd
+LEFT JOIN [whsilver].[dwh].[DimDate] AS dd
     ON dd.CalendarDate = s.order_date
-LEFT JOIN [whsilverad].[dwh].[DimDate] AS dld
+LEFT JOIN [whsilver].[dwh].[DimDate] AS dld
     ON dld.CalendarDate = s.delivery_date
-LEFT JOIN [whsilverad].[dwh].[RefClientAccount] AS rca
+LEFT JOIN [whsilver].[dwh].[RefClientAccount] AS rca
     ON  rca.Id = s.customer_id
     AND rca.EndDate IS NULL
-LEFT JOIN [whsilverad].[dwh].[RefWarehouse] AS rwh
+LEFT JOIN [whsilver].[dwh].[RefWarehouse] AS rwh
     ON  rwh.Id = s.warehouse_id
     AND rwh.EndDate IS NULL
-LEFT JOIN [whsilverad].[dwh].[RefProduct] AS rpr
+LEFT JOIN [whsilver].[dwh].[RefProduct] AS rpr
     ON  rpr.Id = s.product_id
     AND rpr.EndDate IS NULL
-LEFT JOIN [whsilverad].[dwh].[RefEmployee] AS remp
+LEFT JOIN [whsilver].[dwh].[RefEmployee] AS remp
     ON  remp.Id = s.employee_id
     AND remp.EndDate IS NULL
-LEFT JOIN [whsilverad].[dwh].[DimOrderStatus] AS dos
+LEFT JOIN [whsilver].[dwh].[DimOrderStatus] AS dos
     ON  dos.Id = LTRIM(RTRIM(s.status))
     AND dos.EndDate IS NULL
-LEFT JOIN [whsilverad].[dwh].[DimCurrency] AS cur
+LEFT JOIN [whsilver].[dwh].[DimCurrency] AS cur
     ON  cur.Id = LTRIM(RTRIM(s.currency))
     AND cur.EndDate IS NULL
 WHERE s.rn = 1
@@ -152,7 +152,7 @@ WITH dedup_movement AS (
 -- тому CROSS JOIN нижче не може обнулити факт, навіть якщо рядка джерельної системи немає.
 src_system AS (
     SELECT ISNULL(MAX(SKSrcSystemKeyID), -1) AS SKSrcSystemKeyID
-    FROM [whsilverad].[dwh].[DimSrcSystem]
+    FROM [whsilver].[dwh].[DimSrcSystem]
     WHERE Id = 1 AND EndDate IS NULL
 )
 SELECT
@@ -172,21 +172,21 @@ SELECT
     , CAST(m.updated_at AS datetime2(3))       AS SrcModifiedAt
 FROM dedup_movement AS m
 CROSS JOIN src_system AS ss
-LEFT JOIN [whsilverad].[dwh].[DimDate] AS dd
+LEFT JOIN [whsilver].[dwh].[DimDate] AS dd
     ON dd.CalendarDate = CAST(m.movement_date AS date)
-LEFT JOIN [whsilverad].[dwh].[RefWarehouse] AS rwh
+LEFT JOIN [whsilver].[dwh].[RefWarehouse] AS rwh
     ON  rwh.Id = m.warehouse_id
     AND rwh.EndDate IS NULL
-LEFT JOIN [whsilverad].[dwh].[RefProduct] AS rpr
+LEFT JOIN [whsilver].[dwh].[RefProduct] AS rpr
     ON  rpr.Id = m.product_id
     AND rpr.EndDate IS NULL
-LEFT JOIN [whsilverad].[dwh].[RefEmployee] AS remp
+LEFT JOIN [whsilver].[dwh].[RefEmployee] AS remp
     ON  remp.Id = m.employee_id
     AND remp.EndDate IS NULL
-LEFT JOIN [whsilverad].[dwh].[RefMovementType] AS rmt
+LEFT JOIN [whsilver].[dwh].[RefMovementType] AS rmt
     ON  rmt.Id = LTRIM(RTRIM(m.movement_type))
     AND rmt.EndDate IS NULL
-LEFT JOIN [whsilverad].[dwh].[DimMovementType] AS dmt
+LEFT JOIN [whsilver].[dwh].[DimMovementType] AS dmt
     ON  dmt.SKMovementTypeKeyID = rmt.SKMovementTypeKeyID
     AND dmt.EndDate IS NULL
 WHERE m.rn = 1
@@ -205,7 +205,7 @@ WITH dedup_visit AS (
 -- тому CROSS JOIN нижче не може обнулити факт, навіть якщо рядка джерельної системи немає.
 src_system AS (
     SELECT ISNULL(MAX(SKSrcSystemKeyID), -1) AS SKSrcSystemKeyID
-    FROM [whsilverad].[dwh].[DimSrcSystem]
+    FROM [whsilver].[dwh].[DimSrcSystem]
     WHERE Id = 1 AND EndDate IS NULL
 )
 SELECT
@@ -224,18 +224,18 @@ SELECT
     , CAST(v.updated_at AS datetime2(3))       AS SrcModifiedAt
 FROM dedup_visit AS v
 CROSS JOIN src_system AS ss
-LEFT JOIN [whsilverad].[dwh].[DimDate] AS dd
+LEFT JOIN [whsilver].[dwh].[DimDate] AS dd
     ON dd.CalendarDate = CAST(v.visit_date AS date)
-LEFT JOIN [whsilverad].[dwh].[RefDoctor] AS rdoc
+LEFT JOIN [whsilver].[dwh].[RefDoctor] AS rdoc
     ON  rdoc.Id = v.doctor_id
     AND rdoc.EndDate IS NULL
-LEFT JOIN [whsilverad].[dwh].[RefEmployee] AS remp
+LEFT JOIN [whsilver].[dwh].[RefEmployee] AS remp
     ON  remp.Id = v.employee_id
     AND remp.EndDate IS NULL
-LEFT JOIN [whsilverad].[dwh].[RefProduct] AS rpr
+LEFT JOIN [whsilver].[dwh].[RefProduct] AS rpr
     ON  rpr.Id = v.product_id
     AND rpr.EndDate IS NULL
-LEFT JOIN [whsilverad].[dwh].[DimActivityType] AS dat
+LEFT JOIN [whsilver].[dwh].[DimActivityType] AS dat
     ON  dat.Id = LTRIM(RTRIM(v.activity_type))
     AND dat.EndDate IS NULL
 WHERE v.rn = 1
@@ -254,7 +254,7 @@ WITH dedup_rx AS (
 -- тому CROSS JOIN нижче не може обнулити факт, навіть якщо рядка джерельної системи немає.
 src_system AS (
     SELECT ISNULL(MAX(SKSrcSystemKeyID), -1) AS SKSrcSystemKeyID
-    FROM [whsilverad].[dwh].[DimSrcSystem]
+    FROM [whsilver].[dwh].[DimSrcSystem]
     WHERE Id = 1 AND EndDate IS NULL
 )
 SELECT
@@ -271,15 +271,15 @@ SELECT
     , CAST(r.updated_at AS datetime2(3))       AS SrcModifiedAt
 FROM dedup_rx AS r
 CROSS JOIN src_system AS ss
-LEFT JOIN [whsilverad].[dwh].[DimDate] AS dd
+LEFT JOIN [whsilver].[dwh].[DimDate] AS dd
     ON dd.CalendarDate = r.prescription_date
-LEFT JOIN [whsilverad].[dwh].[RefDoctor] AS rdoc
+LEFT JOIN [whsilver].[dwh].[RefDoctor] AS rdoc
     ON  rdoc.Id = r.doctor_id
     AND rdoc.EndDate IS NULL
-LEFT JOIN [whsilverad].[dwh].[RefProduct] AS rpr
+LEFT JOIN [whsilver].[dwh].[RefProduct] AS rpr
     ON  rpr.Id = r.product_id
     AND rpr.EndDate IS NULL
-LEFT JOIN [whsilverad].[dwh].[RefEmployee] AS remp
+LEFT JOIN [whsilver].[dwh].[RefEmployee] AS remp
     ON  remp.Id = r.entered_by_employee_id
     AND remp.EndDate IS NULL
 WHERE r.rn = 1
@@ -298,7 +298,7 @@ WITH dedup_ae AS (
 -- тому CROSS JOIN нижче не може обнулити факт, навіть якщо рядка джерельної системи немає.
 src_system AS (
     SELECT ISNULL(MAX(SKSrcSystemKeyID), -1) AS SKSrcSystemKeyID
-    FROM [whsilverad].[dwh].[DimSrcSystem]
+    FROM [whsilver].[dwh].[DimSrcSystem]
     WHERE Id = 1 AND EndDate IS NULL
 )
 SELECT
@@ -324,24 +324,24 @@ SELECT
     , CAST(a.updated_at AS datetime2(3))       AS SrcModifiedAt
 FROM dedup_ae AS a
 CROSS JOIN src_system AS ss
-LEFT JOIN [whsilverad].[dwh].[DimDate] AS dd
+LEFT JOIN [whsilver].[dwh].[DimDate] AS dd
     ON dd.CalendarDate = a.report_date
-LEFT JOIN [whsilverad].[dwh].[RefProduct] AS rpr
+LEFT JOIN [whsilver].[dwh].[RefProduct] AS rpr
     ON  rpr.Id = a.product_id
     AND rpr.EndDate IS NULL
-LEFT JOIN [whsilverad].[dwh].[RefDoctor] AS rdoc
+LEFT JOIN [whsilver].[dwh].[RefDoctor] AS rdoc
     ON  rdoc.Id = a.reporter_doctor_id
     AND rdoc.EndDate IS NULL
-LEFT JOIN [whsilverad].[dwh].[DimAeSeriousness] AS dser
+LEFT JOIN [whsilver].[dwh].[DimAeSeriousness] AS dser
     ON  dser.Id = LTRIM(RTRIM(a.seriousness))
     AND dser.EndDate IS NULL
-LEFT JOIN [whsilverad].[dwh].[DimAeOutcome] AS dout
+LEFT JOIN [whsilver].[dwh].[DimAeOutcome] AS dout
     ON  dout.Id = LTRIM(RTRIM(a.outcome))
     AND dout.EndDate IS NULL
-LEFT JOIN [whsilverad].[dwh].[DimReportSource] AS drs
+LEFT JOIN [whsilver].[dwh].[DimReportSource] AS drs
     ON  drs.Id = LTRIM(RTRIM(a.report_source))
     AND drs.EndDate IS NULL
-LEFT JOIN [whsilverad].[dwh].[DimRegion] AS reg
+LEFT JOIN [whsilver].[dwh].[DimRegion] AS reg
     ON  reg.Id = LTRIM(RTRIM(a.region))
     AND reg.EndDate IS NULL
 WHERE a.rn = 1
@@ -352,9 +352,9 @@ GO
    3. Реєстр обʼєктів: стратегія завантаження
    ========================================================= */
 
-DROP TABLE IF EXISTS [whsilverad].[dwh].[EtlSilverObject]
+DROP TABLE IF EXISTS [whsilver].[dwh].[EtlSilverObject]
 GO
-CREATE TABLE [whsilverad].[dwh].[EtlSilverObject]
+CREATE TABLE [whsilver].[dwh].[EtlSilverObject]
 (
 	[ObjectName] [varchar](128) NOT NULL,
 	[ObjectType] [varchar](10) NOT NULL,        -- Dim / Ref / Fct
@@ -367,7 +367,7 @@ CREATE TABLE [whsilverad].[dwh].[EtlSilverObject]
 )
 GO
 
-INSERT INTO [whsilverad].[dwh].[EtlSilverObject]
+INSERT INTO [whsilver].[dwh].[EtlSilverObject]
 	([ObjectName],[ObjectType],[LoadLevel],[ScdType],[PassCnt],[LoadStrategy],[WatermarkColumn],[IsActive])
 VALUES
 	('DimActivityType', 'Dim', 1, 'SCD2', 1, 'Full', NULL, 1),
@@ -406,7 +406,7 @@ GO
 
 IF OBJECT_ID('dwh.EtlSilverWatermark', 'U') IS NULL
     EXEC('
-    CREATE TABLE [whsilverad].[dwh].[EtlSilverWatermark]
+    CREATE TABLE [whsilver].[dwh].[EtlSilverWatermark]
     (
         [ObjectName] [varchar](128) NOT NULL,
         [WatermarkValue] [datetime2](3) NULL,
@@ -415,7 +415,7 @@ IF OBJECT_ID('dwh.EtlSilverWatermark', 'U') IS NULL
     )');
 GO
 
-INSERT INTO [whsilverad].[dwh].[EtlSilverWatermark] ([ObjectName],[WatermarkValue],[LastLoadId],[ModifiedAt])
+INSERT INTO [whsilver].[dwh].[EtlSilverWatermark] ([ObjectName],[WatermarkValue],[LastLoadId],[ModifiedAt])
 SELECT v.ObjectName, v.WatermarkValue, v.LastLoadId, v.ModifiedAt
 FROM (VALUES
 	('FctSales', '1900-01-01', NULL, NULL),
@@ -425,7 +425,7 @@ FROM (VALUES
 	('FctAdverseEvent', '1900-01-01', NULL, NULL)
 ) AS v(ObjectName, WatermarkValue, LastLoadId, ModifiedAt)
 WHERE NOT EXISTS (
-    SELECT 1 FROM [whsilverad].[dwh].[EtlSilverWatermark] w WHERE w.ObjectName = v.ObjectName
+    SELECT 1 FROM [whsilver].[dwh].[EtlSilverWatermark] w WHERE w.ObjectName = v.ObjectName
 );
 GO
 

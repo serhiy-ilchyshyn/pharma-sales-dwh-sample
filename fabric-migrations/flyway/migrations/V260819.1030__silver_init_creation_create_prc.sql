@@ -5,7 +5,7 @@
 --   [dwh].[spFullFct]            — повне перезавантаження фактової таблиці з vFct*
 GO
 --IMPORTANT
-USE [whsilverad];
+USE [whsilver];
 --IMPORTANT
 GO
 

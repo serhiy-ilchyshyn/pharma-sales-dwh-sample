@@ -42,8 +42,8 @@ table 'Клієнт'
 		sourceColumn: AccountName
 		annotation SummarizationSetBy = Automatic
 
+	/// Аптека / лікарняна аптека / дистрибʼютор
 	column 'Тип клієнта'
-		/// Аптека / лікарняна аптека / дистрибʼютор
 		dataType: string
 		lineageTag: 0d506cfe-d5d2-502d-be23-eaa83d140cc4
 		summarizeBy: none
@@ -92,8 +92,8 @@ table 'Клієнт'
 		sourceColumn: IsActive
 		annotation SummarizationSetBy = Automatic
 
+	/// Скільки кодів облікової системи злилися в цього клієнта
 	column 'Кодів у джерелі'
-		/// Скільки кодів облікової системи злилися в цього клієнта
 		dataType: int64
 		lineageTag: 07930be9-82d1-5e29-8986-0f169d093c59
 		summarizeBy: none

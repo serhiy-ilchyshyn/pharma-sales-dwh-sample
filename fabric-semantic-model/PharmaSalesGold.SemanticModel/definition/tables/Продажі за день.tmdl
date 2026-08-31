@@ -81,14 +81,6 @@ table 'Продажі за день'
 		sourceColumn: TotalNetAmount
 		annotation SummarizationSetBy = Automatic
 
-	column TotalDiscountAmount
-		dataType: decimal
-		isHidden
-		lineageTag: ffbd885c-a416-5188-a9ba-7c24ba3cc1ab
-		summarizeBy: none
-		sourceColumn: TotalDiscountAmount
-		annotation SummarizationSetBy = Automatic
-
 	column TotalGrossAmount
 		dataType: decimal
 		isHidden
@@ -97,20 +89,28 @@ table 'Продажі за день'
 		sourceColumn: TotalGrossAmount
 		annotation SummarizationSetBy = Automatic
 
-	column OrderLineCnt
-		dataType: int64
-		isHidden
-		lineageTag: 37389599-d13e-5853-933e-1d5afcdc9b12
-		summarizeBy: none
-		sourceColumn: OrderLineCnt
-		annotation SummarizationSetBy = Automatic
-
 	column TotalQty
 		dataType: decimal
 		isHidden
 		lineageTag: bd903500-4c33-550c-84c8-ce44819ce734
 		summarizeBy: none
 		sourceColumn: TotalQty
+		annotation SummarizationSetBy = Automatic
+
+	column TotalDiscountAmount
+		dataType: decimal
+		isHidden
+		lineageTag: ffbd885c-a416-5188-a9ba-7c24ba3cc1ab
+		summarizeBy: none
+		sourceColumn: TotalDiscountAmount
+		annotation SummarizationSetBy = Automatic
+
+	column OrderLineCnt
+		dataType: int64
+		isHidden
+		lineageTag: 37389599-d13e-5853-933e-1d5afcdc9b12
+		summarizeBy: none
+		sourceColumn: OrderLineCnt
 		annotation SummarizationSetBy = Automatic
 
 	column CalendarDate

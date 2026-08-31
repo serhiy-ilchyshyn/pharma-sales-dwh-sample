@@ -34,38 +34,6 @@ table 'Промо проти продажів'
 		sourceColumn: Region
 		annotation SummarizationSetBy = Automatic
 
-	column TotalNetAmount
-		dataType: decimal
-		isHidden
-		lineageTag: 4c5c6ea8-bbbe-52eb-b784-1dd00c7b0155
-		summarizeBy: none
-		sourceColumn: TotalNetAmount
-		annotation SummarizationSetBy = Automatic
-
-	column NetAmountPerVisit
-		dataType: decimal
-		isHidden
-		lineageTag: 757a9a6a-0008-5eaf-9a9f-2e080a890d6d
-		summarizeBy: none
-		sourceColumn: NetAmountPerVisit
-		annotation SummarizationSetBy = Automatic
-
-	column TotalQty
-		dataType: decimal
-		isHidden
-		lineageTag: f259c469-0c4c-50f5-9eb6-2f44ad3b2aef
-		summarizeBy: none
-		sourceColumn: TotalQty
-		annotation SummarizationSetBy = Automatic
-
-	column TotalSamplesQty
-		dataType: int64
-		isHidden
-		lineageTag: 0bb57c77-77ad-5c24-99a2-797ee59f79e9
-		summarizeBy: none
-		sourceColumn: TotalSamplesQty
-		annotation SummarizationSetBy = Automatic
-
 	column TotalPrescriptionsCnt
 		dataType: int64
 		isHidden
@@ -80,6 +48,38 @@ table 'Промо проти продажів'
 		lineageTag: f0d14a00-e6c0-56a9-883b-b7e8f1f33273
 		summarizeBy: none
 		sourceColumn: VisitCnt
+		annotation SummarizationSetBy = Automatic
+
+	column TotalNetAmount
+		dataType: decimal
+		isHidden
+		lineageTag: 4c5c6ea8-bbbe-52eb-b784-1dd00c7b0155
+		summarizeBy: none
+		sourceColumn: TotalNetAmount
+		annotation SummarizationSetBy = Automatic
+
+	column TotalSamplesQty
+		dataType: int64
+		isHidden
+		lineageTag: 0bb57c77-77ad-5c24-99a2-797ee59f79e9
+		summarizeBy: none
+		sourceColumn: TotalSamplesQty
+		annotation SummarizationSetBy = Automatic
+
+	column TotalQty
+		dataType: decimal
+		isHidden
+		lineageTag: f259c469-0c4c-50f5-9eb6-2f44ad3b2aef
+		summarizeBy: none
+		sourceColumn: TotalQty
+		annotation SummarizationSetBy = Automatic
+
+	column NetAmountPerVisit
+		dataType: decimal
+		isHidden
+		lineageTag: 757a9a6a-0008-5eaf-9a9f-2e080a890d6d
+		summarizeBy: none
+		sourceColumn: NetAmountPerVisit
 		annotation SummarizationSetBy = Automatic
 
 	column YearMonth

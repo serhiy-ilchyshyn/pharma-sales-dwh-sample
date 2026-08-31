@@ -81,14 +81,98 @@ EXEC [dwh].[spGoldFullLoad] @load_id = 'after_month_date_key';
 
 ## 5. Деплой
 
-1. Підставити в `definition/expressions.tmdl` SQL endpoint і item id warehouse `whgold`
-   замість `<SQL_ENDPOINT>` і `<WHGOLD_ITEM_ID>`.
-2. Синхронізувати репозиторій через **Fabric → Workspace → Git integration**
-   (`logicalId` у `.platform` заповнений нулями — Fabric призначить свій при першій синхронізації).
-3. Альтернатива без git: відкрити папку `.SemanticModel` у Power BI Desktop (TMDL view)
-   або застосувати через Tabular Editor / `fabric-cli`.
-4. Після публікації перевірити в Copilot три питання з різних доменів — і, за потреби,
-   дописати синоніми в `cultures/uk-UA.tmdl`.
+### 5.0. Перед будь-яким варіантом
+
+У `definition/expressions.tmdl` має стояти справжній SQL endpoint і **item id warehouse
+`whgold`** — його видно в URL айтема у Fabric (`.../warehouses/<id>`) або через
+**Workspace settings → ... → About**. Id — це GUID у форматі `8-4-4-4-12`:
+
+```
+dc20f929-0e9a-4619-9cf3-4a9fb9117c07    -- whgold, валідний
+9dc20f929-0e9a-4619-9cf3-4a9fb9117c07   -- НЕВАЛІДНИЙ: у першому блоці 9 символів
+```
+
+`deploy_semantic_model.py` перевіряє це перед відправкою: якщо id зіпсований, скрипт
+зупиниться й покаже довжини блоків. Без такої перевірки модель створюється успішно,
+але всі таблиці лишаються порожніми, і причину шукають у Direct Lake чи правах доступу.
+
+Endpoint у Fabric спільний для всіх warehouse одного воркспейсу, тому той самий рядок,
+що в пайплайнах, підходить.
+
+### 5.1. Через git integration — найпростіше, бо вже підключено
+
+У воркспейсі `fcw-plt-dds-d-westeu-01` git уже налаштований (панель **Source control**).
+Тоді:
+
+1. закомітити `fabric-semantic-model/PharmaSalesGold.SemanticModel/` у гілку, на яку
+   підписаний воркспейс (`main`);
+2. у Fabric відкрити **Source control** → вкладка **Updates** → **Update all**;
+3. модель зʼявиться як айтем `PharmaSalesGold`.
+
+Два нюанси:
+* Fabric очікує папку айтема (`*.SemanticModel`) відносно кореня, налаштованого в
+  git integration. Якщо там указано корінь репозиторію, наш шлях `fabric-semantic-model/…`
+  стане підпапкою воркспейсу — це підтримується (у вас уже є підпапка `SemanticModel`).
+  Якщо айтем не підтягнувся — перенесіть папку в корінь або змініть Git folder у налаштуваннях.
+* панель показує кількість незастосованих змін (у вас було 17) — спершу розберіться з ними,
+  щоб `Update all` не перезаписав чужу роботу.
+
+### 5.2. Через REST API — найнадійніше, якщо git не варіант
+
+`deploy_semantic_model.py` створює або оновлює айтем без Desktop і без git:
+
+```bash
+az login
+cd fabric-semantic-model
+
+# подивитись, які файли підуть у Fabric
+python3 deploy_semantic_model.py --workspace 343bb55f-11c8-43a8-acba-3ad333a2d07a --dry-run
+
+# власне деплой
+python3 deploy_semantic_model.py --workspace 343bb55f-11c8-43a8-acba-3ad333a2d07a
+```
+
+Скрипт сам знаходить модель за `displayName`: якщо її немає — створює
+(`POST /semanticModels`), якщо є — оновлює визначення
+(`POST /semanticModels/{id}/updateDefinition`). Токен береться з `az account get-access-token`
+або передається через `--token`. Потрібні права Contributor у воркспейсі.
+
+Після створення Fabric може попросити облікові дані підключення:
+**Settings → Data source credentials → Edit credentials** для `whgold`.
+
+### 5.3. Power BI Desktop — чому не спрацювало
+
+Desktop **не відкриває папку `*.SemanticModel`** — він відкриває файл проєкту `.pbip`,
+який лежить поруч і посилається на цю папку. У нашій папці такого файлу немає, бо це
+розкладка Fabric git integration, а не Power BI Project.
+
+Але навіть із `.pbip` Desktop тут не найкращий шлях: модель має партиції
+`mode: directLake`, а Direct Lake — це формат Fabric-айтема; підтримка в Desktop
+обмежена й залежить від версії. Тому Desktop має сенс для **перегляду й правок**
+(TMDL view), а не для деплою.
+
+Якщо все ж потрібен локальний перегляд:
+1. увімкнути в Desktop **Options → Preview features → Power BI Project (.pbip) save option**
+   і **Store semantic model using TMDL format**;
+2. створити пустий проєкт, зберегти як `.pbip` — і порівняти отриману розкладку з нашою:
+   так буде видно, який саме `.pbip` очікує ваша версія Desktop;
+3. деплоїти все одно через 5.1 або 5.2.
+
+### 5.4. Альтернатива: Tabular Editor
+
+TE3 відкриває TMDL-папку напряму й публікує через XMLA endpoint
+(потрібен **read-write XMLA** в налаштуваннях ємності). TE2 працює зі старим форматом
+`Model.bim`, тож для TMDL не підходить без конвертації.
+
+### 5.5. Перевірка після деплою
+
+1. модель відкривається у воркспейсі, у списку таблиць — 13 позицій;
+2. **Refresh** не потрібен: Direct Lake читає дані з `whgold` напряму;
+3. створити порожній звіт і перевірити міру «Сума продажів» у розрізі «Календар[Рік]»;
+4. поставити три питання з [`copilot_prompts.md`](copilot_prompts.md) у Copilot.
+
+Якщо модель створилась, але таблиці порожні — майже завжди це неправильний item id
+warehouse у `expressions.tmdl` (див. 5.0) або відсутні облікові дані підключення.
 
 ## 6. Що навмисно не зроблено
 

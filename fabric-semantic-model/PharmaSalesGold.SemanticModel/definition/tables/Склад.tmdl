@@ -49,16 +49,16 @@ table 'Склад'
 		sourceColumn: WarehouseCode
 		annotation SummarizationSetBy = Automatic
 
+	/// Власний / консигнаційний / транзитний
 	column 'Тип складу'
-		/// Власний / консигнаційний / транзитний
 		dataType: string
 		lineageTag: e928ed02-1ecb-5338-ad46-29926dd03711
 		summarizeBy: none
 		sourceColumn: WarehouseType
 		annotation SummarizationSetBy = Automatic
 
+	/// Для консигнаційних складів — клієнт-дистрибʼютор
 	column Власник
-		/// Для консигнаційних складів — клієнт-дистрибʼютор
 		dataType: string
 		lineageTag: e1453228-df73-5107-8db4-8973149e38b8
 		summarizeBy: none

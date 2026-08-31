@@ -1,7 +1,7 @@
 /// Підключення до warehouse [whgold]. Перед першим деплоєм підставте SQL endpoint і item id.
 expression DatabaseQuery =
 		let
-			database = Sql.Database("<SQL_ENDPOINT>", "<WHGOLD_ITEM_ID>")
+			database = Sql.Database("viqr2bflwtiuvci5miqhwm3h54-l62twngicguehlf2hljthiwqpi.datawarehouse.fabric.microsoft.com", "dc20f929-0e9a-4619-9cf3-4a9fb9117c07")
 		in
 			database
 	lineageTag: c5303798-7403-5ae9-97c6-f93bec9b18f3

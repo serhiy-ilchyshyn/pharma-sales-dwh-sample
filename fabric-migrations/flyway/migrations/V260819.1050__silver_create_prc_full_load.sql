@@ -4,7 +4,7 @@
 -- тут зібрані в одну процедуру для відтворюваності прикладу.
 GO
 --IMPORTANT
-USE [whsilverad];
+USE [whsilver];
 --IMPORTANT
 GO
 

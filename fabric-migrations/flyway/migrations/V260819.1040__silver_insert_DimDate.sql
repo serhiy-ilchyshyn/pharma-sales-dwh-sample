@@ -4,7 +4,7 @@
 -- Фінансовий рік: квітень–березень (як у grp-ctl-azure-dwh).
 GO
 --IMPORTANT
-USE [whsilverad];
+USE [whsilver];
 --IMPORTANT
 GO
 

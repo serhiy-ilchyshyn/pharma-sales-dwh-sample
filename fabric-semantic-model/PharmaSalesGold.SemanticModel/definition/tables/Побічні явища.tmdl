@@ -27,8 +27,8 @@ table 'Побічні явища'
 		sourceColumn: SKProductID
 		annotation SummarizationSetBy = Automatic
 
+	/// Non-serious / Serious / Critical
 	column Серйозність
-		/// Non-serious / Serious / Critical
 		dataType: string
 		lineageTag: 9f1b7cd9-1304-58bb-8684-cf2e6c504824
 		summarizeBy: none
@@ -40,14 +40,6 @@ table 'Побічні явища'
 		lineageTag: 138098c9-a9bb-551d-87e2-3f8c93082caa
 		summarizeBy: none
 		sourceColumn: Region
-		annotation SummarizationSetBy = Automatic
-
-	column FatalCnt
-		dataType: int64
-		isHidden
-		lineageTag: 02062404-f727-556d-87d0-ebed2e23aae2
-		summarizeBy: none
-		sourceColumn: FatalCnt
 		annotation SummarizationSetBy = Automatic
 
 	column LogicalErrorCnt
@@ -64,6 +56,14 @@ table 'Побічні явища'
 		lineageTag: b15633fd-3136-5fab-8cba-67c1be719888
 		summarizeBy: none
 		sourceColumn: CaseCnt
+		annotation SummarizationSetBy = Automatic
+
+	column FatalCnt
+		dataType: int64
+		isHidden
+		lineageTag: 02062404-f727-556d-87d0-ebed2e23aae2
+		summarizeBy: none
+		sourceColumn: FatalCnt
 		annotation SummarizationSetBy = Automatic
 
 	column YearMonth

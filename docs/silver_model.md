@@ -1,4 +1,4 @@
-# Silver level — Microsoft Fabric Warehouse (`whsilverad.dwh`)
+# Silver level — Microsoft Fabric Warehouse (`whsilver.dwh`)
 
 Модель silver-рівня для джерела **Pharma ERP** (Azure SQL, схема `[erp]`), створеного
 скриптами `01_ddl_azure_sql.sql` (DDL) та `02_generate_data_fixed.sql` (наповнення).
@@ -12,7 +12,7 @@
 
 ```
 Azure SQL [erp].*            ->  Bronze lakehouse                ->  Silver warehouse
-(10 таблиць ERP)                 lhbronze.erp_erp.*                  whsilverad.dwh.*
+(10 таблиць ERP)                 lhbronze.erp_erp.*                  whsilver.dwh.*
                                  (1:1 копія, без трансформацій)      (Dim / Ref / Fct)
 
 PL_Bronze_Ingest (Copy, Overwrite) -----> PL_Silver_Full_Load (spSilverLoadLevel по рівнях)
@@ -45,7 +45,7 @@ Silver їх **не читає і не переносить**: усі `v*` маю
 
 | Елемент | Правило |
 |---|---|
-| Схема | `whsilverad.dwh` |
+| Схема | `whsilver.dwh` |
 | Вимір | `Dim<Entity>`; ключі `SK<Entity>ID` (версія рядка) + `SK<Entity>KeyID` (durable key) |
 | Довідник маппінгу | `Ref<Entity>`; ключі `SKRef<Entity>ID` + `SKRef<Entity>KeyID`, плюс `SKSrcSystemKeyID` та `SK<Entity>KeyID` на "золотий" запис |
 | Факт | `Fct<Entity>`; ключ `SKFct<Entity>ID`, посилання **тільки на `SK*KeyID`** |

@@ -56,8 +56,8 @@ table 'Представник'
 		sourceColumn: Territory
 		annotation SummarizationSetBy = Automatic
 
+	/// RX / OTC / обидві
 	column Лінія
-		/// RX / OTC / обидві
 		dataType: string
 		lineageTag: 3287de70-6a28-56ce-9e40-c49b7a4fe77c
 		summarizeBy: none

@@ -35,8 +35,8 @@ table 'Продажі за місяць'
 		sourceColumn: SKEmployeeID
 		annotation SummarizationSetBy = Automatic
 
+	/// Регіон клієнта
 	column 'Регіон продажу'
-		/// Регіон клієнта
 		dataType: string
 		lineageTag: 017e046b-4b53-5daa-b268-27f8582440f8
 		summarizeBy: none
@@ -58,28 +58,20 @@ table 'Продажі за місяць'
 		sourceColumn: TotalNetAmount
 		annotation SummarizationSetBy = Automatic
 
+	column ReturnNetAmount
+		dataType: decimal
+		isHidden
+		lineageTag: b80b13dd-3353-5380-b7b4-2dae30eb2e75
+		summarizeBy: none
+		sourceColumn: ReturnNetAmount
+		annotation SummarizationSetBy = Automatic
+
 	column ClientAccountCnt
 		dataType: int64
 		isHidden
 		lineageTag: a718c827-0231-57cb-a032-a1daa245cd72
 		summarizeBy: none
 		sourceColumn: ClientAccountCnt
-		annotation SummarizationSetBy = Automatic
-
-	column ReturnQty
-		dataType: decimal
-		isHidden
-		lineageTag: 0aa87da7-8115-51a9-bca5-b1b6ed1b46f4
-		summarizeBy: none
-		sourceColumn: ReturnQty
-		annotation SummarizationSetBy = Automatic
-
-	column OrderLineCnt
-		dataType: int64
-		isHidden
-		lineageTag: 5c9bade7-a066-5892-8573-1ea25e0197be
-		summarizeBy: none
-		sourceColumn: OrderLineCnt
 		annotation SummarizationSetBy = Automatic
 
 	column TotalQty
@@ -90,12 +82,20 @@ table 'Продажі за місяць'
 		sourceColumn: TotalQty
 		annotation SummarizationSetBy = Automatic
 
-	column ReturnNetAmount
+	column OrderLineCnt
+		dataType: int64
+		isHidden
+		lineageTag: 5c9bade7-a066-5892-8573-1ea25e0197be
+		summarizeBy: none
+		sourceColumn: OrderLineCnt
+		annotation SummarizationSetBy = Automatic
+
+	column ReturnQty
 		dataType: decimal
 		isHidden
-		lineageTag: b80b13dd-3353-5380-b7b4-2dae30eb2e75
+		lineageTag: 0aa87da7-8115-51a9-bca5-b1b6ed1b46f4
 		summarizeBy: none
-		sourceColumn: ReturnNetAmount
+		sourceColumn: ReturnQty
 		annotation SummarizationSetBy = Automatic
 
 	column YearMonth

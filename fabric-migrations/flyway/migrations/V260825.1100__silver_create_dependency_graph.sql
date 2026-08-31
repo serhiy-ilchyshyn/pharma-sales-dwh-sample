@@ -17,20 +17,20 @@
 -- EtlObjectDependency і виконати EXEC [dwh].[spRefreshObjectClosure].
 GO
 --IMPORTANT
-USE [whsilverad];
+USE [whsilver];
 --IMPORTANT
 GO
 
-DROP TABLE IF EXISTS [whsilverad].[dwh].[EtlObjectDependency]
+DROP TABLE IF EXISTS [whsilver].[dwh].[EtlObjectDependency]
 GO
-CREATE TABLE [whsilverad].[dwh].[EtlObjectDependency]
+CREATE TABLE [whsilver].[dwh].[EtlObjectDependency]
 (
 	[ObjectName] [varchar](256) NOT NULL,        -- dwh.<SilverTable>
 	[DependsOnObject] [varchar](256) NOT NULL    -- dwh.<SilverTable> | lhbronze.<schema>.<table>
 )
 GO
 
-INSERT INTO [whsilverad].[dwh].[EtlObjectDependency] ([ObjectName],[DependsOnObject])
+INSERT INTO [whsilver].[dwh].[EtlObjectDependency] ([ObjectName],[DependsOnObject])
 VALUES
 	('dwh.DimActivityType', 'lhbronze.erp_erp.DOCTOR_VISITS'),
 	('dwh.DimAeOutcome', 'lhbronze.erp_erp.ADVERSE_EVENTS'),
@@ -130,9 +130,9 @@ VALUES
 	('dwh.RefWarehouse', 'lhbronze.erp_erp.WAREHOUSES')
 GO
 
-DROP TABLE IF EXISTS [whsilverad].[dwh].[EtlObjectDownstream]
+DROP TABLE IF EXISTS [whsilver].[dwh].[EtlObjectDownstream]
 GO
-CREATE TABLE [whsilverad].[dwh].[EtlObjectDownstream]
+CREATE TABLE [whsilver].[dwh].[EtlObjectDownstream]
 (
 	[RootObject] [varchar](256) NOT NULL,        -- що перезавантажують (bronze-таблиця або silver-обʼєкт)
 	[ObjectName] [varchar](128) NOT NULL         -- silver-обʼєкт без схеми (join з EtlSilverObject)

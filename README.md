@@ -84,7 +84,7 @@ EXEC [dwh].[spGoldFullLoad]   @load_id = 'init';   -- gold, у whgold
 ## Silver level (Fabric Warehouse)
 
 Поверх ERP-джерела зі скриптів `01_ddl_azure_sql.sql` → `02_generate_data_fixed.sql`
-побудована **silver-модель** для Microsoft Fabric Warehouse `whsilverad.dwh`:
+побудована **silver-модель** для Microsoft Fabric Warehouse `whsilver.dwh`:
 23 виміри, 6 reference-таблиць маппінгу і 5 фактів, з SCD2 + durable-ключами,
 unknown member `-1` та прапорцями якості даних.
 

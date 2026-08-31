@@ -35,22 +35,6 @@ table 'Рухи запасів'
 		sourceColumn: SKProductID
 		annotation SummarizationSetBy = Automatic
 
-	column QtyNet
-		dataType: decimal
-		isHidden
-		lineageTag: 67c83ba5-2215-5dbf-b853-2022ae0fcc78
-		summarizeBy: none
-		sourceColumn: QtyNet
-		annotation SummarizationSetBy = Automatic
-
-	column QtyWriteOff
-		dataType: decimal
-		isHidden
-		lineageTag: 3c59d763-de98-5a50-83bb-a0da8c6eba26
-		summarizeBy: none
-		sourceColumn: QtyWriteOff
-		annotation SummarizationSetBy = Automatic
-
 	column MovementCnt
 		dataType: int64
 		isHidden
@@ -59,12 +43,28 @@ table 'Рухи запасів'
 		sourceColumn: MovementCnt
 		annotation SummarizationSetBy = Automatic
 
+	column QtyNet
+		dataType: decimal
+		isHidden
+		lineageTag: 67c83ba5-2215-5dbf-b853-2022ae0fcc78
+		summarizeBy: none
+		sourceColumn: QtyNet
+		annotation SummarizationSetBy = Automatic
+
 	column QtyOut
 		dataType: decimal
 		isHidden
 		lineageTag: 55061895-1f69-574e-a78f-ed897bbe8011
 		summarizeBy: none
 		sourceColumn: QtyOut
+		annotation SummarizationSetBy = Automatic
+
+	column QtyWriteOff
+		dataType: decimal
+		isHidden
+		lineageTag: 3c59d763-de98-5a50-83bb-a0da8c6eba26
+		summarizeBy: none
+		sourceColumn: QtyWriteOff
 		annotation SummarizationSetBy = Automatic
 
 	column QtyIn

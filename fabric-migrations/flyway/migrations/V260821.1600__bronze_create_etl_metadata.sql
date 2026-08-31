@@ -7,13 +7,13 @@
 -- ETL-бази (у прод-репозиторії її роль виконує [sql-db-etl].[etl]).
 GO
 --IMPORTANT
-USE [whsilverad];
+USE [whsilver];
 --IMPORTANT
 GO
 
-DROP TABLE IF EXISTS [whsilverad].[dwh].[EtlBronzeObject]
+DROP TABLE IF EXISTS [whsilver].[dwh].[EtlBronzeObject]
 GO
-CREATE TABLE [whsilverad].[dwh].[EtlBronzeObject]
+CREATE TABLE [whsilver].[dwh].[EtlBronzeObject]
 (
 	[SourceSchema] [varchar](128) NOT NULL,
 	[SourceTable] [varchar](128) NOT NULL,
@@ -24,7 +24,7 @@ CREATE TABLE [whsilverad].[dwh].[EtlBronzeObject]
 )
 GO
 
-INSERT INTO [whsilverad].[dwh].[EtlBronzeObject]
+INSERT INTO [whsilver].[dwh].[EtlBronzeObject]
 	([SourceSchema],[SourceTable],[TargetSchema],[TargetTable],[LoadMode],[IsActive])
 VALUES
 	('erp', 'PRODUCTS',            'erp_erp', 'PRODUCTS',            'Overwrite', 1),

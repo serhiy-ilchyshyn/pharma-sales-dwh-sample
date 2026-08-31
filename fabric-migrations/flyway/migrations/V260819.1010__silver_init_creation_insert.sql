@@ -3,7 +3,7 @@
 -- + статичні (керовані) виміри, які не походять з даних джерела.
 GO
 --IMPORTANT
-USE [whsilverad];
+USE [whsilver];
 --IMPORTANT
 GO
 
@@ -15,92 +15,92 @@ BEGIN TRY
    -1 РЯДКИ ВИМІРІВ
    ========================================================= */
 
-INSERT INTO [whsilverad].[dwh].[DimSrcSystem] ([SKSrcSystemID],[SKSrcSystemKeyID],[StartDate],[EndDate],[IsDeleted],[CreatedBy],[ModifiedBy],[CreatedAt],[ModifiedAt],[Id],[Name])
+INSERT INTO [whsilver].[dwh].[DimSrcSystem] ([SKSrcSystemID],[SKSrcSystemKeyID],[StartDate],[EndDate],[IsDeleted],[CreatedBy],[ModifiedBy],[CreatedAt],[ModifiedAt],[Id],[Name])
 VALUES (-1,-1,'2000-01-01',NULL,0,'init_insert',NULL,'2000-01-01',NULL,-1,'N/A');
 
-INSERT INTO [whsilverad].[dwh].[DimCurrency] ([SKCurrencyID],[SKCurrencyKeyID],[StartDate],[EndDate],[IsDeleted],[CreatedBy],[ModifiedBy],[CreatedAt],[ModifiedAt],[Id],[Name],[FullName])
+INSERT INTO [whsilver].[dwh].[DimCurrency] ([SKCurrencyID],[SKCurrencyKeyID],[StartDate],[EndDate],[IsDeleted],[CreatedBy],[ModifiedBy],[CreatedAt],[ModifiedAt],[Id],[Name],[FullName])
 VALUES (-1,-1,'2000-01-01',NULL,0,'init_insert',NULL,'2000-01-01',NULL,'N/A','N/A','N/A');
 
-INSERT INTO [whsilverad].[dwh].[DimAtcClass] ([SKAtcClassID],[SKAtcClassKeyID],[StartDate],[EndDate],[IsDeleted],[CreatedBy],[ModifiedBy],[CreatedAt],[ModifiedAt],[Id],[Name],[Description])
+INSERT INTO [whsilver].[dwh].[DimAtcClass] ([SKAtcClassID],[SKAtcClassKeyID],[StartDate],[EndDate],[IsDeleted],[CreatedBy],[ModifiedBy],[CreatedAt],[ModifiedAt],[Id],[Name],[Description])
 VALUES (-1,-1,'2000-01-01',NULL,0,'init_insert',NULL,'2000-01-01',NULL,'?','N/A','N/A');  -- Id '?' щоб не конфліктувати з реальним класом 'N'
 
-INSERT INTO [whsilverad].[dwh].[DimMovementType] ([SKMovementTypeID],[SKMovementTypeKeyID],[StartDate],[EndDate],[IsDeleted],[CreatedBy],[ModifiedBy],[CreatedAt],[ModifiedAt],[Id],[Name],[Direction],[QtySign])
+INSERT INTO [whsilver].[dwh].[DimMovementType] ([SKMovementTypeID],[SKMovementTypeKeyID],[StartDate],[EndDate],[IsDeleted],[CreatedBy],[ModifiedBy],[CreatedAt],[ModifiedAt],[Id],[Name],[Direction],[QtySign])
 VALUES (-1,-1,'2000-01-01',NULL,0,'init_insert',NULL,'2000-01-01',NULL,'N/A','N/A','N/A',0);
 
-INSERT INTO [whsilverad].[dwh].[DimOrderStatus] ([SKOrderStatusID],[SKOrderStatusKeyID],[StartDate],[EndDate],[IsDeleted],[CreatedBy],[ModifiedBy],[CreatedAt],[ModifiedAt],[Id],[Name],[IsSale],[IsReturn],[IsCancelled])
+INSERT INTO [whsilver].[dwh].[DimOrderStatus] ([SKOrderStatusID],[SKOrderStatusKeyID],[StartDate],[EndDate],[IsDeleted],[CreatedBy],[ModifiedBy],[CreatedAt],[ModifiedAt],[Id],[Name],[IsSale],[IsReturn],[IsCancelled])
 VALUES (-1,-1,'2000-01-01',NULL,0,'init_insert',NULL,'2000-01-01',NULL,'N/A','N/A',0,0,0);
 
-INSERT INTO [whsilverad].[dwh].[DimRegion] ([SKRegionID],[SKRegionKeyID],[StartDate],[EndDate],[IsDeleted],[CreatedBy],[ModifiedBy],[CreatedAt],[ModifiedAt],[Id],[Name])
+INSERT INTO [whsilver].[dwh].[DimRegion] ([SKRegionID],[SKRegionKeyID],[StartDate],[EndDate],[IsDeleted],[CreatedBy],[ModifiedBy],[CreatedAt],[ModifiedAt],[Id],[Name])
 VALUES (-1,-1,'2000-01-01',NULL,0,'init_insert',NULL,'2000-01-01',NULL,'N/A','N/A');
 
-INSERT INTO [whsilverad].[dwh].[DimCity] ([SKCityID],[SKCityKeyID],[StartDate],[EndDate],[IsDeleted],[CreatedBy],[ModifiedBy],[CreatedAt],[ModifiedAt],[Id],[Name],[SKRegionKeyID])
+INSERT INTO [whsilver].[dwh].[DimCity] ([SKCityID],[SKCityKeyID],[StartDate],[EndDate],[IsDeleted],[CreatedBy],[ModifiedBy],[CreatedAt],[ModifiedAt],[Id],[Name],[SKRegionKeyID])
 VALUES (-1,-1,'2000-01-01',NULL,0,'init_insert',NULL,'2000-01-01',NULL,'N/A','N/A',-1);
 
-INSERT INTO [whsilverad].[dwh].[DimTerritory] ([SKTerritoryID],[SKTerritoryKeyID],[StartDate],[EndDate],[IsDeleted],[CreatedBy],[ModifiedBy],[CreatedAt],[ModifiedAt],[Id],[Name])
+INSERT INTO [whsilver].[dwh].[DimTerritory] ([SKTerritoryID],[SKTerritoryKeyID],[StartDate],[EndDate],[IsDeleted],[CreatedBy],[ModifiedBy],[CreatedAt],[ModifiedAt],[Id],[Name])
 VALUES (-1,-1,'2000-01-01',NULL,0,'init_insert',NULL,'2000-01-01',NULL,'N/A','N/A');
 
-INSERT INTO [whsilverad].[dwh].[DimChain] ([SKChainID],[SKChainKeyID],[StartDate],[EndDate],[IsDeleted],[CreatedBy],[ModifiedBy],[CreatedAt],[ModifiedAt],[Id],[Name])
+INSERT INTO [whsilver].[dwh].[DimChain] ([SKChainID],[SKChainKeyID],[StartDate],[EndDate],[IsDeleted],[CreatedBy],[ModifiedBy],[CreatedAt],[ModifiedAt],[Id],[Name])
 VALUES (-1,-1,'2000-01-01',NULL,0,'init_insert',NULL,'2000-01-01',NULL,'N/A','N/A');
 
-INSERT INTO [whsilverad].[dwh].[DimLegalEntity] ([SKLegalEntityID],[SKLegalEntityKeyID],[StartDate],[EndDate],[IsDeleted],[CreatedBy],[ModifiedBy],[CreatedAt],[ModifiedAt],[Id],[Name],[EDRPOU],[TaxId])
+INSERT INTO [whsilver].[dwh].[DimLegalEntity] ([SKLegalEntityID],[SKLegalEntityKeyID],[StartDate],[EndDate],[IsDeleted],[CreatedBy],[ModifiedBy],[CreatedAt],[ModifiedAt],[Id],[Name],[EDRPOU],[TaxId])
 VALUES (-1,-1,'2000-01-01',NULL,0,'init_insert',NULL,'2000-01-01',NULL,'N/A','N/A','N/A','N/A');
 
-INSERT INTO [whsilverad].[dwh].[DimManufacturer] ([SKManufacturerID],[SKManufacturerKeyID],[StartDate],[EndDate],[IsDeleted],[CreatedBy],[ModifiedBy],[CreatedAt],[ModifiedAt],[Id],[Name])
+INSERT INTO [whsilver].[dwh].[DimManufacturer] ([SKManufacturerID],[SKManufacturerKeyID],[StartDate],[EndDate],[IsDeleted],[CreatedBy],[ModifiedBy],[CreatedAt],[ModifiedAt],[Id],[Name])
 VALUES (-1,-1,'2000-01-01',NULL,0,'init_insert',NULL,'2000-01-01',NULL,'N/A','N/A');
 
-INSERT INTO [whsilverad].[dwh].[DimProduct] ([SKProductID],[SKProductKeyID],[StartDate],[EndDate],[IsDeleted],[CreatedBy],[ModifiedBy],[CreatedAt],[ModifiedAt],[Id],[Name],[SkuCode],[Barcode],[RegistrationNumber],[INN],[AtcCode],[SKAtcClassKeyID],[ReleaseForm],[Dosage],[SKManufacturerKeyID],[RxOtcType],[BasePriceUAH],[IsActive],[IsAtcCodeValid],[SrcCreatedAt])
+INSERT INTO [whsilver].[dwh].[DimProduct] ([SKProductID],[SKProductKeyID],[StartDate],[EndDate],[IsDeleted],[CreatedBy],[ModifiedBy],[CreatedAt],[ModifiedAt],[Id],[Name],[SkuCode],[Barcode],[RegistrationNumber],[INN],[AtcCode],[SKAtcClassKeyID],[ReleaseForm],[Dosage],[SKManufacturerKeyID],[RxOtcType],[BasePriceUAH],[IsActive],[IsAtcCodeValid],[SrcCreatedAt])
 VALUES (-1,-1,'2000-01-01',NULL,0,'init_insert',NULL,'2000-01-01',NULL,'N/A','N/A','N/A','N/A','N/A','N/A','N/A',-1,'N/A','N/A',-1,'N/A',NULL,0,0,NULL);
 
-INSERT INTO [whsilverad].[dwh].[DimClientAccount] ([SKClientAccountID],[SKClientAccountKeyID],[StartDate],[EndDate],[IsDeleted],[CreatedBy],[ModifiedBy],[CreatedAt],[ModifiedAt],[Id],[Name],[AccountType],[SKChainKeyID],[SKLegalEntityKeyID],[SKRegionKeyID],[SKCityKeyID],[Address],[IsActive],[SrcDuplicateCnt],[SrcCreatedAt])
+INSERT INTO [whsilver].[dwh].[DimClientAccount] ([SKClientAccountID],[SKClientAccountKeyID],[StartDate],[EndDate],[IsDeleted],[CreatedBy],[ModifiedBy],[CreatedAt],[ModifiedAt],[Id],[Name],[AccountType],[SKChainKeyID],[SKLegalEntityKeyID],[SKRegionKeyID],[SKCityKeyID],[Address],[IsActive],[SrcDuplicateCnt],[SrcCreatedAt])
 VALUES (-1,-1,'2000-01-01',NULL,0,'init_insert',NULL,'2000-01-01',NULL,'N/A','N/A','N/A',-1,-1,-1,-1,'N/A',0,0,NULL);
 
-INSERT INTO [whsilverad].[dwh].[DimSpecialty] ([SKSpecialtyID],[SKSpecialtyKeyID],[StartDate],[EndDate],[IsDeleted],[CreatedBy],[ModifiedBy],[CreatedAt],[ModifiedAt],[Id],[Name])
+INSERT INTO [whsilver].[dwh].[DimSpecialty] ([SKSpecialtyID],[SKSpecialtyKeyID],[StartDate],[EndDate],[IsDeleted],[CreatedBy],[ModifiedBy],[CreatedAt],[ModifiedAt],[Id],[Name])
 VALUES (-1,-1,'2000-01-01',NULL,0,'init_insert',NULL,'2000-01-01',NULL,'N/A','N/A');
 
-INSERT INTO [whsilverad].[dwh].[DimLpu] ([SKLpuID],[SKLpuKeyID],[StartDate],[EndDate],[IsDeleted],[CreatedBy],[ModifiedBy],[CreatedAt],[ModifiedAt],[Id],[Name],[SKRegionKeyID],[SKCityKeyID])
+INSERT INTO [whsilver].[dwh].[DimLpu] ([SKLpuID],[SKLpuKeyID],[StartDate],[EndDate],[IsDeleted],[CreatedBy],[ModifiedBy],[CreatedAt],[ModifiedAt],[Id],[Name],[SKRegionKeyID],[SKCityKeyID])
 VALUES (-1,-1,'2000-01-01',NULL,0,'init_insert',NULL,'2000-01-01',NULL,'N/A','N/A',-1,-1);
 
-INSERT INTO [whsilverad].[dwh].[DimDoctor] ([SKDoctorID],[SKDoctorKeyID],[StartDate],[EndDate],[IsDeleted],[CreatedBy],[ModifiedBy],[CreatedAt],[ModifiedAt],[Id],[Name],[LastName],[FirstName],[MiddleName],[SKSpecialtyKeyID],[SKLpuKeyID],[SKRegionKeyID],[SKCityKeyID],[Segment],[IsTarget],[SrcDuplicateCnt],[SrcCreatedAt])
+INSERT INTO [whsilver].[dwh].[DimDoctor] ([SKDoctorID],[SKDoctorKeyID],[StartDate],[EndDate],[IsDeleted],[CreatedBy],[ModifiedBy],[CreatedAt],[ModifiedAt],[Id],[Name],[LastName],[FirstName],[MiddleName],[SKSpecialtyKeyID],[SKLpuKeyID],[SKRegionKeyID],[SKCityKeyID],[Segment],[IsTarget],[SrcDuplicateCnt],[SrcCreatedAt])
 VALUES (-1,-1,'2000-01-01',NULL,0,'init_insert',NULL,'2000-01-01',NULL,'N/A','N/A','N/A','N/A','N/A',-1,-1,-1,-1,'N',0,0,NULL);
 
-INSERT INTO [whsilverad].[dwh].[DimEmployee] ([SKEmployeeID],[SKEmployeeKeyID],[StartDate],[EndDate],[IsDeleted],[CreatedBy],[ModifiedBy],[CreatedAt],[ModifiedAt],[Id],[Name],[EmployeeRole],[SKTerritoryKeyID],[ProductLine],[SKEmployeeManagerKeyID],[HireDate],[IsActive],[SrcCreatedAt])
+INSERT INTO [whsilver].[dwh].[DimEmployee] ([SKEmployeeID],[SKEmployeeKeyID],[StartDate],[EndDate],[IsDeleted],[CreatedBy],[ModifiedBy],[CreatedAt],[ModifiedAt],[Id],[Name],[EmployeeRole],[SKTerritoryKeyID],[ProductLine],[SKEmployeeManagerKeyID],[HireDate],[IsActive],[SrcCreatedAt])
 VALUES (-1,-1,'2000-01-01',NULL,0,'init_insert',NULL,'2000-01-01',NULL,'N/A','N/A','N/A',-1,'N/A',-1,NULL,0,NULL);
 
-INSERT INTO [whsilverad].[dwh].[DimWarehouse] ([SKWarehouseID],[SKWarehouseKeyID],[StartDate],[EndDate],[IsDeleted],[CreatedBy],[ModifiedBy],[CreatedAt],[ModifiedAt],[Id],[Name],[WarehouseCode],[WarehouseType],[SKClientAccountOwnerKeyID],[SKRegionKeyID],[SKCityKeyID],[SrcCreatedAt])
+INSERT INTO [whsilver].[dwh].[DimWarehouse] ([SKWarehouseID],[SKWarehouseKeyID],[StartDate],[EndDate],[IsDeleted],[CreatedBy],[ModifiedBy],[CreatedAt],[ModifiedAt],[Id],[Name],[WarehouseCode],[WarehouseType],[SKClientAccountOwnerKeyID],[SKRegionKeyID],[SKCityKeyID],[SrcCreatedAt])
 VALUES (-1,-1,'2000-01-01',NULL,0,'init_insert',NULL,'2000-01-01',NULL,'N/A','N/A','N/A','N/A',-1,-1,-1,NULL);
 
-INSERT INTO [whsilverad].[dwh].[DimActivityType] ([SKActivityTypeID],[SKActivityTypeKeyID],[StartDate],[EndDate],[IsDeleted],[CreatedBy],[ModifiedBy],[CreatedAt],[ModifiedAt],[Id],[Name],[IsRemote],[IsGroupEvent])
+INSERT INTO [whsilver].[dwh].[DimActivityType] ([SKActivityTypeID],[SKActivityTypeKeyID],[StartDate],[EndDate],[IsDeleted],[CreatedBy],[ModifiedBy],[CreatedAt],[ModifiedAt],[Id],[Name],[IsRemote],[IsGroupEvent])
 VALUES (-1,-1,'2000-01-01',NULL,0,'init_insert',NULL,'2000-01-01',NULL,'N/A','N/A',0,0);
 
-INSERT INTO [whsilverad].[dwh].[DimAeSeriousness] ([SKAeSeriousnessID],[SKAeSeriousnessKeyID],[StartDate],[EndDate],[IsDeleted],[CreatedBy],[ModifiedBy],[CreatedAt],[ModifiedAt],[Id],[Name],[SeverityRank])
+INSERT INTO [whsilver].[dwh].[DimAeSeriousness] ([SKAeSeriousnessID],[SKAeSeriousnessKeyID],[StartDate],[EndDate],[IsDeleted],[CreatedBy],[ModifiedBy],[CreatedAt],[ModifiedAt],[Id],[Name],[SeverityRank])
 VALUES (-1,-1,'2000-01-01',NULL,0,'init_insert',NULL,'2000-01-01',NULL,'N/A','N/A',0);
 
-INSERT INTO [whsilverad].[dwh].[DimAeOutcome] ([SKAeOutcomeID],[SKAeOutcomeKeyID],[StartDate],[EndDate],[IsDeleted],[CreatedBy],[ModifiedBy],[CreatedAt],[ModifiedAt],[Id],[Name],[IsFatal],[IsRecovered])
+INSERT INTO [whsilver].[dwh].[DimAeOutcome] ([SKAeOutcomeID],[SKAeOutcomeKeyID],[StartDate],[EndDate],[IsDeleted],[CreatedBy],[ModifiedBy],[CreatedAt],[ModifiedAt],[Id],[Name],[IsFatal],[IsRecovered])
 VALUES (-1,-1,'2000-01-01',NULL,0,'init_insert',NULL,'2000-01-01',NULL,'N/A','N/A',0,0);
 
-INSERT INTO [whsilverad].[dwh].[DimReportSource] ([SKReportSourceID],[SKReportSourceKeyID],[StartDate],[EndDate],[IsDeleted],[CreatedBy],[ModifiedBy],[CreatedAt],[ModifiedAt],[Id],[Name],[IsHcpReported])
+INSERT INTO [whsilver].[dwh].[DimReportSource] ([SKReportSourceID],[SKReportSourceKeyID],[StartDate],[EndDate],[IsDeleted],[CreatedBy],[ModifiedBy],[CreatedAt],[ModifiedAt],[Id],[Name],[IsHcpReported])
 VALUES (-1,-1,'2000-01-01',NULL,0,'init_insert',NULL,'2000-01-01',NULL,'N/A','N/A',0);
 
 /* =========================================================
    -1 РЯДКИ REFERENCE-ТАБЛИЦЬ
    ========================================================= */
 
-INSERT INTO [whsilverad].[dwh].[RefProduct] ([SKRefProductID],[SKRefProductKeyID],[StartDate],[EndDate],[IsDeleted],[CreatedBy],[ModifiedBy],[CreatedAt],[ModifiedAt],[Id],[SKSrcSystemKeyID],[RawSkuCode],[RawBrandName],[SKProductKeyID])
+INSERT INTO [whsilver].[dwh].[RefProduct] ([SKRefProductID],[SKRefProductKeyID],[StartDate],[EndDate],[IsDeleted],[CreatedBy],[ModifiedBy],[CreatedAt],[ModifiedAt],[Id],[SKSrcSystemKeyID],[RawSkuCode],[RawBrandName],[SKProductKeyID])
 VALUES (-1,-1,'2000-01-01',NULL,0,'init_insert',NULL,'2000-01-01',NULL,'N/A',-1,'N/A','N/A',-1);
 
-INSERT INTO [whsilverad].[dwh].[RefClientAccount] ([SKRefClientAccountID],[SKRefClientAccountKeyID],[StartDate],[EndDate],[IsDeleted],[CreatedBy],[ModifiedBy],[CreatedAt],[ModifiedAt],[Id],[SKSrcSystemKeyID],[RawName],[RawEDRPOU],[IsGoldenRecord],[SKClientAccountKeyID])
+INSERT INTO [whsilver].[dwh].[RefClientAccount] ([SKRefClientAccountID],[SKRefClientAccountKeyID],[StartDate],[EndDate],[IsDeleted],[CreatedBy],[ModifiedBy],[CreatedAt],[ModifiedAt],[Id],[SKSrcSystemKeyID],[RawName],[RawEDRPOU],[IsGoldenRecord],[SKClientAccountKeyID])
 VALUES (-1,-1,'2000-01-01',NULL,0,'init_insert',NULL,'2000-01-01',NULL,'N/A',-1,'N/A','N/A',0,-1);
 
-INSERT INTO [whsilverad].[dwh].[RefDoctor] ([SKRefDoctorID],[SKRefDoctorKeyID],[StartDate],[EndDate],[IsDeleted],[CreatedBy],[ModifiedBy],[CreatedAt],[ModifiedAt],[Id],[SKSrcSystemKeyID],[RawFullName],[RawLpuName],[IsGoldenRecord],[SKDoctorKeyID])
+INSERT INTO [whsilver].[dwh].[RefDoctor] ([SKRefDoctorID],[SKRefDoctorKeyID],[StartDate],[EndDate],[IsDeleted],[CreatedBy],[ModifiedBy],[CreatedAt],[ModifiedAt],[Id],[SKSrcSystemKeyID],[RawFullName],[RawLpuName],[IsGoldenRecord],[SKDoctorKeyID])
 VALUES (-1,-1,'2000-01-01',NULL,0,'init_insert',NULL,'2000-01-01',NULL,'N/A',-1,'N/A','N/A',0,-1);
 
-INSERT INTO [whsilverad].[dwh].[RefEmployee] ([SKRefEmployeeID],[SKRefEmployeeKeyID],[StartDate],[EndDate],[IsDeleted],[CreatedBy],[ModifiedBy],[CreatedAt],[ModifiedAt],[Id],[SKSrcSystemKeyID],[RawFullName],[SKEmployeeKeyID])
+INSERT INTO [whsilver].[dwh].[RefEmployee] ([SKRefEmployeeID],[SKRefEmployeeKeyID],[StartDate],[EndDate],[IsDeleted],[CreatedBy],[ModifiedBy],[CreatedAt],[ModifiedAt],[Id],[SKSrcSystemKeyID],[RawFullName],[SKEmployeeKeyID])
 VALUES (-1,-1,'2000-01-01',NULL,0,'init_insert',NULL,'2000-01-01',NULL,'N/A',-1,'N/A',-1);
 
-INSERT INTO [whsilverad].[dwh].[RefWarehouse] ([SKRefWarehouseID],[SKRefWarehouseKeyID],[StartDate],[EndDate],[IsDeleted],[CreatedBy],[ModifiedBy],[CreatedAt],[ModifiedAt],[Id],[SKSrcSystemKeyID],[RawName],[SKWarehouseKeyID])
+INSERT INTO [whsilver].[dwh].[RefWarehouse] ([SKRefWarehouseID],[SKRefWarehouseKeyID],[StartDate],[EndDate],[IsDeleted],[CreatedBy],[ModifiedBy],[CreatedAt],[ModifiedAt],[Id],[SKSrcSystemKeyID],[RawName],[SKWarehouseKeyID])
 VALUES (-1,-1,'2000-01-01',NULL,0,'init_insert',NULL,'2000-01-01',NULL,'N/A',-1,'N/A',-1);
 
-INSERT INTO [whsilverad].[dwh].[RefMovementType] ([SKRefMovementTypeID],[SKRefMovementTypeKeyID],[StartDate],[EndDate],[IsDeleted],[CreatedBy],[ModifiedBy],[CreatedAt],[ModifiedAt],[Id],[SKSrcSystemKeyID],[RawMovementType],[SKMovementTypeKeyID])
+INSERT INTO [whsilver].[dwh].[RefMovementType] ([SKRefMovementTypeID],[SKRefMovementTypeKeyID],[StartDate],[EndDate],[IsDeleted],[CreatedBy],[ModifiedBy],[CreatedAt],[ModifiedAt],[Id],[SKSrcSystemKeyID],[RawMovementType],[SKMovementTypeKeyID])
 VALUES (-1,-1,'2000-01-01',NULL,0,'init_insert',NULL,'2000-01-01',NULL,'N/A',-1,'N/A',-1);
 
 /* =========================================================
@@ -109,18 +109,18 @@ VALUES (-1,-1,'2000-01-01',NULL,0,'init_insert',NULL,'2000-01-01',NULL,'N/A',-1,
    ========================================================= */
 
 -- Джерельні системи
-INSERT INTO [whsilverad].[dwh].[DimSrcSystem] ([SKSrcSystemID],[SKSrcSystemKeyID],[StartDate],[EndDate],[IsDeleted],[CreatedBy],[ModifiedBy],[CreatedAt],[ModifiedAt],[Id],[Name])
+INSERT INTO [whsilver].[dwh].[DimSrcSystem] ([SKSrcSystemID],[SKSrcSystemKeyID],[StartDate],[EndDate],[IsDeleted],[CreatedBy],[ModifiedBy],[CreatedAt],[ModifiedAt],[Id],[Name])
 VALUES (1,1,'2000-01-01',NULL,0,'init_insert',NULL,'2000-01-01',NULL,1,'PharmaERP');
 
 -- Валюти
-INSERT INTO [whsilverad].[dwh].[DimCurrency] ([SKCurrencyID],[SKCurrencyKeyID],[StartDate],[EndDate],[IsDeleted],[CreatedBy],[ModifiedBy],[CreatedAt],[ModifiedAt],[Id],[Name],[FullName])
+INSERT INTO [whsilver].[dwh].[DimCurrency] ([SKCurrencyID],[SKCurrencyKeyID],[StartDate],[EndDate],[IsDeleted],[CreatedBy],[ModifiedBy],[CreatedAt],[ModifiedAt],[Id],[Name],[FullName])
 VALUES
 	 (1,1,'2000-01-01',NULL,0,'init_insert',NULL,'2000-01-01',NULL,'UAH','грн','Українська гривня')
 	,(2,2,'2000-01-01',NULL,0,'init_insert',NULL,'2000-01-01',NULL,'USD','usd','Долар США')
 	,(3,3,'2000-01-01',NULL,0,'init_insert',NULL,'2000-01-01',NULL,'EUR','eur','Євро');
 
 -- ATC, рівень 1 (анатомічна група)
-INSERT INTO [whsilverad].[dwh].[DimAtcClass] ([SKAtcClassID],[SKAtcClassKeyID],[StartDate],[EndDate],[IsDeleted],[CreatedBy],[ModifiedBy],[CreatedAt],[ModifiedAt],[Id],[Name],[Description])
+INSERT INTO [whsilver].[dwh].[DimAtcClass] ([SKAtcClassID],[SKAtcClassKeyID],[StartDate],[EndDate],[IsDeleted],[CreatedBy],[ModifiedBy],[CreatedAt],[ModifiedAt],[Id],[Name],[Description])
 VALUES
 	 (1,1,'2000-01-01',NULL,0,'init_insert',NULL,'2000-01-01',NULL,'A','Alimentary tract and metabolism','Травний тракт та метаболізм')
 	,(2,2,'2000-01-01',NULL,0,'init_insert',NULL,'2000-01-01',NULL,'B','Blood and blood forming organs','Кров та система кровотворення')
@@ -138,7 +138,7 @@ VALUES
 	,(14,14,'2000-01-01',NULL,0,'init_insert',NULL,'2000-01-01',NULL,'V','Various','Інші засоби');
 
 -- Типи складських рухів (канонічні); сирі значення джерела мапляться через RefMovementType
-INSERT INTO [whsilverad].[dwh].[DimMovementType] ([SKMovementTypeID],[SKMovementTypeKeyID],[StartDate],[EndDate],[IsDeleted],[CreatedBy],[ModifiedBy],[CreatedAt],[ModifiedAt],[Id],[Name],[Direction],[QtySign])
+INSERT INTO [whsilver].[dwh].[DimMovementType] ([SKMovementTypeID],[SKMovementTypeKeyID],[StartDate],[EndDate],[IsDeleted],[CreatedBy],[ModifiedBy],[CreatedAt],[ModifiedAt],[Id],[Name],[Direction],[QtySign])
 VALUES
 	 (1,1,'2000-01-01',NULL,0,'init_insert',NULL,'2000-01-01',NULL,'IN','Прихід','IN',1)
 	,(2,2,'2000-01-01',NULL,0,'init_insert',NULL,'2000-01-01',NULL,'OUT','Видача','OUT',-1)
@@ -146,7 +146,7 @@ VALUES
 	,(4,4,'2000-01-01',NULL,0,'init_insert',NULL,'2000-01-01',NULL,'WRITEOFF','Списання','OUT',-1);
 
 -- Статуси замовлень
-INSERT INTO [whsilverad].[dwh].[DimOrderStatus] ([SKOrderStatusID],[SKOrderStatusKeyID],[StartDate],[EndDate],[IsDeleted],[CreatedBy],[ModifiedBy],[CreatedAt],[ModifiedAt],[Id],[Name],[IsSale],[IsReturn],[IsCancelled])
+INSERT INTO [whsilver].[dwh].[DimOrderStatus] ([SKOrderStatusID],[SKOrderStatusKeyID],[StartDate],[EndDate],[IsDeleted],[CreatedBy],[ModifiedBy],[CreatedAt],[ModifiedAt],[Id],[Name],[IsSale],[IsReturn],[IsCancelled])
 VALUES
 	 (1,1,'2000-01-01',NULL,0,'init_insert',NULL,'2000-01-01',NULL,'NEW','Нове',0,0,0)
 	,(2,2,'2000-01-01',NULL,0,'init_insert',NULL,'2000-01-01',NULL,'CONFIRMED','Підтверджене',0,0,0)
