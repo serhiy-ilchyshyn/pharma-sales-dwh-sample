@@ -137,6 +137,9 @@ def main() -> None:
     ap.add_argument("--folder", default=DEFAULT_FOLDER, help="шлях до *.SemanticModel")
     ap.add_argument("--name", default="PharmaSalesGold", help="displayName айтема")
     ap.add_argument("--token", help="access token; без нього береться з az CLI")
+    ap.add_argument("--item-id", help="id наявної моделі; тоді пошук за назвою не робиться. "
+                                      "Корисно, коли модель створена в UI, а сюди підвантажується "
+                                      "лише визначення — так обходиться привʼязка джерела при create")
     ap.add_argument("--dry-run", action="store_true")
     args = ap.parse_args()
 
@@ -152,8 +155,11 @@ def main() -> None:
 
     token = args.token or get_token_from_az()
 
-    _, _, listing = request("GET", f"{API}/workspaces/{args.workspace}/semanticModels", token)
-    existing = next((i for i in listing.get("value", []) if i.get("displayName") == args.name), None)
+    if args.item_id:
+        existing = {"id": args.item_id}
+    else:
+        _, _, listing = request("GET", f"{API}/workspaces/{args.workspace}/semanticModels", token)
+        existing = next((i for i in listing.get("value", []) if i.get("displayName") == args.name), None)
 
     definition = {"parts": parts}
     if existing:
@@ -161,7 +167,8 @@ def main() -> None:
         print(f"\nЗнайдено наявну модель {item_id} — оновлюю визначення")
         status, headers, _ = request(
             "POST",
-            f"{API}/workspaces/{args.workspace}/semanticModels/{item_id}/updateDefinition?updateMetadata=True",
+            # updateMetadata не вмикаємо: .platform у parts не йде, оновлюємо лише визначення
+            f"{API}/workspaces/{args.workspace}/semanticModels/{item_id}/updateDefinition",
             token, {"definition": definition})
     else:
         print("\nМоделі з такою назвою немає — створюю")
