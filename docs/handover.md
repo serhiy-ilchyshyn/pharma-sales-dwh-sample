@@ -19,7 +19,7 @@
 | Джерело Azure SQL `erp` | 10 таблиць, наповнені `02_generate_data_fixed.sql`; догенерація — `02b_generate_more_data.sql` |
 | Bronze `lhbronze.erp_erp` | наливається pipeline'ом, дані на місці |
 | Silver `whsilver.dwh` | 34 таблиці, 28 view, SCD2 + SCD1, інкремент фактів — задеплоєно, працює |
-| Gold `whgold.dwh` | 6 вимірів + 7 агрегатів — задеплоєно, дані є |
+| Gold `whgold.dwh` | 6 вимірів + 7 агрегатів, дані є; `MonthStartDate` у місячних агрегатах заповнена, звʼязок із календарем перевірено |
 | Оркестрація | metadata-driven, pipeline'и в Fabric працюють |
 | Семантична модель | `PharmaSalesGold` працює у воркспейсі, Copilot відповідає на промпти. Створена вручну в UI + `deploy_semantic_model.py --item-id`, **у git ще не заведена** — наступний sync її прибере |
 
@@ -83,7 +83,7 @@ Bronze перезаписується повністю (`OverwriteSchema`), то
 
 | # | Що зробити | Деталі |
 |---|---|---|
-| 1 | **Задеплоїти `V260828.1000__gold_add_month_date_key.sql`** | додає `MonthStartDate`; далі `EXEC [dwh].[spGoldFullLoad]` у `whgold`. Без цієї колонки шість звʼязків семантичної моделі з календарем биті |
+| ~~1~~ | ~~`V260828.1000` + повний прогін gold~~ | **зроблено 02.09**: `MonthStartDate` заповнена в усіх 6 місячних агрегатах, `spGoldFullLoad` відпрацював усі 13 обʼєктів зі статусом Success (`LoadId = manual_after_month_date_key`) |
 | 2 | **Завести модель у git** | зараз вона існує лише у воркспейсі: закомітити `fabric-semantic-model/` у `main`, далі Source control. Інакше наступний `Update all` її знесе — так уже сталося 31.08 |
 | 3 | Перезалити `PL_Silver_Full_Load` | у Fabric лежить стара версія без параметра `root_object` — адресне перезавантаження там ще не працює |
 | 4 | Опублікувати `PL_Gold_Full_Load` | підставити `<WHGOLD_ITEM_ID>`; після публікації додати Invoke на нього в silver-пайплайн, щоб ланцюг закривався одним запуском |
