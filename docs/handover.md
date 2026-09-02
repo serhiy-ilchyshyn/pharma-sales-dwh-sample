@@ -8,7 +8,7 @@
 [`silver_model.md`](silver_model.md) · [`gold_model.md`](gold_model.md) ·
 [`semantic_model.md`](semantic_model.md) · [`silver_dependencies.md`](silver_dependencies.md) ·
 [`data_dictionary.md`](data_dictionary.md) · [`copilot_prompts.md`](copilot_prompts.md) ·
-[`scd1_demo.md`](scd1_demo.md) · [`er_diagram.md`](er_diagram.md) · [`../ddl/README.md`](../ddl/README.md)
+[`scd1_demo.md`](scd1_demo.md) · [`er_diagram.md`](er_diagram.md) · [`fabric_agent.md`](fabric_agent.md) · [`../ddl/README.md`](../ddl/README.md)
 
 ---
 
@@ -91,6 +91,7 @@ Bronze перезаписується повністю (`OverwriteSchema`), то
 | 6 | `flyway repair` | міграції `V260819.1020` і `V260820.0930` редагувалися після застосування — checksum розійшовся |
 | 7 | RLS у семантичній моделі | зараз усі бачать усі регіони |
 | 8 | Узгодити з власником bronze | два записувачі в ті самі таблиці — наш pipeline і `dpl-bronze-sql-load-full` |
+| 9 | Fabric data agent для демо «UseCase 8» | tenant settings + створення агента над `whgold` і семантичною моделлю — готова конфігурація в `fabric_agent.md` |
 
 ## 6. Як запустити з нуля
 
@@ -116,6 +117,8 @@ EXEC [dwh].[spGoldFullLoad] @load_id = 'init';
   silver нічого не викидає, а позначає.
 * **Copilot** — `copilot_prompts.md`, 50 перевірених питань і чесний список того, чого модель
   не вміє.
+* **Fabric data agent** — питання по warehouse і семантичній моделі одразу, з показом
+  згенерованого SQL; налаштування в `fabric_agent.md`.
 * **Журнали завантажень** — `EtlSilverLoadLog` / `EtlGoldLoadLog`: кожен рядок факту
   прив'язаний до `RunId` пайплайна через `CreatedBy`.
 

@@ -122,6 +122,7 @@ fabric-pipelines/
 **Стан проєкту, ідентифікатори середовища та відкриті пункти — [`docs/handover.md`](docs/handover.md).**
 
 Промпти для ad-hoc звітності в Copilot — [`docs/copilot_prompts.md`](docs/copilot_prompts.md),
+налаштування Fabric data agent — [`docs/fabric_agent.md`](docs/fabric_agent.md),
 семантична модель над gold — [`docs/semantic_model.md`](docs/semantic_model.md).
 Опис моделі, ER-схема, bus matrix, порядок завантаження та обробка дефектів джерела —
 [`docs/silver_model.md`](docs/silver_model.md). Gold-рівень — [`docs/gold_model.md`](docs/gold_model.md).
